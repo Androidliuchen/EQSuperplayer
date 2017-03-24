@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:gravity="center_vertical"
+    android:paddingBottom="10dp"
+    android:paddingRight="-90dp"
+    android:paddingTop="10dp">
+        <ImageView
+            android:id="@+id/iamge_pro"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/programe"/>
+        <TextView
+            android:id="@+id/tv_name_Re_left"
+            android:layout_width="340dp"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:text="节目"
+            android:textColor="#000"
+            android:textSize="16sp"
+            android:layout_alignTop="@+id/iamge_pro"
+            android:layout_toEndOf="@+id/iamge_pro" />
+
+    <TextView
+        android:id="@+id/prmDelete"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        android:background="@android:color/holo_red_light"
+        android:gravity="center"
+        android:text="删除"
+        android:textColor="@android:color/white"
+        android:textSize="15sp"
+        android:layout_alignBottom="@+id/tv_name_Re_left"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>
+

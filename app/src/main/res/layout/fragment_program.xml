@@ -1,0 +1,42 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.eq.EQSuperPlayer.fargament.ProgramFragment">
+
+        <com.eq.EQSuperPlayer.view.SlidingItemListView
+            xmlns:dyk="http://schemas.android.com/apk/res/com.eq.EQSuperPlayer"
+            android:id="@+id/program_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#fff4f7f9"
+            android:cacheColorHint="#00000000"
+            android:divider="#dddbdb"
+            android:dividerHeight="1dp"
+            app:mode="right"
+            dyk:right_width="120dp" />
+
+    <LinearLayout
+        android:id="@+id/myText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/noitem" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="没有找到任何设备^_^" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/iamge"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/add"
+        android:layout_gravity="right|bottom" />
+</FrameLayout>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/relt"
+    tools:context="com.eq.EQSuperPlayer.activity.ProgramActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/blud"
+        android:orientation="horizontal">
+
+
+        <ImageView
+            android:id="@+id/out_iamge"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:src="@drawable/button_return" />
+
+        <TextView
+            android:id="@+id/region_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="区域管理"
+            android:textColor="#fff"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/region_send"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:background="@drawable/button_down"
+            android:text="预览"
+            android:textColor="#fff"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/program_text_background"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
+        android:background="@drawable/program_shape"
+        android:clickable="true"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true">
+        <ViewFlipper
+            android:id="@+id/program_iamge"
+            android:clickable="true"
+            android:background="@color/gainsboro"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="87dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_gravity="bottom">
+
+        <Button
+            android:id="@+id/region"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_gravity="bottom"
+            android:background="@drawable/reg" />
+
+        <Button
+            android:id="@+id/region_program"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_above="@+id/linearLayout"
+            android:layout_alignParentStart="true"
+            android:layout_gravity="right|bottom"
+            android:background="@drawable/pro" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_alignBottom="@+id/region"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal|bottom"
+            android:background="@drawable/switch_off_bg"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/region_jia"
+                android:layout_width="28dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/magnify" />
+
+            <Button
+                android:id="@+id/region_jian"
+                android:layout_width="23dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="25dp"
+                android:background="@drawable/shrink" />
+        </LinearLayout>
+    </RelativeLayout>
+
+
+</RelativeLayout>
