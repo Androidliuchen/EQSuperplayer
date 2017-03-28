@@ -9,6 +9,7 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -32,7 +33,7 @@ import com.eq.EQSuperPlayer.utils.WindowSizeManager;
 import java.util.List;
 
 
-public class ProgramFragment extends Fragment implements View.OnClickListener {
+public class ProgramFragment extends Fragment implements View.OnClickListener, View.OnTouchListener {
     private EditText program_name;
     private TextView program_type;
     private EditText program_width;
@@ -65,6 +66,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
         mListView = (SlidingItemListView) view.findViewById(R.id.program_list);
         mListView.setEmptyView(view.findViewById(R.id.myText));
         mImageView.setOnClickListener(this);
+        mListView.setOnTouchListener(this);
         mProgramAdapter = new ProgramAdapter(getActivity(), areabeens);
         mListView.setAdapter(mProgramAdapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -121,6 +123,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
                         Toast.LENGTH_SHORT).show();
                 new AreabeanDao(getActivity()).delete(areabeens.get(position).getId());
                 areabeens.remove(position);
+                mListView.slideBack();
                 mProgramAdapter.notifyDataSetChanged();
             }
         });
@@ -284,6 +287,8 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
     private View getPopWindowView() {
 
         String IP = intToIp(dhcpInfo.dns1);
+        String port = intToIp(dhcpInfo.netmask);
+        Log.d("............", "port.........................." + port);
         View view = getActivity().getLayoutInflater().inflate(R.layout.add, null);
         program_name = (EditText) view.findViewById(R.id.progeam_name);
         program_type = (TextView) view.findViewById(R.id.progeam_type);
@@ -293,7 +298,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
         progeam_duan = (EditText) view.findViewById(R.id.progeam_duan);
         program_btn = (Button) view.findViewById(R.id.progeam_btn);
         program_ip.setText(IP);
-        progeam_duan.setText("5005");
+        progeam_duan.setText(port);
         program_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -347,4 +352,13 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
         return view;
     }
 
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        Log.e("onTouch==========", "onTouch");
+        if (mListView != null) {
+            mListView.mode = mListView.MODE_RIGHT;
+        }
+
+        return false;
+    }
 }

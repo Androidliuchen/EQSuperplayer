@@ -48,7 +48,6 @@ import com.eq.EQSuperPlayer.dao.ProgramBeanDao;
 import com.eq.EQSuperPlayer.dao.TextBeanDao;
 import com.eq.EQSuperPlayer.dao.TimeDao;
 import com.eq.EQSuperPlayer.dao.VedioDao;
-import com.eq.EQSuperPlayer.utils.AnimationManager;
 import com.eq.EQSuperPlayer.utils.AnimatorUtils;
 import com.eq.EQSuperPlayer.utils.AreaDrawText;
 import com.eq.EQSuperPlayer.utils.ProgramNameItemManager;
@@ -67,7 +66,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProgramActivity extends Activity implements View.OnClickListener {
+public class ProgramActivity extends Activity implements View.OnClickListener, View.OnTouchListener {
     private Button mProgram_image;
     private Button mJian;
     private ViewFlipper text_ima;
@@ -224,7 +223,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener {
                 String times = timeBean.getId() + ".............." + timeBean.getTimeToname();
                 Log.d("............", "times数值.........:" + times);
                 timeBean.setProgramBean(programBean);
-                timeBean.setType(Constant.AREA_TYPE_IMAGE);
+                timeBean.setType(Constant.AREA_TYPE_TIME);
                 totalBeens.add(timeBean);
             }
             //查询是否有视频
@@ -235,7 +234,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener {
                 String vedios = vedioBean.getId() + ".............." + vedioBean.getVedioName();
                 Log.d("............", "vedios数值.........:" + vedios);
                 vedioBean.setProgramBean(programBean);
-                vedioBean.setType(Constant.AREA_TYPE_IMAGE);
+                vedioBean.setType(Constant.AREA_TYPE_VIDEO);
                 totalBeens.add(vedioBean);
             }
         }
@@ -329,6 +328,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener {
     private View getTypeWindowListView() {
         View view = this.getLayoutInflater().inflate(R.layout.recry_itme, null);
         programListView = (ProgramListView) view.findViewById(R.id.program_listview);
+        programListView.setOnTouchListener(this);
         TextView textView = (TextView) view.findViewById(R.id.text_name);
         Button button = (Button) view.findViewById(R.id.pro_button);
         button.setOnClickListener(new View.OnClickListener() {
@@ -416,22 +416,25 @@ public class ProgramActivity extends Activity implements View.OnClickListener {
                     mDatas.remove(position);
                     totalBeens.remove(position);
                     new TextBeanDao(ProgramActivity.this).delete(textBean);
+                    programListView.slideBack();
                     recyclerViewAdapter.notifyDataSetChanged();
                 } else if (timeBean == totalBeens.get(position)) {
                     mDatas.remove(position);
                     totalBeens.remove(position);
                     new TimeDao(ProgramActivity.this).delete(timeBean);
+                    programListView.slideBack();
                     recyclerViewAdapter.notifyDataSetChanged();
                 } else if (imageBean == totalBeens.get(position)) {
                     mDatas.remove(position);
                     totalBeens.remove(position);
                     new ImageDao(ProgramActivity.this).delete(imageBean);
+                    programListView.slideBack();
                     recyclerViewAdapter.notifyDataSetChanged();
-
                 } else if (vedioBean == totalBeens.get(position)) {
                     mDatas.remove(position);
                     totalBeens.remove(position);
                     new VedioDao(ProgramActivity.this).delete(vedioBean);
+                    programListView.slideBack();
                     recyclerViewAdapter.notifyDataSetChanged();
                 }
                 showText();
@@ -467,8 +470,9 @@ public class ProgramActivity extends Activity implements View.OnClickListener {
                         break;
                     case Constant.AREA_TYPE_TIME:
                         intent = new Intent();
+                        TimeBean timeBean = (TimeBean) totalBeens.get(position);
                         intent.setClass(ProgramActivity.this, TimeActivity.class);
-                        intent.putExtra(Constant.PROGRAM_ID, selet);
+                        intent.putExtra(Constant.PROGRAM_ID, timeBean.getId());
                         startActivity(intent);
                         customTypeWindow.dismiss();
                         showText();
@@ -476,8 +480,9 @@ public class ProgramActivity extends Activity implements View.OnClickListener {
                         break;
                     case Constant.AREA_TYPE_VIDEO:
                         intent = new Intent();
+                        VedioBean vedioBean = (VedioBean) totalBeens.get(position);
                         intent.setClass(ProgramActivity.this, VedioActivity.class);
-                        intent.putExtra(Constant.PROGRAM_ID, selet);
+                        intent.putExtra(Constant.PROGRAM_ID, vedioBean.getId());
                         startActivity(intent);
                         showText();
                         customTypeWindow.dismiss();
@@ -493,6 +498,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener {
     public View getPopWindowListView() {
         View view = this.getLayoutInflater().inflate(R.layout.region_itme, null);
         regionListView = (SlidingItemListView) view.findViewById(R.id.program_listname);
+        regionListView.setOnTouchListener(this);
         regionListView.setEmptyView(view.findViewById(R.id.myText));
         TextView textView = (TextView) view.findViewById(R.id.text_name);
         textView.setText("节目名称");
@@ -507,6 +513,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener {
             @Override
             public void onRemoveItem(int position) {
                 ProgramBean programBean = (ProgramBean) tableBeens.get(position);
+                regionListView.slideBack();
                 new ProgramBeanDao(ProgramActivity.this).delete(programBean.getId());
                 tableBeens.remove(position);
                 textAdapter.notifyDataSetChanged();
@@ -798,7 +805,31 @@ public class ProgramActivity extends Activity implements View.OnClickListener {
                 if (iteratorText != null) {
                     while (iteratorText.hasNext()) {
                         textBean = iteratorText.next();
+                        serializer.startTag(null, "zone");
+                        serializer.attribute(null, "index", "0");
 
+                        serializer.startTag(null, "zonetype");
+                        serializer.text("file");
+                        serializer.endTag(null, "zonetype");
+
+                        serializer.startTag(null, "attribute");
+
+                        serializer.startTag(null, "x");
+                        serializer.text(String.valueOf(areabean.getArea_X()));
+                        serializer.endTag(null, "x");
+
+                        serializer.startTag(null, "y");
+                        serializer.text(String.valueOf(areabean.getArea_Y()));
+                        serializer.endTag(null, "y");
+
+                        serializer.startTag(null, "width");
+                        serializer.text(String.valueOf(textBean.getWidth()));
+                        serializer.endTag(null, "width");
+
+                        serializer.startTag(null, "heidht");
+                        serializer.text(String.valueOf(textBean.getHeidht()));
+                        serializer.endTag(null, "heidht");
+                        serializer.endTag(null, "attribute");
                         // 图片列表
                         List<String> imagePathList = new ArrayList<String>();
                         // 得到sd卡内image文件夹的路径   File.separator(/)
@@ -810,37 +841,11 @@ public class ProgramActivity extends Activity implements View.OnClickListener {
                         // 将所有的文件存入ArrayList中,并过滤所有图片格式的文件
                         for (int i = 0; i < files.length; i++) {
                             File file2 = files[i];
-                            serializer.startTag(null, "zone");
-                            serializer.attribute(null, "index", i + "");
-
-                            serializer.startTag(null, "zonetype");
-                            serializer.text("file");
-                            serializer.endTag(null, "zonetype");
-
-                            serializer.startTag(null, "attribute");
-
-                            serializer.startTag(null, "x");
-                            serializer.text(String.valueOf(areabean.getArea_X()));
-                            serializer.endTag(null, "x");
-
-                            serializer.startTag(null, "y");
-                            serializer.text(String.valueOf(areabean.getArea_Y()));
-                            serializer.endTag(null, "y");
-
-                            serializer.startTag(null, "width");
-                            serializer.text(String.valueOf(areabean.getWindowWidth()));
-                            serializer.endTag(null, "width");
-
-                            serializer.startTag(null, "heidht");
-                            serializer.text(String.valueOf(areabean.getWindowHeight()));
-                            serializer.endTag(null, "heidht");
-                            serializer.endTag(null, "attribute");
-
                             if (checkIsImageFile(file2.getPath())) {
                                 imagePathList.add(file2.getPath());
                                 String imageName = file2.getPath().substring(file2.getPath().lastIndexOf("/") + 1, file2.getPath().length());
                                 serializer.startTag(null, "file");
-                                serializer.attribute(null, "index", "");
+                                serializer.attribute(null, "index", i + "");
 
                                 serializer.startTag(null, "type");
                                 serializer.text("2");
@@ -875,9 +880,8 @@ public class ProgramActivity extends Activity implements View.OnClickListener {
                                 serializer.endTag(null, "file");
                                 Log.d("...............", "全部数据................:" + textBean.toString());
                             }
-                            serializer.endTag(null, "zone");
                         }
-
+                        serializer.endTag(null, "zone");
                     }
                 }
                 //生成图片xml
@@ -893,19 +897,19 @@ public class ProgramActivity extends Activity implements View.OnClickListener {
                         serializer.endTag(null, "zonetype");
                         serializer.startTag(null, "attribute");
                         serializer.startTag(null, "x");
-                        serializer.text(String.valueOf(areabean.getArea_X()));
+                        serializer.text(String.valueOf(imageBean.getIamgeX()));
                         serializer.endTag(null, "x");
 
                         serializer.startTag(null, "y");
-                        serializer.text(String.valueOf(areabean.getArea_Y()));
+                        serializer.text(String.valueOf(imageBean.getIamgeY()));
                         serializer.endTag(null, "y");
 
                         serializer.startTag(null, "width");
-                        serializer.text(String.valueOf(areabean.getWindowWidth()));
+                        serializer.text(String.valueOf(imageBean.getIamgeWidth()));
                         serializer.endTag(null, "width");
 
                         serializer.startTag(null, "heidht");
-                        serializer.text(String.valueOf(areabean.getWindowHeight()));
+                        serializer.text(String.valueOf(imageBean.getIamgeHeidht()));
                         serializer.endTag(null, "heidht");
                         serializer.endTag(null, "attribute");
                         // 图片列表
@@ -980,19 +984,19 @@ public class ProgramActivity extends Activity implements View.OnClickListener {
 
                         serializer.startTag(null, "attribute");
                         serializer.startTag(null, "x");
-                        serializer.text(String.valueOf(areabean.getArea_X()));
+                        serializer.text(String.valueOf(vedioBean.getVedioX()));
                         serializer.endTag(null, "x");
 
                         serializer.startTag(null, "y");
-                        serializer.text(String.valueOf(areabean.getArea_Y()));
+                        serializer.text(String.valueOf(vedioBean.getVedioY()));
                         serializer.endTag(null, "y");
 
                         serializer.startTag(null, "width");
-                        serializer.text(String.valueOf(areabean.getWindowWidth()));
+                        serializer.text(String.valueOf(vedioBean.getVedioWidth()));
                         serializer.endTag(null, "width");
 
                         serializer.startTag(null, "heidht");
-                        serializer.text(String.valueOf(areabean.getWindowHeight()));
+                        serializer.text(String.valueOf(vedioBean.getVedioHeidht()));
                         serializer.endTag(null, "heidht");
                         serializer.endTag(null, "attribute");
                         // 视频列表
@@ -1167,5 +1171,18 @@ public class ProgramActivity extends Activity implements View.OnClickListener {
             Toast.makeText(ProgramActivity.this, "生成失败！", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        Log.e("onTouch==========", "onTouch");
+        if (regionListView != null) {
+            regionListView.mode = regionListView.MODE_RIGHT;
+        }
+        if (programListView != null) {
+            programListView.mode = programListView.MODE_RIGHT;
+        }
+
+        return false;
     }
 }

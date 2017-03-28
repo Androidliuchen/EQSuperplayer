@@ -3,7 +3,7 @@
 
     <!--滑动删除-->
     <declare-styleable name="SlideMode">
-        <attr name="mode">
+        <attr name="modes">
             <enum name="forbid" value="0"></enum>
             <enum name="right" value="1"></enum>
         </attr>

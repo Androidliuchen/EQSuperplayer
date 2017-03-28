@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.os.Environment;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
@@ -29,7 +28,11 @@ import com.eq.EQSuperPlayer.communication.InterfaceConnect;
 import com.eq.EQSuperPlayer.communication.SendPacket;
 import com.eq.EQSuperPlayer.custom.Constant;
 import com.eq.EQSuperPlayer.custom.CustomPopWindow;
+import com.eq.EQSuperPlayer.fargament.LeftFragment;
 import com.eq.EQSuperPlayer.fargament.ProgramFragment;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
+import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,7 +46,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends FragmentActivity implements View.OnClickListener {
+public class MainActivity extends SlidingFragmentActivity implements View.OnClickListener {
     private FragmentManager mFragmentManager;
     private RadioGroup radioGroup;
     private Button mSend;
@@ -93,7 +96,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private int endLeng = 0;//最后一小包的长度
     private int EORRE_COUNT = 1;//错误次数
     private ExecutorService cachedThreadPool = Executors.newCachedThreadPool();//线程池
-    //    private ExecutorService cachedThreadPool = Executors.newFixedThreadPool(2);
     private int resourcesIndex = 0;
 
     @Override
@@ -101,7 +103,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         setContentView(R.layout.activity_main);
-//        setContentView(R.layout.fragment_main);
+        initSlidingMenu(savedInstanceState);
         mSend = (Button) findViewById(R.id.send);
         topButton = (ImageView) findViewById(R.id.topButton);
         topButton.setOnClickListener(this);
@@ -132,6 +134,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 0:
+                    countOrAdress = 0;
+                    manyStratIndex = 0;
+                    resourcesIndex = 0;
+                    countAdress = 0;//当前发送的长度
+                    manyAllConten = 0;//总包数
+                    sendLeng = 0;
+                    sendConten = 0;
                     String paths = progrmae.get(resourcesIndex);
                     File file = new File(paths);
                     try {
@@ -139,6 +148,9 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                         byte[] buffer = new byte[is.available()];
                         Log.d("...", "buffer.length....." + buffer.length);
                         is.read(buffer);
+                        if (buffer.length < DATA_MAX_SIZE) {
+
+                        }
                         int endXMLlen = DATA_MAX_SIZE;
                         int xmlCount = buffer.length / DATA_MAX_SIZE;//xml数据可以分为多少个1024包
                         if (buffer.length % DATA_MAX_SIZE > 0) {
@@ -146,11 +158,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                             endXMLlen = buffer.length % DATA_MAX_SIZE;
                         }
                         List<byte[]> cutXml = new ArrayList<byte[]>();
-                        byte[] xmlData = new byte[DATA_MAX_SIZE];
+                        byte[] xmlData;
                         for (int i = 0; i < xmlCount; i++) {
                             if (i == xmlCount - 1) {
+                                xmlData = new byte[endXMLlen];
                                 System.arraycopy(buffer, i * DATA_MAX_SIZE, xmlData, 0, endXMLlen);
                             } else {
+                                xmlData = new byte[DATA_MAX_SIZE];
                                 System.arraycopy(buffer, i * DATA_MAX_SIZE, xmlData, 0, DATA_MAX_SIZE);
                             }
                             byte[] proBytes = SendPacket.prepareSendDataPkg(xmlData, i);
@@ -166,7 +180,14 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                             @Override
                             public void failure(int stateCode) {
                                 start = 1;
-                                handler.sendEmptyMessage(1);
+                                if (EORRE_COUNT == 3) {
+                                    handler.sendEmptyMessage(1);
+                                    EORRE_COUNT = 1;
+                                } else {
+                                    handler.sendEmptyMessage(0);
+                                    EORRE_COUNT++;
+                                }
+
                             }
 
                             @Override
@@ -196,7 +217,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                             if (start == 0) {
                                 handler.sendEmptyMessage(3);
                             } else if (start == 8) {
-                                Log.d("....", "imageAllSize11111" + imageAllSize);
+                                Log.d("....", "imageAllSize88888" + imageAllSize);
                                 if (resourcesIndex < imageAllSize) {
                                     resourcesIndex++;
                                     countOrAdress = 0;
@@ -208,7 +229,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                             } else if (start == 6) {
                                 Log.d("....", "countAdress" + countAdress);
                                 Log.d("....", "AllSize" + AllSize);
-                                if (countAdress == AllSize - 1) {
+                                if (countAdress == AllSize) {
                                     Log.d("....", "imageAllSize11111" + imageAllSize);
                                     Log.d("....", "resourcesIndex2222222" + resourcesIndex);
                                     if (resourcesIndex == imageAllSize - 1) {
@@ -253,6 +274,12 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     ccc = new ConnectControlCard(controlData, new InterfaceConnect() {
                         @Override
                         public void success(byte[] result) {
+                            countOrAdress = 0;
+                            manyStratIndex = 0;
+                            countAdress = 0;//当前发送的长度
+                            manyAllConten = 0;//总包数
+                            sendLeng = 0;
+                            sendConten = 0;
                             start = 3;
                             handler.sendEmptyMessage(6);
                             isSuee = true;
@@ -299,7 +326,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     Log.d("......", "countAdress2222222:" + countAdress);
                     Log.d("......", "resourcesIndex6666666:" + resourcesIndex);
                     List<byte[]> manyData = new ArrayList<byte[]>();
-                    String pathData = progrmae.get(resourcesIndex);
+                    String pathData = progrmae.get(resourcesIndex + 1);
                     File files = new File(pathData);
                     try {
                         FileInputStream ism = new FileInputStream(files);
@@ -363,7 +390,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                             });
                             cachedThreadPool.execute(ccc);
                         } else if (countOrAdress == manyAllConten - 2) {
-                            if (MULTI_PACKAGE_MIN_COUNT < sendConten) {
+                            if (MULTI_PACKAGE_MIN_COUNT <= sendConten) {
                                 Log.d("最后一包当前位置", "manyStratIndex....." + manyStratIndex);
                                 Log.d("最后一包当前位置", "sendConten....." + sendConten);
                                 byte[] manySendStart = SendPacket.manyPakStart(manyStratIndex, sendConten * DATA_MAX_SIZE, sendConten, DATA_MAX_SIZE);
@@ -389,13 +416,14 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                                 cachedThreadPool.execute(ccc);
 
                             } else {
-                                arrays = arr.subList(countAdress, AllSize - 1);
+                                arrays = arr.subList(countAdress, AllSize);
                                 List<byte[]> simallData = new ArrayList<byte[]>();
                                 for (int i = 0; i < arrays.size(); i++) {
                                     byte[] arrData = arrays.get(i);
                                     byte[] iangeData = SendPacket.prepareSendDataPkg(arrData, i);
                                     simallData.add(iangeData);
                                     countAdress++;
+                                    Log.d("countAdress....",countAdress +"");
                                 }
                                 ccc = new ConnectControlCard(simallData, new InterfaceConnect() {
                                     @Override
@@ -417,10 +445,14 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                                     }
                                 });
                                 cachedThreadPool.execute(ccc);
+                                countOrAdress += 1;
+
                             }
                         } else {
+                            Log.d("......", "countAdress1111111111:" + countAdress);
+                            Log.d("......", "arr1111111111:" + arr);
                             arrays = new ArrayList<byte[]>();
-                            arrays.add(arr.get(countAdress));
+                            arrays.add(arr.get(countAdress - 1));
                             countAdress++;
                             List<byte[]> simallData = new ArrayList<byte[]>();
                             for (int i = 0; i < arrays.size(); i++) {
@@ -659,77 +691,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     }
 
-    /**
-     * <p>拆分文件</p>
-     *
-     * @param file 源文件
-     * @throws Exception
-     */
-
-    public void split(String file) throws Exception {
-        RandomAccessFile raf = new RandomAccessFile(new File(file), "r");
-        long length = raf.length();
-        int count = (int) (length / Constant.DATA_SPLIT);
-        long theadMaxSize = length / count; //每份的大小 1024 * 1000L;
-        raf.close();
-        long offset = 0L;
-        for (int i = 0; i < count - 1; i++) {//这里不去处理最后一份
-            long fbegin = offset;
-            long fend = (i + 1) * theadMaxSize;
-            offset = write(file, i, fbegin, fend);
-        }
-        if (length - offset > 0) //将剩余的都写入最后一份
-            write(file, count - 1, offset, length);
-    }
-
-    /**
-     * <p>指定每份文件的范围写入不同文件</p>
-     *
-     * @param file  源文件
-     * @param index 文件顺序标识
-     * @param begin 开始指针位置
-     * @param end   结束指针位置
-     * @return
-     * @throws Exception
-     */
-    private long write(String file, long index, long begin, long end) throws Exception {
-        RandomAccessFile in = new RandomAccessFile(new File(file), "r");
-        RandomAccessFile out = new RandomAccessFile(new File(file + "_" + index + ".tmp"), "rw");
-        byte[] b = new byte[1024];
-        int n = 0;
-        in.seek(begin);//从指定位置读取
-
-        while (in.getFilePointer() <= end && (n = in.read(b)) != -1) {
-            out.write(b, 0, n);
-        }
-        long endPointer = in.getFilePointer();
-        in.close();
-        out.close();
-        return endPointer;
-    }
-
-    public void manyPak(List<byte[]> arr) {
-    }
-
-    /**
-     * 检查扩展名，得到图片格式的文件
-     *
-     * @param fName 文件名
-     */
-    @SuppressLint("DefaultLocale")
-    private boolean checkIsImageFile(String fName) {
-        boolean isImageFile = false;
-        // 获取扩展名
-        String FileEnd = fName.substring(fName.lastIndexOf(".") + 1,
-                fName.length()).toLowerCase();
-        if (FileEnd.equals("jpg") || FileEnd.equals("png") || FileEnd.equals("gif")
-                || FileEnd.equals("jpeg") || FileEnd.equals("bmp")) {
-            isImageFile = true;
-        } else {
-            isImageFile = false;
-        }
-        return isImageFile;
-    }
 
     public View getPopWindowListView() {
         List<Areabean> areabeens = new ArrayList<Areabean>();
@@ -740,6 +701,58 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         mListView.setAdapter(mSendAdapter);
 
         return null;
+    }
+
+    /**
+     * 初始化侧边栏
+     */
+    private void initSlidingMenu(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {//== null的时候新建MainFragment
+            mContent = new ProgramFragment();
+        } else {//不等于null，直接get出来
+            //不等于null，找出之前保存的当前Activity显示的Fragment
+            mContent = getSupportFragmentManager().getFragment(savedInstanceState, "mContent");
+        }
+        //设置内容Fragment
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment, mContent)
+                .commit();
+        // 设置侧面隐藏的布局
+        setBehindContentView(R.layout.menu_frame_left);
+        // 增加碎片
+        final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
+        //监听点击按钮事件,实现不同Fragment之间的切换
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                Fragment fragment = FragmentFactory.getInstanceByIndex(checkedId);
+                ft.replace(R.id.fragment, fragment);
+                ft.commit();
+            }
+        });
+        LeftFragment leftFragment = new LeftFragment();
+        ft.replace(R.id.menu_frame, leftFragment);
+        ft.commit();
+
+        // 实例化滑动菜单对象
+        SlidingMenu sm = getSlidingMenu();
+        // 设置可以左右滑动的菜单
+        sm.setMode(SlidingMenu.LEFT);
+        // 设置滑动阴影的宽度
+        sm.setShadowWidthRes(R.dimen.shadow_width);
+        // 设置滑动菜单阴影的图像资源
+        sm.setShadowDrawable(null);
+        // 设置滑动菜单视图的宽度
+        sm.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+        // 设置渐入渐出效果的值
+        sm.setFadeDegree(0.35f);
+        // 设置触摸屏幕的模式,这里设置为全屏
+        sm.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+        // 设置下方视图的在滚动时的缩放比例
+        sm.setBehindScrollScale(0.0f);
+
     }
 
     /**
@@ -781,6 +794,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.topButton:
+                toggle();
                 break;
             case R.id.send:
                 Sendprogram();

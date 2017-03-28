@@ -21,7 +21,7 @@ public class ProgramListView extends ListView {
     /** 从右向左滑出菜单模式 */
     public static int MODE_RIGHT = 1;
     /** 当前的模式 */
-    private int mode = MODE_FORBID;
+    public int mode = MODE_FORBID;
     /** 右侧菜单的长度 */
     private int rightLength = 0;
 
@@ -67,14 +67,14 @@ public class ProgramListView extends ListView {
         this(context, attrs, 0);
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.SlideMode);
-        mode = a.getInt(R.styleable.SlideMode_mode, 0);
+        mode = a.getInt(R.styleable.SlideMode_modes, 0);
     }
 
     public ProgramListView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.SlideMode);
-        mode = a.getInt(R.styleable.SlideMode_mode, 0);
+        mode = a.getInt(R.styleable.SlideMode_modes, 0);
         scroller = new Scroller(context);
         mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
     }

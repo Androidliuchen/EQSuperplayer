@@ -1,11 +1,18 @@
 package com.eq.EQSuperPlayer.fargament;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.eq.EQSuperPlayer.R;
+import com.eq.EQSuperPlayer.SlidingMenuActivity.AboutActivity;
+import com.eq.EQSuperPlayer.SlidingMenuActivity.BrightnessActivity;
+import com.eq.EQSuperPlayer.SlidingMenuActivity.CorrectionActivity;
+import com.eq.EQSuperPlayer.SlidingMenuActivity.LanguageActivity;
+import com.eq.EQSuperPlayer.SlidingMenuActivity.OpenActivity;
+import com.eq.EQSuperPlayer.SlidingMenuActivity.WIFIActivity;
 
 public class LeftFragment extends Fragment implements View.OnClickListener {
     private View todayView;
@@ -53,32 +60,30 @@ public class LeftFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        Fragment newContent = null;
-        String title = null;
+        Intent intent = new Intent();
         switch (v.getId()) {
             case R.id.tvToday: // 开关屏幕
-                newContent = new OpenFragment();
-                title = getString(R.string.today);
+                intent.setClass(getActivity(), OpenActivity.class);
+                startActivity(intent);
                 break;
             case R.id.tvLastlist:// 调节亮度
-                newContent = new LastListFragment();
-                title = getString(R.string.lastList);
-                break;
+                intent.setClass(getActivity(), BrightnessActivity.class);
+                startActivity(intent);
             case R.id.tvDiscussMeeting: // 校正时间
-                newContent = new DiscussFragment();
-                title = getString(R.string.discussMeetting);
+                intent.setClass(getActivity(), CorrectionActivity.class);
+                startActivity(intent);
                 break;
             case R.id.tvMyFavorites: // WiFi设置
-                newContent = new MyFavoritesFragment();
-                title = getString(R.string.myFavorities);
+                intent.setClass(getActivity(), WIFIActivity.class);
+                startActivity(intent);
                 break;
             case R.id.tvMyComments: // 语言
-                newContent = new MyCommentsFragment();
-                title = getString(R.string.myComments);
+                intent.setClass(getActivity(), LanguageActivity.class);
+                startActivity(intent);
                 break;
             case R.id.tvMySettings: // 关于
-                newContent = new MySettingsFragment();
-                title = getString(R.string.settings);
+                intent.setClass(getActivity(), AboutActivity.class);
+                startActivity(intent);
                 break;
             default:
                 break;

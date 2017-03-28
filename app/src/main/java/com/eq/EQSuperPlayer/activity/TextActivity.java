@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -237,7 +238,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
 
     public Bitmap drawBitmap() {
         Paint paint = new Paint();
-        paint.setTextSize(textBean.getStSize());
+        paint.setTextSize(textBean.getStSize() + 3);
         String text = editText.getText().toString();
         textWidth = paint.measureText(text);
         textWidths = Integer.parseInt(STWidth.getText().toString());//文本框输入的长度
@@ -289,20 +290,20 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
             paint.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
         }
         Canvas canvas = new Canvas(bitmap); // 创建画布
-        canvas.drawColor(number_colors[1]);
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         canvas.drawText(text, 0, textBean.getHeidht() / 2, paint);
-        Paint paint1 = new Paint();
-        //给边框设置颜色
-        paint1.setColor(number_colors[0]);
-        //上
-        canvas.drawLine(0, 0, textWidth - 1, 0, paint1);
-        //左
-        canvas.drawLine(0, 0, 0, textHeight - 1, paint1);
-        //下
-        canvas.drawLine(0, textHeight - 1, textWidth - 1, textHeight - 1, paint1);
-        //右
-        canvas.drawLine(textWidth - 1, 0, textWidth - 1, textHeight - 1, paint1);
-        Log.d(".......", "Bitmap宽度........." + bitmap.getWidth());
+//        Paint paint1 = new Paint();
+//        //给边框设置颜色
+//        paint1.setColor(number_colors[0]);
+//        //上
+//        canvas.drawLine(0, 0, textWidth - 1, 0, paint1);
+//        //左
+//        canvas.drawLine(0, 0, 0, textHeight - 1, paint1);
+//        //下
+//        canvas.drawLine(0, textHeight - 1, textWidth - 1, textHeight - 1, paint1);
+//        //右
+//        canvas.drawLine(textWidth - 1, 0, textWidth - 1, textHeight - 1, paint1);
+//        Log.d(".......", "Bitmap宽度........." + bitmap.getWidth());
 
 
         return bitmap;
