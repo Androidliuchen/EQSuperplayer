@@ -43,8 +43,10 @@ public class ImageBean extends TotalBean {
     @DatabaseField(columnName = "iamgeClearspeed")
     public int iamgeClearspeed;  //清场速度
     @DatabaseField(columnName = "iamgeandtime")
-    public int iamgeandtime;  //停留时间
+    public int iamgeandtime = 5;  //停留时间
     public List<String> iamgeId = new ArrayList<String>();
+    @DatabaseField(columnName = "path")
+    public String path; //图片路径
     public int getId() {
         return id;
     }
@@ -165,13 +167,12 @@ public class ImageBean extends TotalBean {
         this.iamgeId = iamgeId;
     }
 
-//    public byte[] getImageBytes() {
-//        return imageBytes;
-//    }
-//
-//    public void setImageBytes(byte[] imageBytes) {
-//        this.imageBytes = imageBytes;
-//    }
+    public String getPath() {
+        return path;
+    }
+    public void setPath(String path) {
+        this.path = path;
+    }
 
     @Override
     public String toString() {

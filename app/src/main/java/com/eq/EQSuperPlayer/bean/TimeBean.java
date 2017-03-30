@@ -113,7 +113,7 @@ public class TimeBean extends TotalBean{
 
     @DatabaseField(columnName = "fenbiaoshape")
     private int fenbiaoshape;
-//    private EQ_DateFile_Asc[] asc;
+    private EQ_DateFile_Asc[] asc;
 
     public int getId() {
         return id;
@@ -513,6 +513,15 @@ public class TimeBean extends TotalBean{
     public void setFenbiaoshape(int fenbiaoshape) {
         this.fenbiaoshape = fenbiaoshape;
     }
+
+    public EQ_DateFile_Asc[] getAsc() {
+        return asc;
+    }
+
+    public void setAsc(EQ_DateFile_Asc[] asc) {
+        this.asc = asc;
+    }
+
     /**
      * 把  年月日是否显示的 string 切割成int[]  0不显示，1显示
      */

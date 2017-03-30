@@ -37,7 +37,7 @@
             android:layout_height="60dp"
             android:gravity="center_vertical"
             android:textSize="20sp"
-            android:text="未连接"/>
+            android:text="@string/network_no_connection"/>
 
 
             <ListView
@@ -58,7 +58,7 @@
             android:layout_gravity="center"
             android:background="@drawable/screen_button"
             android:textSize="20dp"
-            android:text="搜索附近WiFi"/>
+            android:text="@string/network_search_wifi"/>
     </LinearLayout>
 
 

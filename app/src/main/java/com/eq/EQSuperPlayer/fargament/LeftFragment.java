@@ -17,10 +17,7 @@ import com.eq.EQSuperPlayer.SlidingMenuActivity.WIFIActivity;
 public class LeftFragment extends Fragment implements View.OnClickListener {
     private View todayView;
     private View lastListView;
-    private View discussView;
-    private View favoritesView;
     private View commentsView;
-    private View settingsView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,17 +32,11 @@ public class LeftFragment extends Fragment implements View.OnClickListener {
     public void findViews(View view) {
         todayView = view.findViewById(R.id.tvToday);
         lastListView = view.findViewById(R.id.tvLastlist);
-        discussView = view.findViewById(R.id.tvDiscussMeeting);
-        favoritesView = view.findViewById(R.id.tvMyFavorites);
         commentsView = view.findViewById(R.id.tvMyComments);
-        settingsView = view.findViewById(R.id.tvMySettings);
 
         todayView.setOnClickListener(this);
         lastListView.setOnClickListener(this);
-        discussView.setOnClickListener(this);
-        favoritesView.setOnClickListener(this);
         commentsView.setOnClickListener(this);
-        settingsView.setOnClickListener(this);
     }
 
     @Override
@@ -69,20 +60,8 @@ public class LeftFragment extends Fragment implements View.OnClickListener {
             case R.id.tvLastlist:// 调节亮度
                 intent.setClass(getActivity(), BrightnessActivity.class);
                 startActivity(intent);
-            case R.id.tvDiscussMeeting: // 校正时间
-                intent.setClass(getActivity(), CorrectionActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.tvMyFavorites: // WiFi设置
-                intent.setClass(getActivity(), WIFIActivity.class);
-                startActivity(intent);
-                break;
             case R.id.tvMyComments: // 语言
                 intent.setClass(getActivity(), LanguageActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.tvMySettings: // 关于
-                intent.setClass(getActivity(), AboutActivity.class);
                 startActivity(intent);
                 break;
             default:

@@ -2,10 +2,12 @@ package com.eq.EQSuperPlayer.utils;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
 import android.util.Log;
 
 import com.eq.EQSuperPlayer.bean.Areabean;
 import com.eq.EQSuperPlayer.bean.ImageBean;
+import com.eq.EQSuperPlayer.bean.ImagePath;
 import com.eq.EQSuperPlayer.bean.ProgramBean;
 import com.eq.EQSuperPlayer.bean.TextBean;
 import com.eq.EQSuperPlayer.bean.TimeBean;
@@ -20,11 +22,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
-    private static final String TABLE_NAME = "sqlite-EQ.db";
+    public static final String TABLE_NAME =  "EQ.db";
 
     private Map<String, Dao> daos = new HashMap<String, Dao>();
 
-    private DatabaseHelper(Context context) {
+    public DatabaseHelper(Context context) {
         super(context, TABLE_NAME, null, 4);
     }
 
@@ -38,6 +40,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.createTable(connectionSource, ImageBean.class);
             TableUtils.createTable(connectionSource, TimeBean.class);
             TableUtils.createTable(connectionSource, VedioBean.class);
+            TableUtils.createTable(connectionSource, ImagePath.class);
         } catch (SQLException e) {
             Log.e(DatabaseHelper.class.getName(), "创建数据库失败", e);
             e.printStackTrace();
@@ -54,6 +57,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.dropTable(connectionSource, ImageBean.class, true);
             TableUtils.dropTable(connectionSource, TimeBean.class, true);
             TableUtils.dropTable(connectionSource, VedioBean.class, true);
+            TableUtils.dropTable(connectionSource, ImagePath.class, true);
             onCreate(database, connectionSource);
         } catch (SQLException e) {
             Log.e(DatabaseHelper.class.getName(), "更新数据库失败", e);

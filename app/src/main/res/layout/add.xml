@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="20sp"
-        android:text="添加节目"/>
+        android:text="@string/addprogram"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -32,7 +32,7 @@
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:textSize="20sp"
-            android:text="节目名称"/>
+            android:text="@string/addprogram_name"/>
 
         <EditText
             android:id="@+id/progeam_name"
@@ -43,7 +43,7 @@
             android:gravity="center"
             android:background="@null"
             android:textColor="@color/royalblue"
-            android:hint="新节目"/>
+            android:hint="@string/addprogram_new_name"/>
     </LinearLayout>
     <View
         android:layout_width="match_parent"
@@ -61,7 +61,7 @@
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:textSize="20sp"
-            android:text="节目类型"/>
+            android:text="@string/the_programme"/>
         <TextView
             android:id="@+id/progeam_type"
             android:layout_width="match_parent"
@@ -88,7 +88,7 @@
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:textSize="20sp"
-            android:text="宽        度"/>
+            android:text="@string/text_parameters_w"/>
 
         <EditText
             android:id="@+id/progeam_width"
@@ -116,7 +116,7 @@
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:textSize="20sp"
-            android:text="高        度"/>
+            android:text="@string/text_parameters_h"/>
 
         <EditText
             android:id="@+id/progeam_height"
@@ -143,7 +143,7 @@
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:textSize="20sp"
-            android:text="IP  地  址"/>
+            android:text="@string/hardware_ip"/>
 
         <EditText
             android:id="@+id/progeam_ip"
@@ -170,7 +170,7 @@
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:textSize="20sp"
-            android:text="端  口  号"/>
+            android:text="@string/hardware_port"/>
 
         <EditText
             android:id="@+id/progeam_duan"
@@ -195,5 +195,5 @@
         android:layout_gravity="center"
         android:layout_marginTop="15dp"
         android:textSize="20sp"
-        android:text="确定"/>
+        android:text="@string/submit"/>
 </LinearLayout>

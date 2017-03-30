@@ -26,11 +26,12 @@ import com.eq.EQSuperPlayer.adapter.SpinnerAdapter;
 import com.eq.EQSuperPlayer.adapter.SpinnerImageAdapter;
 import com.eq.EQSuperPlayer.bean.Areabean;
 import com.eq.EQSuperPlayer.bean.ImageBean;
+import com.eq.EQSuperPlayer.bean.ImagePath;
 import com.eq.EQSuperPlayer.bean.ProgramBean;
 import com.eq.EQSuperPlayer.custom.Constant;
 import com.eq.EQSuperPlayer.dao.ImageDao;
+import com.eq.EQSuperPlayer.dao.ImagePathDao;
 import com.eq.EQSuperPlayer.dao.ProgramBeanDao;
-import com.eq.EQSuperPlayer.dao.TextBeanDao;
 import com.eq.EQSuperPlayer.imageutils.GlideLoader;
 import com.eq.EQSuperPlayer.imageutils.SpacesItemDecoration;
 import com.eq.EQSuperPlayer.utils.WindowSizeManager;
@@ -79,7 +80,7 @@ public class ImageActivity extends Activity {
     @BindView(R.id.IMClearSpeed)
     Spinner IMClearSpeed;
     @BindView(R.id.IMStandtime)
-    Spinner IMStandtime;
+    EditText IMStandtime;
     @BindView(R.id.iam_btn)
     ImageView iamBtn;
     @BindView(R.id.rvResultPhoto)
@@ -88,14 +89,14 @@ public class ImageActivity extends Activity {
     TextView imageTitle;
     private PhotoAdapter photoAdapter;
     private List<ProgramBean> programBeens;
-    private ArrayList<String> paths = new ArrayList<>();
+    private List<ImagePath> paths = new ArrayList<>();
     private ImageBean imageBean;
     private ProgramBean programBean;
-    private Areabean areabean = new Areabean();
     private WindowSizeManager windowSizeManager;
     private int windowWidth;
     private int windowHeight;
-
+    private int text_id;
+    private ImagePath imagePath = new ImagePath();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,15 +108,22 @@ public class ImageActivity extends Activity {
         rvResultPhoto.setPadding(8, 8, 8, 8);
         //3.为recyclerView设置布局管理器
         //设置item之间的间隔
+
+        if(imagePath.getPath() != null){
+            imagePath = new ImagePathDao(this).get(text_id);
+            paths.add(imagePath);
+        }
         rvResultPhoto.setLayoutManager(staggeredGridLayoutManager);
         SpacesItemDecoration decoration = new SpacesItemDecoration(8);
         rvResultPhoto.addItemDecoration(decoration);
         photoAdapter = new PhotoAdapter(this, paths);
         rvResultPhoto.setAdapter(photoAdapter);
+        photoAdapter.notifyDataSetChanged();
+
     }
 
     private void initData() {
-        int text_id = getIntent().getIntExtra(Constant.PROGRAM_ID, -1);
+        text_id = getIntent().getIntExtra(Constant.PROGRAM_ID, -1);
         imageBean = new ImageDao(this).get(text_id);
         programBean = new ProgramBeanDao(this).get(ProgramActivity.selet);
         imageTitle.setText(programBean.getName());
@@ -125,15 +133,21 @@ public class ImageActivity extends Activity {
         windowWidth = windowSizeManager.getWindowWidth();
         windowHeight = windowSizeManager.getWindowHeight();
         // 图片窗宽高
-        if (areabean.getWindowWidth() != 0) {
-            IMWidth.setText(areabean.getWindowWidth() + "");
-            IMHeigth.setText(areabean.getWindowHeight() + "");
+        if (imageBean.getIamgeWidth() != 0) {
+            IMWidth.setText(imageBean.getIamgeWidth() + "");
+            IMHeigth.setText(imageBean.getIamgeHeidht() + "");
         } else {
             IMWidth.setText(windowWidth + "");
             IMHeigth.setText(windowHeight + "");
         }
-        IMx.setText(0 + "");
-        IMy.setText(0 + "");
+        if (imageBean.getIamgeX() != 0){
+            IMx.setText(imageBean.getIamgeX() + "");
+            IMy.setText(imageBean.getIamgeY() + "");
+        }else {
+            IMx.setText(0 + "");
+            IMy.setText(0 + "");
+        }
+
         TypedArray typedArray = this.getResources().obtainTypedArray(R.array.textcolor);
         int[] color_id = new int[typedArray.length()];
         for (int i = 0; i < typedArray.length(); i++) {
@@ -158,8 +172,8 @@ public class ImageActivity extends Activity {
         IMClearSpeed.setAdapter(new SpinnerAdapter(this, this.getResources().getStringArray(R.array.clearspeed)));
         IMClearSpeed.setSelection((int) imageBean.getIamgeClearspeed());
         //停留时间
-        IMStandtime.setAdapter(new SpinnerAdapter(this, this.getResources().getStringArray(R.array.clearspeed)));
-        IMStandtime.setSelection(imageBean.getIamgeandtime());
+
+        IMStandtime.setText(imageBean.getIamgeandtime() + "");
 
     }
     public void imageSave(){
@@ -168,10 +182,10 @@ public class ImageActivity extends Activity {
                     && Integer.parseInt(IMHeigth.getText().toString()) + Integer.parseInt(IMy.getText().toString()) <= windowHeight) {
                 imageBean.setIamgeWidth(Integer.parseInt(IMWidth.getText().toString()));
                 imageBean.setIamgeHeidht(Integer.parseInt(IMHeigth.getText().toString()));
-                areabean.setArea_X(Integer.parseInt(IMx.getText().toString()));
-                areabean.setArea_Y(Integer.parseInt(IMy.getText().toString()));
+                imageBean.setIamgeX(Integer.parseInt(IMx.getText().toString()));
+                imageBean.setIamgeY(Integer.parseInt(IMy.getText().toString()));
             } else {
-                Toast.makeText(this, "参数超出边界，请重新设置", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getResources().getText(R.string.program_area_reset), Toast.LENGTH_SHORT).show();
             }
         } catch (NumberFormatException exception) {
         }
@@ -182,7 +196,7 @@ public class ImageActivity extends Activity {
         imageBean.setIamgeCleartrick(IMClear.getSelectedItemPosition());
         imageBean.setIamgeEnterspeed(IMSpeed.getSelectedItemPosition());
         imageBean.setIamgeEntertrick(IMTick.getSelectedItemPosition());
-        imageBean.setIamgeandtime(IMStandtime.getSelectedItemPosition());
+        imageBean.setIamgeandtime(Integer.parseInt(IMStandtime.getText().toString()));
         new ImageDao(this).update(imageBean);
     }
     public static final int REQUEST_CODE = 1000;
@@ -197,15 +211,15 @@ public class ImageActivity extends Activity {
                 break;
             case R.id.image_send://提交数据，同时将数据写入数据库，以供节目显示用。
                 imageSave();
-                ArrayList<String> bitmaps = new ArrayList<String>();
-                bitmaps.addAll(paths);
-                Log.d(".................","bitmaps的数据是否改变..........:" + bitmaps.toString());
                 Intent intent1 = new Intent(ImageActivity.this,ProgramActivity.class);
-                intent1.putStringArrayListExtra("infoList", bitmaps);
                 startActivity(intent1);
                 ImageActivity.this.finish();
                 break;
             case R.id.iam_btn://图片添加按钮，点击跳转到图片添加界面。
+                ArrayList<String> imagePath = new ArrayList<>();
+                for (ImagePath imagePath1 : paths){
+                    imagePath.add(imagePath1.getPath());
+                }
                 ImageConfig imageConfig = new ImageConfig.Builder(
                         // GlideLoader 可用自己用的缓存库
                         new GlideLoader())
@@ -223,7 +237,7 @@ public class ImageActivity extends Activity {
                         // 多选时的最大数量   （默认 9 张）
                         .mutiSelectMaxSize(9)
                         // 已选择的图片路径
-                        .pathList(paths)
+                        .pathList(imagePath)
                         // 拍照后存放的图片路径（默认 /temp/picture）
                         .filePath("/ImageSelector/Pictures")
                         // 开启拍照功能 （默认开启）
@@ -242,6 +256,12 @@ public class ImageActivity extends Activity {
             ArrayList<String> iamgID = new ArrayList<String>();
             for (String path : pathList) {
                 Log.i("ImagePathList", path);
+                imagePath.setPath(path);
+                imagePath.setProgramBean(programBean);
+                imagePath.setImageBean(imageBean);
+//                new ImagePathDao(ImageActivity.this).add(imagePath);
+                paths.add(imagePath);
+                Log.d("............", "paths............" + paths);
                 String imageName = path.substring(path.lastIndexOf("/") + 1, path.length());
                 Log.d("............", "imageName............" + imageName);
                 File file = new File(path);
@@ -257,9 +277,6 @@ public class ImageActivity extends Activity {
                         new ImageDao(this).update(imageBean);
                     }
                 }
-                paths.clear();
-                paths.addAll(pathList);
-                Log.v("............", "paths都有什么..............：" + paths);
                 photoAdapter.notifyDataSetChanged();
             }
         }

@@ -27,7 +27,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="文本编辑"
+            android:text="@string/text_parameters_text"
             android:textColor="#fff"
             android:textSize="20sp" />
 
@@ -37,7 +37,7 @@
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:background="@drawable/button_down"
-            android:text="确定"
+            android:text="@string/submit"
             android:textColor="#fff"
             android:textSize="20sp" />
     </LinearLayout>
@@ -50,7 +50,7 @@
         android:layout_marginTop="10dp"
         android:gravity="top"
         android:background="@drawable/edit_shape"
-        android:hint="请输入显示内容" />
+        android:hint="@string/text_parameters_content" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -66,7 +66,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="参数设置"
+                android:text="@string/parameter_Settings"
                 android:textSize="20sp" />
 
             <View
@@ -84,7 +84,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="名         称："
+                    android:text="@string/name"
                     android:textSize="20sp" />
 
                 <EditText
@@ -94,7 +94,7 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:gravity="center"
-                    android:text="单行文本" />
+                    android:text="@string/text" />
             </LinearLayout>
 
             <View
@@ -112,7 +112,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="边         框："
+                    android:text="@string/side_frame"
                     android:textSize="20sp" />
 
                 <Spinner
@@ -137,7 +137,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="边框颜色："
+                    android:text="@string/border_color"
                     android:textSize="20sp" />
 
                 <Spinner
@@ -162,7 +162,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="坐       标x："
+                    android:text="@string/text_parameters_x"
                     android:textSize="20sp" />
 
                 <EditText
@@ -172,7 +172,7 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:gravity="center"
-                    android:hint="请输入坐标x" />
+                    android:hint="@string/text_parameter_x" />
             </LinearLayout>
 
             <View
@@ -190,7 +190,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="坐       标y："
+                    android:text="@string/text_parameters_y"
                     android:textSize="20sp" />
 
                 <EditText
@@ -200,7 +200,7 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:gravity="center"
-                    android:hint="请输入坐标y" />
+                    android:hint="@string/text_parameter_y" />
             </LinearLayout>
 
 
@@ -220,7 +220,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="长         度："
+                    android:text="@string/text_parameters_w"
                     android:textSize="20sp" />
 
                 <EditText
@@ -230,7 +230,7 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:gravity="center"
-                    android:hint="请输入长度" />
+                    android:hint="@string/text_parameter_w" />
             </LinearLayout>
 
             <View
@@ -248,7 +248,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="宽         度："
+                    android:text="@string/text_parameters_h"
                     android:textSize="20sp" />
 
                 <EditText
@@ -258,7 +258,7 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:gravity="center"
-                    android:hint="请输入宽度" />
+                    android:hint="@string/text_parameter_h" />
             </LinearLayout>
 
             <View
@@ -276,7 +276,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="字         体："
+                    android:text="@string/text_parameters_typepace"
                     android:textSize="20sp" />
 
                 <Spinner
@@ -300,7 +300,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="字体大小："
+                    android:text="@string/text_parameters_textsize"
                     android:textSize="20sp" />
 
                 <Spinner
@@ -325,7 +325,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="字体颜色："
+                    android:text="@string/text_parameters_color"
                     android:textSize="20sp" />
 
                 <Spinner
@@ -350,7 +350,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="加         粗："
+                    android:text="@string/text_parameters_bold"
                     android:textSize="20sp" />
 
                 <CheckBox
@@ -358,7 +358,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:hint="加粗"
+                    android:hint="@string/text_parameters_bold"
                     android:textSize="15sp" />
             </LinearLayout>
 
@@ -376,7 +376,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="2"
-                    android:text="斜         体："
+                    android:gravity="center"
+                    android:text="@string/text_parameters_italic"
                     android:textSize="20sp" />
 
                 <CheckBox
@@ -384,7 +385,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:hint="斜体"
+                    android:hint="@string/text_parameters_italic"
                     android:textSize="15sp" />
             </LinearLayout>
 
@@ -403,7 +404,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="下  划   线："
+                    android:text="@string/text_parameters_underline"
                     android:textSize="20sp" />
 
                 <CheckBox
@@ -411,7 +412,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:hint="下划线"
+                    android:hint="@string/text_parameters_underline"
                     android:textSize="15sp" />
             </LinearLayout>
 
@@ -432,7 +433,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="进场特技："
+                    android:text="@string/text_entry_stunt"
                     android:textSize="20sp" />
 
                 <Spinner
@@ -456,7 +457,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="清场特技："
+                    android:text="@string/text_clear_stunt"
                     android:textSize="20sp" />
 
                 <Spinner
@@ -482,7 +483,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="进场速度："
+                    android:text="@string/text_entry_speed"
                     android:textSize="20sp" />
 
                 <Spinner
@@ -507,7 +508,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="清场速度："
+                    android:text="@string/text_clear_speed"
                     android:textSize="20sp" />
 
                 <Spinner
@@ -532,7 +533,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="背  景   色："
+                    android:text="@string/text_parameters_background_color"
                     android:textSize="20sp" />
 
                 <Spinner
@@ -557,7 +558,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="停留时间："
+                    android:text="@string/text_hold_time"
                     android:textSize="20sp" />
 
                 <EditText

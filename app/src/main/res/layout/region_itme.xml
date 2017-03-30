@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="20sp"
-        android:text="节目名称"/>
+        android:text="@string/programlist"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -64,5 +64,5 @@
         android:background="@drawable/button_down"
         android:layout_gravity="center"
         android:textSize="20sp"
-        android:text="添加"/>
+        android:text="@string/addprogram"/>
 </LinearLayout>

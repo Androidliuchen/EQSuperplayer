@@ -119,8 +119,6 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
             @Override
             public void onRemoveItem(int position) {
                 // 删除按钮的回调，注意也可以放在adapter里面处理
-                Toast.makeText(getActivity(), "点击了" + position + "项的删除",
-                        Toast.LENGTH_SHORT).show();
                 new AreabeanDao(getActivity()).delete(areabeens.get(position).getId());
                 areabeens.remove(position);
                 mListView.slideBack();

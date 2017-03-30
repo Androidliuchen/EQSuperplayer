@@ -91,8 +91,8 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
     private int windowHeight; //窗口高度
     private int containerWidth;//屏幕宽度
     private int containerHeight;//屏幕高度
-    public static int selet;
-    public int program_itme;
+    public static int selet = 0;
+    public int program_itme = 0;
     public static int program_id;
     private List<TableBean> tableBeens = new ArrayList<TableBean>();//区域数组
     private List<TotalBean> totalBeens = new ArrayList<TotalBean>();
@@ -118,6 +118,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
     private static final int ZOOM = 2;
     int mode = NONE;
     private int program_name_count;
+    private int zoneIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,59 +186,63 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             tableBeens.add(programBean);
             Log.d("........", "tableBeens.............:" + tableBeens.toString());
             System.out.println("查询设备所有节目个数:" + programBean.toString());
+        //查询是否文本内容
+        ForeignCollection<TextBean> text = programBean.getTextBeen();
+        CloseableIterator<TextBean> iteratorText = text.closeableIterator();
+        while (iteratorText.hasNext()) {
+            textBean = iteratorText.next();
+            String tt = textBean.getId() + "..............." + textBean.getName();
+            Log.d("............", "tt数值.........:" + tt);
+            Paint paint = Utils.getPaint(this, Utils.getPaintSize(this, textBean.getStSize()));//字体参数启动读取
+            paint.setFakeBoldText(textBean.isStBold());
+            Utils.setTypeface(this, paint
+                    , (this.getResources().getStringArray(R.array.typeface_path))[textBean.getStTypeFace()]);
+            textBean.setPaint(paint);
+            textBean.setProgramBean(programBean);
+            textBean.setType(Constant.AREA_TYPE_TEXT);
+            Log.d("..............", "查询设备所有节目内容:" + textBean.toString());
+            totalBeens.add(textBean);
 
-            //查询是否文本内容
-            ForeignCollection<TextBean> text = programBean.getTextBeen();
-            CloseableIterator<TextBean> iterator1 = text.closeableIterator();
-            while (iterator1.hasNext()) {
-                textBean = iterator1.next();
-                String tt = textBean.getId() + "..............." + textBean.getName();
-                Log.d("............", "tt数值.........:" + tt);
-                Paint paint = Utils.getPaint(this, Utils.getPaintSize(this, textBean.getStSize()));//字体参数启动读取
-                paint.setFakeBoldText(textBean.isStBold());
-                Utils.setTypeface(this, paint
-                        , (this.getResources().getStringArray(R.array.typeface_path))[textBean.getStTypeFace()]);
-                textBean.setPaint(paint);
-                textBean.setProgramBean(programBean);
-                textBean.setType(Constant.AREA_TYPE_TEXT);
-                Log.d("..............", "查询设备所有节目内容:" + textBean.toString());
-                totalBeens.add(textBean);
-
-            }
-            //查询是否有图片
-            ForeignCollection<ImageBean> iamge = programBean.getImageBeen();
-            CloseableIterator<ImageBean> iterator2 = iamge.closeableIterator();
-            while (iterator2.hasNext()) {
-                imageBean = iterator2.next();
-                String iamges = imageBean.getIamgeId() + ".............." + imageBean.getIamgeName();
-                Log.d("............", "iamges数值.........:" + iamges);
-                imageBean.setProgramBean(programBean);
-                imageBean.setType(Constant.AREA_TYPE_IMAGE);
-                totalBeens.add(imageBean);
-            }
-            //查询是否有时钟
-            ForeignCollection<TimeBean> time = programBean.getTimeBeen();
-            CloseableIterator<TimeBean> iterator3 = time.closeableIterator();
-            while (iterator2.hasNext()) {
-                timeBean = iterator3.next();
-                String times = timeBean.getId() + ".............." + timeBean.getTimeToname();
-                Log.d("............", "times数值.........:" + times);
-                timeBean.setProgramBean(programBean);
-                timeBean.setType(Constant.AREA_TYPE_TIME);
-                totalBeens.add(timeBean);
-            }
-            //查询是否有视频
-            ForeignCollection<VedioBean> vedio = programBean.getVedioBeen();
-            CloseableIterator<VedioBean> iterator4 = vedio.closeableIterator();
-            while (iterator2.hasNext()) {
-                vedioBean = iterator4.next();
-                String vedios = vedioBean.getId() + ".............." + vedioBean.getVedioName();
-                Log.d("............", "vedios数值.........:" + vedios);
-                vedioBean.setProgramBean(programBean);
-                vedioBean.setType(Constant.AREA_TYPE_VIDEO);
-                totalBeens.add(vedioBean);
-            }
         }
+        //查询是否有图片
+        ForeignCollection<ImageBean> iamge = programBean.getImageBeen();
+        CloseableIterator<ImageBean> iteratorImage = iamge.closeableIterator();
+        while (iteratorImage.hasNext()) {
+            imageBean = iteratorImage.next();
+            String iamges = imageBean.getIamgeId() + ".............." + imageBean.getIamgeName();
+            Log.d("............", "iamges数值.........:" + iamges);
+            imageBean.setProgramBean(programBean);
+            imageBean.setType(Constant.AREA_TYPE_IMAGE);
+            totalBeens.add(imageBean);
+        }
+        //查询是否有时钟
+        ForeignCollection<TimeBean> time = programBean.getTimeBeen();
+        Log.d("............", "time数值.........:" + time);
+        CloseableIterator<TimeBean> iteratorTime = time.closeableIterator();
+        Log.d("............", "iteratorTime数值.........:" + iteratorTime);
+        while (iteratorTime.hasNext()) {
+            timeBean = iteratorTime.next();
+            String times = timeBean.getId() + ".............." + timeBean.getTimeToname();
+            Log.d("............", "times数值.........:" + times);
+            timeBean.setProgramBean(programBean);
+            timeBean.setType(Constant.AREA_TYPE_TIME);
+            totalBeens.add(timeBean);
+        }
+        //查询是否有视频
+        ForeignCollection<VedioBean> vedio = programBean.getVedioBeen();
+        Log.d("............", "vedio数值.........:" + vedio);
+        CloseableIterator<VedioBean> iteratorVedio = vedio.closeableIterator();
+        Log.d("............", "iteratorVedio数值.........:" + iteratorVedio);
+        while (iteratorVedio.hasNext()) {
+            vedioBean = iteratorVedio.next();
+            String vedios = vedioBean.getId() + ".............." + vedioBean.getVedioName();
+            Log.d("............", "vedios数值.........:" + vedios);
+            vedioBean.setProgramBean(programBean);
+            vedioBean.setType(Constant.AREA_TYPE_VIDEO);
+            totalBeens.add(vedioBean);
+        }
+        }
+
         for (TotalBean totalBean : totalBeens) {
             Log.d("............", "totalBean中的数据...........:" + totalBean.getType());
             switch (totalBean.getType()) {
@@ -253,9 +258,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 case Constant.AREA_TYPE_VIDEO:
                     mDatas.add(getString(R.string.video));
                     break;
-//                        case Constant.AREA_TYPE_PROGRAM:
-//                            mDatas.add(getString(R.string.program_parameters));
-//                            break;
             }
         }
         showText();
@@ -329,6 +331,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         View view = this.getLayoutInflater().inflate(R.layout.recry_itme, null);
         programListView = (ProgramListView) view.findViewById(R.id.program_listview);
         programListView.setOnTouchListener(this);
+        programListView.setEmptyView(view.findViewById(R.id.myText));
         TextView textView = (TextView) view.findViewById(R.id.text_name);
         Button button = (Button) view.findViewById(R.id.pro_button);
         button.setOnClickListener(new View.OnClickListener() {
@@ -336,7 +339,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             public void onClick(View v) {
                 //填充的数据源
                 String[] arrayFruit = new String[]{getResources().getString(R.string.program_text),
-                        getResources().getString(R.string.program_time),
+//                        getResources().getString(R.string.program_time),
                         getResources().getString(R.string.program_video),
                         getResources().getString(R.string.program_image),
                 };
@@ -346,7 +349,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        ProgramBean programBean = (ProgramBean) tableBeens.get(program_itme);
+                                        ProgramBean programBean = new ProgramBeanDao(ProgramActivity.this).get(selet);
                                         Log.d("...............", "programBean数据......." + programBean.toString());
                                         if (which == 0) {
                                             TextBean textBean = new TextBean();
@@ -405,7 +408,8 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 dia.show();
             }
         });
-        textView.setText("节目单");
+        textView.setText(getResources().getText(R.string.the_programme));
+        ProgramBean programBean = new ProgramBeanDao(this).get(selet);
         recyclerViewAdapter = new RecyclerViewAdapter(ProgramActivity.this, mDatas);
         recyclerViewAdapter.setmRemoveViewListener(new RecyclerViewAdapter.OnRemoveViewListener() {
             @Override
@@ -442,6 +446,8 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         });
         programListView.setAdapter(recyclerViewAdapter);
         recyclerViewAdapter.notifyDataSetChanged();
+
+
         programListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -501,7 +507,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         regionListView.setOnTouchListener(this);
         regionListView.setEmptyView(view.findViewById(R.id.myText));
         TextView textView = (TextView) view.findViewById(R.id.text_name);
-        textView.setText("节目名称");
+        textView.setText(getResources().getText(R.string.programlist));
         Button button = (Button) view.findViewById(R.id.text_button);
         if (tableBeens.size() == 0) {
             program_name_count = 1;
@@ -539,7 +545,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 programBean = new ProgramBean();
                 areabean = new AreabeanDao(ProgramActivity.this).get(program_id);
                 programBean.setAreabean(areabean);
-                programBean.setName("节目" + program_name_count);
+                programBean.setName(getResources().getText(R.string.main_program) +""+ program_name_count);
                 Log.d("..............", "areabean...........:" + areabean.toString());
                 program_name_count++;
                 ProgramNameItemManager.setSharedPreference(ProgramActivity.this, program_name_count);
@@ -594,7 +600,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                     customTypeWindow.showPopupWindow(region_btn);
 
                 } else {
-                    Toast.makeText(ProgramActivity.this, "还没有节目哟！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProgramActivity.this, getResources().getText(R.string.program_no), Toast.LENGTH_SHORT).show();
                 }
 
                 break;
@@ -805,11 +811,12 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 if (iteratorText != null) {
                     while (iteratorText.hasNext()) {
                         textBean = iteratorText.next();
+                        zoneIndex = 0;
                         serializer.startTag(null, "zone");
-                        serializer.attribute(null, "index", "0");
-
+                        serializer.attribute(null, "index", zoneIndex + "");
+                        zoneIndex++;
                         serializer.startTag(null, "zonetype");
-                        serializer.text("file");
+                        serializer.text("bmp");
                         serializer.endTag(null, "zonetype");
 
                         serializer.startTag(null, "attribute");
@@ -848,7 +855,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                                 serializer.attribute(null, "index", i + "");
 
                                 serializer.startTag(null, "type");
-                                serializer.text("2");
+                                serializer.text("bmp");
                                 serializer.endTag(null, "type");
 
                                 serializer.startTag(null, "name");
@@ -891,7 +898,8 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                     while (iteratorImage.hasNext()) {
                         imageBean = iteratorImage.next();
                         serializer.startTag(null, "zone");
-                        serializer.attribute(null, "index", String.valueOf(tableBean.getType()));
+                        serializer.attribute(null, "index", zoneIndex + "");
+                        zoneIndex++;
                         serializer.startTag(null, "zonetype");
                         serializer.text("file");
                         serializer.endTag(null, "zonetype");
@@ -969,6 +977,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         Log.d("...............", "全部数据................:" + imageBean.toString());
                     }
                 }
+
                 //生成视频xml
                 ForeignCollection<VedioBean> vedio = programBean.getVedioBeen();
                 CloseableIterator<VedioBean> iteratorVedio = vedio.closeableIterator();
@@ -976,8 +985,8 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                     while (iteratorVedio.hasNext()) {
                         vedioBean = iteratorVedio.next();
                         serializer.startTag(null, "zone");
-                        serializer.attribute(null, "index", String.valueOf(tableBean.getType()));
-
+                        serializer.attribute(null, "index", zoneIndex + "");
+                        zoneIndex++;
                         serializer.startTag(null, "zonetype");
                         serializer.text("file");
                         serializer.endTag(null, "zonetype");
@@ -1012,7 +1021,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                             imagePathList.add(fileVedio.getPath());
                             String vedioName = fileVedio.getPath().substring(fileVedio.getPath().lastIndexOf("/") + 1, fileVedio.getPath().length());
                             serializer.startTag(null, "file");
-                            serializer.attribute(null, "index", "0");
+                            serializer.attribute(null, "index",i+ "");
 
                             serializer.startTag(null, "type");
                             serializer.text("1");
@@ -1047,7 +1056,8 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                     while (iteratorTime.hasNext()) {
                         timeBean = iteratorTime.next();
                         serializer.startTag(null, "zone");
-                        serializer.attribute(null, "index", String.valueOf(tableBean.getType()));
+                        serializer.attribute(null, "index", zoneIndex + "");
+                        zoneIndex++;
                         serializer.startTag(null, "zonetype");
 
                         serializer.text("clock");
@@ -1165,10 +1175,10 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             serializer.endTag(null, "manifest");
             serializer.endDocument();
             fos.close();
-            Toast.makeText(ProgramActivity.this, "生成成功！", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ProgramActivity.this, getResources().getText(R.string.xml_success), Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(ProgramActivity.this, "生成失败！", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ProgramActivity.this, getResources().getText(R.string.xml_failure), Toast.LENGTH_SHORT).show();
         }
 
     }

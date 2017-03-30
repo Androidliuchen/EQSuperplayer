@@ -25,6 +25,7 @@ import com.eq.EQSuperPlayer.bean.TimeBean;
 import com.eq.EQSuperPlayer.custom.Constant;
 import com.eq.EQSuperPlayer.dao.ProgramBeanDao;
 import com.eq.EQSuperPlayer.dao.TimeDao;
+import com.eq.EQSuperPlayer.dao.VedioDao;
 import com.eq.EQSuperPlayer.utils.Utils;
 import com.eq.EQSuperPlayer.utils.WindowSizeManager;
 import java.util.List;
@@ -105,11 +106,11 @@ public class TimeActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        timeBean = new TimeBean();
-        int text_id = getIntent().getIntExtra(Constant.PROGRAM_ID, -1);
-        timeBean = new TimeDao(this).get(text_id);
-        programBean = new ProgramBeanDao(this).get(text_id);
+        int time_id = getIntent().getIntExtra(Constant.PROGRAM_ID, -1);
+        timeBean = new TimeDao(this).get(time_id);
+        programBean = new ProgramBeanDao(this).get(ProgramActivity.selet);
         timeBean.setProgramBean(programBean);
+        timeTitle.setText(programBean.getName());
         //节目名称
         timeToname.setText(timeBean.getTimeToname());
         windowSizeManager = WindowSizeManager.getSahrePreference(this);
@@ -296,6 +297,7 @@ public class TimeActivity extends AppCompatActivity {
                 break;
             case R.id.time_btn:
                 TimeActivity.this.finish();
+
                 break;
         }
     }

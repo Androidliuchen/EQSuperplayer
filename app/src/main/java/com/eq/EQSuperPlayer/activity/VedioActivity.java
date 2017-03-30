@@ -26,7 +26,9 @@ import com.eq.EQSuperPlayer.adapter.SpinnerImageAdapter;
 import com.eq.EQSuperPlayer.bean.Areabean;
 import com.eq.EQSuperPlayer.bean.ProgramBean;
 import com.eq.EQSuperPlayer.bean.VedioBean;
+import com.eq.EQSuperPlayer.custom.Constant;
 import com.eq.EQSuperPlayer.dao.ProgramBeanDao;
+import com.eq.EQSuperPlayer.dao.TextBeanDao;
 import com.eq.EQSuperPlayer.dao.VedioDao;
 import com.eq.EQSuperPlayer.utils.TimeChange;
 import com.eq.EQSuperPlayer.utils.WindowSizeManager;
@@ -77,6 +79,7 @@ public class VedioActivity extends AppCompatActivity {
     private WindowSizeManager windowSizeManager;
     private int windowWidth;
     private int windowHeight;
+    private ProgramBean programBean;
     private List<ProgramBean> programBeens;
     private Areabean areabean = new Areabean();
 
@@ -89,27 +92,28 @@ public class VedioActivity extends AppCompatActivity {
     }
 
     private void initData() {
-        vedioBean = new VedioBean();
-        //获取节目数据库中的所有数据
-        programBeens = new ProgramBeanDao(this).getListAll();
-        //遍历集合中的数据
-        for (ProgramBean programBean : programBeens) {
-            //动态设置导航栏名称，用来确定该文本所属那个节目集合
-            vedio.setText(programBean.getName());
-            //必须添加，根据节目显示界面传过来的id来存储编辑界面的内容，不设置这项将造成本页数据不能写入对应的节目集合中....关键！！！.....
-            vedioBean.setProgramBean(programBean);
-        }
-//        vedio.setText(vedioBean.getProgema_name());
+        int vedio_id = getIntent().getIntExtra(Constant.PROGRAM_ID, -1);
+        vedioBean = new VedioDao(this).get(vedio_id);
+        programBean = new ProgramBeanDao(this).get(ProgramActivity.selet);
+        //动态设置导航栏名称，用来确定该文本所属那个节目集合
+        vedio.setText(programBean.getName());
+        //必须添加，根据节目显示界面传过来的id来存储编辑界面的内容，不设置这项将造成本页数据不能写入对应的节目集合中....关键！！！.....
+        vedioBean.setProgramBean(programBean);
+        vedioTitle.setText(programBean.getName());
         windowSizeManager = WindowSizeManager.getSahrePreference(this);
         windowWidth = windowSizeManager.getWindowWidth();
         windowHeight = windowSizeManager.getWindowHeight();
         // 视频窗宽高
-        if (areabean.getWindowWidth() != 0) {
-            vedioHeigth.setText(areabean.getWindowWidth() + "");
-            vedioHeigth.setText(areabean.getWindowHeight() + "");
+        if (vedioBean.getVedioWidth() != 0 && vedioBean.getVedioHeidht() != 0) {
+            vedioHeigth.setText(vedioBean.getVedioWidth() + "");
+            vedioHeigth.setText(vedioBean.getVedioWidth() + "");
         } else {
             vedioWidth.setText(windowWidth + "");
             vedioHeigth.setText(windowHeight + "");
+        }
+        if (vedioBean.getVedioX() != 0){
+            vedioX.setText(vedioBean.getVedioX() + "");
+            vedioY.setText(vedioBean.getVedioY() + "");
         }
         vedioX.setText(0 + "");
         vedioY.setText(0 + "");
@@ -125,17 +129,20 @@ public class VedioActivity extends AppCompatActivity {
         vedioColor.setAdapter(new SpinnerImageAdapter(this, color_id));
         vedioColor.setSelection(vedioBean.getVedioBorderColor());
     }
+
     /**
      * 修改视频原数据的方法
-     * */
-    public void vedioSave(){
+     */
+    public void vedioSave() {
         try {
             if (Integer.parseInt(vedioWidth.getText().toString()) + Integer.parseInt(vedioX.getText().toString()) <= windowWidth
                     && Integer.parseInt(vedioHeigth.getText().toString()) + Integer.parseInt(vedioY.getText().toString()) <= windowHeight) {
                 vedioBean.setVedioWidth(Integer.parseInt(vedioWidth.getText().toString()));
                 vedioBean.setVedioHeidht(Integer.parseInt(vedioHeigth.getText().toString()));
-                areabean.setArea_X(Integer.parseInt(vedioX.getText().toString()));
-                areabean.setArea_Y(Integer.parseInt(vedioY.getText().toString()));
+                vedioBean.setVedioX(Integer.parseInt(vedioX.getText().toString()));
+                vedioBean.setVedioY(Integer.parseInt(vedioY.getText().toString()));
+//                areabean.setArea_X(Integer.parseInt(vedioX.getText().toString()));
+//                areabean.setArea_Y(Integer.parseInt(vedioY.getText().toString()));
             } else {
                 Toast.makeText(this, "参数超出边界，请重新设置", Toast.LENGTH_SHORT).show();
             }
@@ -144,6 +151,7 @@ public class VedioActivity extends AppCompatActivity {
         vedioBean.setVedioName(vedio.getText().toString());
         vedioBean.setVedioBorder(vedioBorder.getSelectedItemPosition());
         vedioBean.setVedioBorderColor(vedioColor.getSelectedItemPosition());
+
         new VedioDao(this).update(vedioBean);
     }
 
@@ -234,14 +242,14 @@ public class VedioActivity extends AppCompatActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.vedio_finsh:
-                Intent intent = new Intent(VedioActivity.this,ProgramActivity.class);
+                Intent intent = new Intent(VedioActivity.this, ProgramActivity.class);
                 startActivity(intent);
                 VedioActivity.this.finish();
                 break;
             case R.id.vedio_send://提交修改后的数据
                 vedioSave();
-                Log.d("..........","vedioBean改变数据内容...............:" + vedioBean.toString());
-                Intent intent1 = new Intent(VedioActivity.this,ProgramActivity.class);
+                Log.d("..........", "vedioBean改变数据内容...............:" + vedioBean.toString());
+                Intent intent1 = new Intent(VedioActivity.this, ProgramActivity.class);
                 startActivity(intent1);
                 VedioActivity.this.finish();
                 break;

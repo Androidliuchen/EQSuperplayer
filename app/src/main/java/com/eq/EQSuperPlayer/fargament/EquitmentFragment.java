@@ -157,12 +157,12 @@ public class EquitmentFragment extends Fragment implements OnClickListener {
                 case 2:
                     proDialog.cancel();
                     updateWifiName();
-                    Toast.makeText(getActivity(),"连接成功",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),getResources().getString(R.string.hint_connection_success),Toast.LENGTH_SHORT).show();
                     break;
 
                 case 3:
                     proDialog.cancel();
-                    Toast.makeText(getActivity(),"连接失败",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),getResources().getString(R.string.hint_connection_failure),Toast.LENGTH_SHORT).show();
                     break;
 
                 default:
@@ -267,7 +267,7 @@ public class EquitmentFragment extends Fragment implements OnClickListener {
         }
 
         if (mNetWorkCheck.mWifiList.size() == 0) {
-            Toast.makeText(getActivity(), "没有搜到wifi!",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),getResources().getString(R.string.hint_control_wifi_failure) ,Toast.LENGTH_SHORT).show();
 
         } else { // 过滤wifi列表
             for (int i = 0; i < mNetWorkCheck.mWifiList.size(); i++) {

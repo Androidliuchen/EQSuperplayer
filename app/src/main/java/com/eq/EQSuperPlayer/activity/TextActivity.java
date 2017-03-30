@@ -122,15 +122,21 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
         windowWidth = windowSizeManager.getWindowWidth();
         windowHeight = windowSizeManager.getWindowHeight();
         // 文本窗宽高
-        if (areabean.getWindowWidth() != 0) {
-            STWidth.setText(areabean.getWindowWidth() + "");
-            STHeigth.setText(areabean.getWindowHeight() + "");
+        if (textBean.getWidth() != 0) {
+            STWidth.setText(textBean.getWidth() + "");
+            STHeigth.setText(textBean.getHeidht() + "");
         } else {
             STWidth.setText(windowWidth + "");
             STHeigth.setText(windowHeight + "");
         }
-        STx.setText(0 + "");
-        STy.setText(0 + "");
+        if (textBean.getX() != 0) {
+            STx.setText(textBean.getX() + "");
+            STy.setText(textBean.getY() + "");
+        } else {
+            STx.setText(0 + "");
+            STy.setText(0 + "");
+        }
+
         //字体是否加粗
         STBold.setChecked(textBean.isStBold());
         //文字是否设置斜体
@@ -175,11 +181,8 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
         STBackground.setAdapter(new SpinnerImageAdapter(this, color_id));
         STBackground.setSelection(textBean.getStBackground());
         //停留时间
-        STStandtime.setText(STStandtime.getText().toString());
-        programBeans = new ProgramBeanDao(TextActivity.this).getListAll();
-        for (ProgramBean programBean : programBeans) {
-            textTitle.setText(programBean.getName());
-        }
+        STStandtime.setText(textBean.getStandtime() + "");
+        textTitle.setText(programBean.getName());
     }
 
     public void save() {
@@ -188,8 +191,8 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
                     && Integer.parseInt(STHeigth.getText().toString()) + Integer.parseInt(STy.getText().toString()) <= windowHeight) {
                 textBean.setWidth(Integer.parseInt(STWidth.getText().toString()));
                 textBean.setHeidht(Integer.parseInt(STHeigth.getText().toString()));
-                areabean.setArea_X(Integer.parseInt(STx.getText().toString()));
-                areabean.setArea_Y(Integer.parseInt(STy.getText().toString()));
+                textBean.setX(Integer.parseInt(STx.getText().toString()));
+                textBean.setY(Integer.parseInt(STy.getText().toString()));
             } else {
                 Toast.makeText(this, "参数超出边界，请重新设置", Toast.LENGTH_SHORT).show();
             }
@@ -320,7 +323,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
             if (bitmapWidth % textWidths > 0) {
                 bitmapCount += 1;
                 endBitmapWidth = bitmapWidth % textWidths;//最后一张图片截取的宽度
-            }else {
+            } else {
                 endBitmapWidth = textWidths;
             }
             Log.d(".......", "bitmapCount生成的图片可以截取几张图片。。。：" + bitmapCount);
@@ -329,7 +332,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
                 Bitmap bmp;
                 if (i == bitmapCount - 1) {
                     bmp = Bitmap.createBitmap(drawBitmap(), x, 0, endBitmapWidth, y, null, true);
-                    zoomImg(bmp,textWidths,textHeights,i);
+                    zoomImg(bmp, textWidths, textHeights, i);
                     textWidths += textWidths;
                 } else {
                     bmp = Bitmap.createBitmap(drawBitmap(), x, 0, textWidths, y, null, true);
@@ -340,12 +343,14 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
+
     /**
-     *  处理图片
+     * 处理图片
+     *
      * @param bm 所要转换的bitmap
      * @return 指定宽高的bitmap
      */
-    public static Bitmap zoomImg(Bitmap bm, int newWidth ,int newHeight,int i){
+    public static Bitmap zoomImg(Bitmap bm, int newWidth, int newHeight, int i) {
         // 获得图片的宽高
         int width = bm.getWidth();
         int height = bm.getHeight();
@@ -355,10 +360,10 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
         // 取得想要缩放的matrix参数
         Matrix matrix = new Matrix();
         matrix.postScale(scaleWidth, scaleHeight);
-        Log.d(".....","matrix缩放比。。。" + matrix);
+        Log.d(".....", "matrix缩放比。。。" + matrix);
         // 得到新的图片
         Bitmap newbm = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
-        Utils.saveMyBitmap(bm, "text" + i);
+//        Utils.saveMyBitmap(bm, "text" + i);
         return newbm;
     }
 }

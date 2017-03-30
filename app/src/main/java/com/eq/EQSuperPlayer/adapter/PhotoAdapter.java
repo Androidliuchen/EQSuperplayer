@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.eq.EQSuperPlayer.R;
+import com.eq.EQSuperPlayer.bean.ImagePath;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,13 +20,13 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
 
     private Context context;
     private LayoutInflater mLayoutInflater;
-    private List<String> result;
+    private List<ImagePath> imagePaths;
     private final static String TAG = "PhotoAdapter";
 
-    public PhotoAdapter(Context context, List<String> result) {
+    public PhotoAdapter(Context context, List<ImagePath> imagePaths) {
         mLayoutInflater = LayoutInflater.from(context);
         this.context = context;
-        this.result = result;
+        this.imagePaths = imagePaths;
     }
 
     @Override
@@ -34,6 +36,10 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        List<String> result = new ArrayList<>();
+        for (ImagePath imagePath : imagePaths){
+            result.add(imagePath.getPath());
+        }
         Glide.with(context)
                 .load(result.get(position))
                 .centerCrop()
@@ -42,7 +48,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return result.size();
+        return imagePaths.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

@@ -23,7 +23,7 @@
     android:layout_height="match_parent"
     android:layout_centerInParent="true"
     android:gravity="center"
-    android:text="EQ彩幕王"
+    android:text="@string/app_name"
     android:textColor="#fff"
     android:textSize="20sp" />
 
@@ -50,21 +50,21 @@
     style="@style/MTabStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="节目"
+    android:text="@string/program"
     android:drawableTop="@drawable/program"/>
     <Button
     android:id="@+id/send"
     style="@style/MTabStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="发送"
+    android:text="@string/hardware_send_button"
     android:drawableTop="@drawable/send"/>
     <RadioButton
     android:id="@+id/equitment"
     style="@style/MTabStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="设备"
+    android:text="@string/equipment"
     android:drawableTop="@drawable/equitment"/>
     </RadioGroup>
 

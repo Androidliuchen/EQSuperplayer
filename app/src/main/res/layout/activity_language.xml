@@ -23,9 +23,36 @@
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
             android:gravity="center"
-            android:text="语言"
+            android:text="@string/setting_Follow"
             android:textColor="#fff"
             android:textSize="20sp" />
 
     </RelativeLayout>
+
+    <RadioButton
+        android:layout_width="120dp"
+        android:layout_height="40dp"
+        android:text="@string/setting_Follow"
+        android:id="@+id/radioButton"
+        android:layout_centerHorizontal="true"
+        android:checked="false"
+        android:layout_below="@+id/alertTitle" />
+
+    <RadioButton
+        android:layout_width="120dp"
+        android:layout_height="40dp"
+        android:text="@string/setting_language_cn"
+        android:id="@+id/radioButton2"
+        android:layout_below="@+id/radioButton"
+        android:checked="false"
+        android:layout_centerHorizontal="true" />
+
+    <RadioButton
+        android:layout_width="120dp"
+        android:layout_height="40dp"
+        android:text="@string/setting_language_en"
+        android:id="@+id/radioButton3"
+        android:checked="false"
+        android:layout_below="@+id/radioButton2"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

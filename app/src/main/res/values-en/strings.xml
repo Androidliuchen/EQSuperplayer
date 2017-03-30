@@ -6,6 +6,12 @@
 	<string name="searchwiif">search wiif</string>
 	<string name="programlist">program list</string>
 	<string name="addprogram">add program</string>
+	<string name="addprogram_name">Show the name</string>
+	<string name="addprogram_new_name">The new program</string>
+	<string name="program_video">Add video</string>
+	<string name="program_text">Add text</string>
+	<string name="program_image">Add image</string>
+	<string name="program_time">Add time</string>
 	<string name="screenset">set screen</string>
 	<string name="language">language</string>
 	<string name="about">about</string>
@@ -13,8 +19,7 @@
 	<string name="setting_wifi">wifi setting</string>
 	<string name="alert_hint">alert hint</string>
 	<string name="main_program">program</string>
-	<string name="main_control">control</string>
-	<string name="main_setting">setting</string>
+	<string name="find_programs">Failed to find any programs^_^</string>
 	<string name="control_wifi">search wifi</string>
 	<string name="control_isopen">screen switch</string>
 	<string name="control_setbrightness">set brightness</string>
@@ -32,6 +37,7 @@
 	<string name="hint_exit">press back again to exit</string>
 	<!--  newworkActivity   !-->
 	<string name="hint_connection_to">connecting:</string>
+	<string name="regional_management">Regional management</string>
 	<string name="hint_start_wifi">turn on WiFi-enabled...</string>
 	<string name="hint_connection_wifi">connecting WiFi...</string>
 	<string name="hint_control_wifi_failure">Can not find WiFi</string>
@@ -46,9 +52,15 @@
 	<!--  programActivity   !-->
 	<string name="program_parameters">Program</string>
 	<string name="program_area_add">Click to add content</string>
-	<string name="program_text">Text</string>
-	<string name="program_image">Image</string>
-	<string name="program_time">Time</string>
+	<string name="program_area_reset">Parameters beyond the border, please reset</string>
+	<string name="image">Image</string>
+	<string name="time">Time</string>
+	<string name="video">Vedio</string>
+	<string name="the_programme">Program type</string>
+	<string name="addthe_programme">Add the program type</string>
+	<string name="program_no">Have not show yo！</string>
+	<string name="xml_success">XML Generate success！</string>
+	<string name="xml_failure">XML Generate failure！</string>
 	<string name="program_send_success">send successful</string>
 	<string name="program_send_failure">unsuccessful</string>
 	<string name="program_sending">Program Sending ...</string>
@@ -79,26 +91,20 @@
 	<string name="hardware_port">port:</string>
 	<string name="hardware_subnet">Subnet Mask:</string>
 	<string name="hardware_gateway">Gateway:</string>
-	<string name="hardware_send_button">Load</string>
+
 
 	<!--  programFragment   !-->
 	<string name="program">program </string>
+	<string name="hardware_send_button">Load</string>
+	<string name="equipment">equipment </string>
 	<string name="program_edit_name">Program editing</string>
 	<string name="program_send_program">loading</string>
 
-	<!--  scanFragment  暂时屏蔽  !-->
-	<string name="scan_3.75">Indoor 3.75</string>
-	<string name="scan_P10">Outdoor P10</string>
-	<string name="scan_scaning_mode">Common scanning mode:</string>
-	<string name="scan_name">Quick setup</string>
-	<string name="scan_loading_parameter">Loading parameters</string>
 	<!--   setting fragment  !-->
 	<string name="setting_language_cn">Chinese</string>
 	<string name="setting_language_en">English</string>
-	<string name="setting_language_select">Please select a language</string>
+	<string name="setting_Follow"> language</string>
 	<string name="setting_cancel">cancel</string>
-	<!--    setting fragment  !-->
-	<string name="program_content_cn">There is no data, waiting for editing</string>
 	<!--  preview.xml  !-->
 	<string name="preview_name">Preview</string>
 	<string name="preview_stop">Stop</string>
@@ -130,21 +136,40 @@
 	<string name="popu_program_edit">Edit</string>
 	<string name="popu_program_delete">Delete</string>
 	<!--  window text.xml   文本窗参数界面-->
-	<string name="text_parameters_name">Text parameter</string>
+	<string name="text_parameters_text">Text editing</string>
+	<string name="text_parameters_image">Image editing</string>
+	<string name="text_parameters_vedio">Vedio editing</string>
+	<string name="text_parameters_time">Time editing</string>
+	<string name="text_parameters_content">Please enter the display content</string>
+	<string name="text_parameter_x">Please enter the coordinates x</string>
+	<string name="text_parameter_y">Please enter the coordinates y</string>
+	<string name="text_parameter_w">Please enter the width of the</string>
+	<string name="text_parameter_h">Please enter the height of the</string>
+	<string name="submit">submit</string>
+	<string name="parameter_Settings">Parameter Settings</string>
+	<string name="name">Type the name：</string>
+	<string name="single_line">Single-line text</string>
+	<string name="side_frame">Border:</string>
+	<string name="border_color">Border color:</string>
 	<string name="text_parameters_w">Width:</string>
 	<string name="text_parameters_h">Height:</string>
 	<string name="text_parameters_x">Start X:</string>
 	<string name="text_parameters_y">Start Y:</string>
 	<string name="text_parameters_index">Position:</string>
 	<string name="text_parameters_center">VCenter</string>
-	<string name="text_parameters_content">Content:</string>
+	<string name="text_parameters_color">The font color:</string>
 	<string name="text_parameters_typepace">Typeface:</string>
 	<string name="text_parameters_textsize">Font size:</string>
+	<string name="text_parameters_background_color">The background color:</string>
 	<string name="text_parameters_bold">Bold:</string>
+	<string name="text_parameters_italic">The italic font:</string>
+	<string name="text_parameters_underline">The underline:</string>
 	<string name="text_parameters_no">no</string>
 	<string name="text_parameters_yes">yes</string>
 	<string name="text_entry_stunt">Entry Stunt：</string>
+	<string name="text_entry_speed">Entry Speed：</string>
 	<string name="text_clear_stunt">Clear Stunt：</string>
+	<string name="text_clear_speed">Clear Speed：</string>
 	<string name="text_speed">Speed：</string>
 	<string name="text_hold_time">Hold Time：</string>
 	<string name="text_time_s">0.1s</string>

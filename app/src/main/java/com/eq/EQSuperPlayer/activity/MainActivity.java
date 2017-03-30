@@ -208,7 +208,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     break;
                 case 2://文件发送完成指令
                     List<byte[]> sendEnd = new ArrayList<byte[]>();
-                    Toast.makeText(MainActivity.this, "文件发送完毕，发送文件传输结束指令", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(MainActivity.this, "文件发送完毕，发送文件传输结束指令", Toast.LENGTH_SHORT).show();
                     byte[] managerSend = SendPacket.pkgHeadend();
                     sendEnd.add(managerSend);
                     ccc = new ConnectControlCard(sendEnd, new InterfaceConnect() {
@@ -299,7 +299,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     break;
                 case 4://节目发送完成指令
                     List<byte[]> programeData = new ArrayList<byte[]>();
-                    Toast.makeText(MainActivity.this, "节目发送完毕，发送节目传输结束指令", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(MainActivity.this, "节目发送完毕，发送节目传输结束指令", Toast.LENGTH_SHORT).show();
                     byte[] endSend = SendPacket.pkgPingend();
                     programeData.add(endSend);
                     ccc = new ConnectControlCard(programeData, new InterfaceConnect() {
@@ -450,9 +450,9 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                             }
                         } else {
                             Log.d("......", "countAdress1111111111:" + countAdress);
-                            Log.d("......", "arr1111111111:" + arr);
+                            Log.d("......", "arr1111111111:" + arr.size());
                             arrays = new ArrayList<byte[]>();
-                            arrays.add(arr.get(countAdress - 1));
+                            arrays.add(arr.get(countAdress));
                             countAdress++;
                             List<byte[]> simallData = new ArrayList<byte[]>();
                             for (int i = 0; i < arrays.size(); i++) {
@@ -661,12 +661,15 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
         String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
                 + "textImage";
         filePath.add(fileTextPath);
+
         String fileImagePath = Environment.getExternalStorageDirectory().toString() + File.separator
                 + "EQImage";
         filePath.add(fileImagePath);
+
         String fileVedioPath = Environment.getExternalStorageDirectory().toString() + File.separator
                 + "EQVedio";
         filePath.add(fileVedioPath);
+
         for (int i = 0; i < filePath.size(); i++) {
             File fileAll = new File(filePath.get(i));
             if (!fileAll.exists()) {
@@ -775,7 +778,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
         if (isExit == false) {
             isExit = true;
             // 准备退出
-            Toast.makeText(MainActivity.this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, getResources().getText(R.string.hint_exit), Toast.LENGTH_SHORT).show();
             tExit = new Timer();
             tExit.schedule(new TimerTask() {
                 @Override
