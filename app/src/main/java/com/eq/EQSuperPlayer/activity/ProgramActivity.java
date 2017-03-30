@@ -193,6 +193,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         }
 
     }
+
     /*
   获取单个节目单中的所有节目
    */
@@ -335,6 +336,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         text_layout.addView(textview);
 
     }
+
     /**
      * 添加ImageView控件
      **/
@@ -384,7 +386,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
     /*
    添加视频显示
     */
-    private void showVedio(){
+    private void showVedio() {
         String fileVedioPath = Environment.getExternalStorageDirectory().toString() + File.separator
                 + "EQVedio";
         File fileAll = new File(fileVedioPath);
@@ -395,7 +397,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         for (int j = 0; j < files.length; j++) {
 
             //定义父容器为填充窗口
-            View view = View.inflate(this,R.layout.videoshow,null);
+            View view = View.inflate(this, R.layout.videoshow, null);
             RelativeLayout mvideolayout = (RelativeLayout) view.findViewById(R.id.videoparent);
             RelativeLayout.LayoutParams ll = (RelativeLayout.LayoutParams) mvideolayout.getLayoutParams();
             ll.width = windowWidth;
@@ -449,9 +451,10 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             public void onClick(View v) {
                 //填充的数据源
                 String[] arrayFruit = new String[]{getResources().getString(R.string.program_text),
-//                        getResources().getString(R.string.program_time),
                         getResources().getString(R.string.program_video),
                         getResources().getString(R.string.program_image),
+//                      getResources().getString(R.string.program_time),
+
                 };
                 AlertDialog.Builder dia = new AlertDialog.Builder(ProgramActivity.this);
                 dia.setTitle(getString(R.string.program_area_add))
@@ -479,16 +482,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                                             dialog.dismiss();
                                             recyclerViewAdapter.notifyDataSetChanged();
                                         } else if (which == 1) {
-                                            TimeBean timeBean = new TimeBean();
-                                            timeBean.setProgramBean(programBean);
-                                            timeBean.setTimeToname(getString(R.string.time));
-                                            timeBean.setType(Constant.AREA_TYPE_TIME);
-                                            new TimeDao(ProgramActivity.this).add(timeBean);
-                                            mDatas.add(getString(R.string.time));
-                                            totalBeens.add(timeBean);
-                                            dialog.dismiss();
-                                            recyclerViewAdapter.notifyDataSetChanged();
-                                        } else if (which == 2) {
                                             VedioBean vedioBean = new VedioBean();
                                             vedioBean.setProgramBean(programBean);
                                             vedioBean.setType(Constant.AREA_TYPE_VIDEO);
@@ -501,7 +494,8 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                                             totalBeens.add(vedioBean);
                                             dialog.dismiss();
                                             recyclerViewAdapter.notifyDataSetChanged();
-                                        } else if (which == 3) {
+
+                                        } else if (which == 2) {
                                             ImageBean imageBean = new ImageBean();
                                             imageBean.setProgramBean(programBean);
                                             imageBean.setType(Constant.AREA_TYPE_IMAGE);
@@ -512,6 +506,16 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                                             mDatas.add(getString(R.string.image));
                                             recyclerViewAdapter.notifyDataSetChanged();
                                             totalBeens.add(imageBean);
+                                        } else if (which == 3) {
+                                            TimeBean timeBean = new TimeBean();
+                                            timeBean.setProgramBean(programBean);
+                                            timeBean.setTimeToname(getString(R.string.time));
+                                            timeBean.setType(Constant.AREA_TYPE_TIME);
+                                            new TimeDao(ProgramActivity.this).add(timeBean);
+                                            mDatas.add(getString(R.string.time));
+                                            totalBeens.add(timeBean);
+                                            dialog.dismiss();
+                                            recyclerViewAdapter.notifyDataSetChanged();
                                         }
                                     }
                                 });
@@ -652,7 +656,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 programBean = new ProgramBean();
                 areabean = new AreabeanDao(ProgramActivity.this).get(program_id);
                 programBean.setAreabean(areabean);
-                programBean.setName(getResources().getText(R.string.main_program) +""+ program_name_count);
+                programBean.setName(getResources().getText(R.string.main_program) + "" + program_name_count);
                 Log.d("..............", "areabean...........:" + areabean.toString());
                 program_name_count++;
                 ProgramNameItemManager.setSharedPreference(ProgramActivity.this, program_name_count);
@@ -1128,7 +1132,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                             imagePathList.add(fileVedio.getPath());
                             String vedioName = fileVedio.getPath().substring(fileVedio.getPath().lastIndexOf("/") + 1, fileVedio.getPath().length());
                             serializer.startTag(null, "file");
-                            serializer.attribute(null, "index",i+ "");
+                            serializer.attribute(null, "index", i + "");
 
                             serializer.startTag(null, "type");
                             serializer.text("1");
