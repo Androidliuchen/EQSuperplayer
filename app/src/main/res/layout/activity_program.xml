@@ -53,8 +53,8 @@
             android:id="@+id/program_iamge"
             android:clickable="true"
             android:background="@color/gainsboro"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             />
     </RelativeLayout>
 

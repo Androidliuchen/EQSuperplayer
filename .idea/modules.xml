@@ -3,7 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/EQSuperplayer.iml" filepath="$PROJECT_DIR$/EQSuperplayer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/EQSuperplayer.iml" filepath="$PROJECT_DIR$/EQSuperplayer.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/slidingmenu_library/slidingmenu_library.iml" filepath="$PROJECT_DIR$/slidingmenu_library/slidingmenu_library.iml" />
       <module fileurl="file://$PROJECT_DIR$/slidingmenu_library/slidingmenu_library.iml" filepath="$PROJECT_DIR$/slidingmenu_library/slidingmenu_library.iml" />
     </modules>
   </component>

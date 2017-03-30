@@ -4,12 +4,11 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
@@ -17,17 +16,21 @@ import android.util.Log;
 import android.util.Xml;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 import android.widget.ViewFlipper;
 
+import com.bumptech.glide.Glide;
 import com.eq.EQSuperPlayer.R;
 import com.eq.EQSuperPlayer.adapter.RecyclerViewAdapter;
 import com.eq.EQSuperPlayer.adapter.TextAdapter;
@@ -49,15 +52,14 @@ import com.eq.EQSuperPlayer.dao.TextBeanDao;
 import com.eq.EQSuperPlayer.dao.TimeDao;
 import com.eq.EQSuperPlayer.dao.VedioDao;
 import com.eq.EQSuperPlayer.utils.AnimatorUtils;
-import com.eq.EQSuperPlayer.utils.AreaDrawText;
 import com.eq.EQSuperPlayer.utils.ProgramNameItemManager;
 import com.eq.EQSuperPlayer.utils.Utils;
 import com.eq.EQSuperPlayer.utils.WindowSizeManager;
+import com.eq.EQSuperPlayer.view.MarqueeButton;
 import com.eq.EQSuperPlayer.view.ProgramListView;
 import com.eq.EQSuperPlayer.view.SlidingItemListView;
 import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.dao.ForeignCollection;
-
 
 import org.xmlpull.v1.XmlSerializer;
 
@@ -120,6 +122,8 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
     private int program_name_count;
     private int zoneIndex = 0;
 
+    private MyOnTouchListener listener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -143,7 +147,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         text_ima = (ViewFlipper) findViewById(R.id.program_iamge);
         text_layout = (RelativeLayout) findViewById(R.id.program_text_background);
         relt = (RelativeLayout) findViewById(R.id.relt);
-        MyOnTouchListener listener = new MyOnTouchListener();
+        listener = new MyOnTouchListener();
         //读取宽高设置
         WindowSizeManager windowSizeManager = WindowSizeManager.getSahrePreference(this);
         windowHeight = windowSizeManager.getWindowHeight();
@@ -154,9 +158,9 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         Log.d("...........", "显示屏宽高...............：" + text_layout.getLayoutParams().height);
         Log.d("...........", "显示屏宽高...............：" + text_layout.getLayoutParams().width);
         //手势缩放监听事件，有些瑕疵，有待完善
-        text_layout.setOnTouchListener(listener);
+//        text_layout.setOnTouchListener(listener);
         //节目区手势监听
-        text_ima.setOnTouchListener(listener);
+//        text_ima.setOnTouchListener(listener);
         region_btn = (Button) findViewById(R.id.region);
         send_btn = (Button) findViewById(R.id.region_send);
         out_image.setOnClickListener(this);
@@ -186,61 +190,83 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             tableBeens.add(programBean);
             Log.d("........", "tableBeens.............:" + tableBeens.toString());
             System.out.println("查询设备所有节目个数:" + programBean.toString());
-        //查询是否文本内容
-        ForeignCollection<TextBean> text = programBean.getTextBeen();
-        CloseableIterator<TextBean> iteratorText = text.closeableIterator();
-        while (iteratorText.hasNext()) {
-            textBean = iteratorText.next();
-            String tt = textBean.getId() + "..............." + textBean.getName();
-            Log.d("............", "tt数值.........:" + tt);
-            Paint paint = Utils.getPaint(this, Utils.getPaintSize(this, textBean.getStSize()));//字体参数启动读取
-            paint.setFakeBoldText(textBean.isStBold());
-            Utils.setTypeface(this, paint
-                    , (this.getResources().getStringArray(R.array.typeface_path))[textBean.getStTypeFace()]);
-            textBean.setPaint(paint);
-            textBean.setProgramBean(programBean);
-            textBean.setType(Constant.AREA_TYPE_TEXT);
-            Log.d("..............", "查询设备所有节目内容:" + textBean.toString());
-            totalBeens.add(textBean);
+        }
+
+    }
+    /*
+  获取单个节目单中的所有节目
+   */
+    private void initDatas(ProgramBean programBean) {
+        totalBeens.clear();
+        mDatas.clear();
+        text_ima.removeAllViews();
+        text_layout.removeAllViews();
+        int num = 0;
+        //查询是否有视频
+        ForeignCollection<VedioBean> vedio = programBean.getVedioBeen();
+        if (vedio != null) {
+            CloseableIterator<VedioBean> iterator4 = vedio.closeableIterator();
+            while (iterator4.hasNext()) {
+                vedioBean = iterator4.next();
+                String vedios = vedioBean.getId() + ".............." + vedioBean.getVedioName();
+                Log.d("............", "vedios数值.........:" + vedios);
+                vedioBean.setProgramBean(programBean);
+                vedioBean.setType(Constant.AREA_TYPE_VIDEO);
+                totalBeens.add(vedioBean);
+                showVedio();
+            }
+
 
         }
         //查询是否有图片
         ForeignCollection<ImageBean> iamge = programBean.getImageBeen();
-        CloseableIterator<ImageBean> iteratorImage = iamge.closeableIterator();
-        while (iteratorImage.hasNext()) {
-            imageBean = iteratorImage.next();
-            String iamges = imageBean.getIamgeId() + ".............." + imageBean.getIamgeName();
-            Log.d("............", "iamges数值.........:" + iamges);
-            imageBean.setProgramBean(programBean);
-            imageBean.setType(Constant.AREA_TYPE_IMAGE);
-            totalBeens.add(imageBean);
+        if (iamge != null) {
+            CloseableIterator<ImageBean> iterator2 = iamge.closeableIterator();
+            while (iterator2.hasNext()) {
+                imageBean = iterator2.next();
+                String iamges = imageBean.getIamgeId() + ".............." + imageBean.getIamgeName();
+                Log.d("............", "iamges数值.........:" + iamges);
+                imageBean.setProgramBean(programBean);
+                imageBean.setType(Constant.AREA_TYPE_IMAGE);
+                totalBeens.add(imageBean);
+                showImageView();
+            }
         }
+        //查询是否文本内容
+        num = 10;
+        ForeignCollection<TextBean> text = programBean.getTextBeen();
+        if (text != null) {
+            CloseableIterator<TextBean> iterator1 = text.closeableIterator();
+            while (iterator1.hasNext()) {
+                textBean = iterator1.next();
+                String tt = textBean.getId() + "..............." + textBean.getName();
+                Log.d("............", "tt数值.........:" + tt);
+                Paint paint = Utils.getPaint(this, Utils.getPaintSize(this, textBean.getStSize()));//字体参数启动读取
+                paint.setFakeBoldText(textBean.isStBold());
+                Utils.setTypeface(this, paint
+                        , (this.getResources().getStringArray(R.array.typeface_path))[textBean.getStTypeFace()]);
+                textBean.setPaint(paint);
+                textBean.setProgramBean(programBean);
+                textBean.setType(Constant.AREA_TYPE_TEXT);
+                Log.d("..............", "查询设备所有节目内容:" + textBean.toString());
+                totalBeens.add(textBean);
+                showText(num);
+                num++;
+            }
+        }
+
         //查询是否有时钟
         ForeignCollection<TimeBean> time = programBean.getTimeBeen();
-        Log.d("............", "time数值.........:" + time);
-        CloseableIterator<TimeBean> iteratorTime = time.closeableIterator();
-        Log.d("............", "iteratorTime数值.........:" + iteratorTime);
-        while (iteratorTime.hasNext()) {
-            timeBean = iteratorTime.next();
-            String times = timeBean.getId() + ".............." + timeBean.getTimeToname();
-            Log.d("............", "times数值.........:" + times);
-            timeBean.setProgramBean(programBean);
-            timeBean.setType(Constant.AREA_TYPE_TIME);
-            totalBeens.add(timeBean);
-        }
-        //查询是否有视频
-        ForeignCollection<VedioBean> vedio = programBean.getVedioBeen();
-        Log.d("............", "vedio数值.........:" + vedio);
-        CloseableIterator<VedioBean> iteratorVedio = vedio.closeableIterator();
-        Log.d("............", "iteratorVedio数值.........:" + iteratorVedio);
-        while (iteratorVedio.hasNext()) {
-            vedioBean = iteratorVedio.next();
-            String vedios = vedioBean.getId() + ".............." + vedioBean.getVedioName();
-            Log.d("............", "vedios数值.........:" + vedios);
-            vedioBean.setProgramBean(programBean);
-            vedioBean.setType(Constant.AREA_TYPE_VIDEO);
-            totalBeens.add(vedioBean);
-        }
+        if (time != null) {
+            CloseableIterator<TimeBean> iterator3 = time.closeableIterator();
+            while (iterator3.hasNext()) {
+                timeBean = iterator3.next();
+                String times = timeBean.getId() + ".............." + timeBean.getTimeToname();
+                Log.d("............", "times数值.........:" + times);
+                timeBean.setProgramBean(programBean);
+                timeBean.setType(Constant.AREA_TYPE_IMAGE);
+                totalBeens.add(timeBean);
+            }
         }
 
         for (TotalBean totalBean : totalBeens) {
@@ -260,13 +286,12 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                     break;
             }
         }
-        showText();
     }
 
     /*
-     显示第一屏内容
-   */
-    private void showText() {
+      显示文本内容
+    */
+    private void showText(int num) {
         int[] number_colors = new int[]{textBean.getBorderColor(), textBean.getStBackground(), textBean.getStColor()};
         for (int i = 0; i < number_colors.length; i++) {
             switch (number_colors[i]) {
@@ -296,36 +321,121 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                     break;
             }
         }
-        RelativeLayout.LayoutParams linearParams = (RelativeLayout.LayoutParams) text_ima.getLayoutParams();
-        linearParams.width = windowWidth;
-        linearParams.height = windowHeight;
-        text_ima.setLayoutParams(linearParams);
-        final Bitmap bt = Bitmap.createBitmap(windowWidth, windowHeight, Bitmap.Config.ARGB_8888);
-        Canvas canvas1 = new Canvas(bt); // 创建画布
-        canvas1.drawColor(Color.BLACK); // 颜色黑色
-        Paint paint = Utils.getPaint(this, Utils.getPaintSize(this, textBean.getStSize()));//字体参数启动读取
-        Utils.setTypeface(this, paint
-                , (this.getResources().getStringArray(R.array.typeface_path))[textBean.getStTypeFace()]);
-        textBean.setPaint(paint);
-        AreaDrawText.DrawArea(this, canvas1, textBean);
-        int hour = textBean.getStandtime();
-        text_ima.setFlipInterval(hour * 1000);//设置自动播放的时间间隔为3S
-        Log.d(".......", "设置自动播放的时间间隔为：" + hour);
-        text_ima.setAutoStart(true);
-        text_ima.addView(addImageView(bt));
-
+        MarqueeButton textview = new MarqueeButton(this);
+        textview.setText(textBean.getSingleTextValue());
+        textview.setX(textBean.getX());
+        textview.setY(textBean.getY());
+        textview.setOnTouchListener(listener);
+        textview.setTextColor(number_colors[2]);
+        textview.setTextSize(textBean.getStSize());
+        textview.setWidth(textBean.getWidth());
+        textview.setHeight(textBean.getHeidht());
+        textview.setBackgroundColor(0x0000);
+        textview.setId(num);
+        text_layout.addView(textview);
 
     }
-
-
     /**
      * 添加ImageView控件
      **/
-    private View addImageView(Bitmap bitmap) {
-        ImageView imageView = new ImageView(this);
-        imageView.setImageBitmap(bitmap);
-        return imageView;
+    private void showImageView() {
+        String fileImagePath = Environment.getExternalStorageDirectory().toString() + File.separator
+                + "EQImage";
+        File fileAll = new File(fileImagePath);
+        if (!fileAll.exists()) {
+            fileAll.mkdir();
+        }
+        File[] files = fileAll.listFiles();
+
+        View view = View.inflate(this, R.layout.image_viewflipler, null);
+
+        LinearLayout mImagelayout = (LinearLayout) view.findViewById(R.id.image_layout);
+        LinearLayout.LayoutParams ll = (LinearLayout.LayoutParams) mImagelayout.getLayoutParams();
+        ll.width = windowWidth;
+        ll.height = windowHeight;
+        mImagelayout.setLayoutParams(ll);
+
+
+        mImagelayout.setOnTouchListener(listener);
+
+        ViewFlipper flipler = (ViewFlipper) view.findViewById(R.id.image_flipler);
+
+        flipler.setOnTouchListener(listener);
+        int hour = imageBean.getIamgeandtime();
+        flipler.setFlipInterval(hour * 1000);//设置自动播放的时间间隔为3S
+        flipler.setAutoStart(true);
+        flipler.setX(imageBean.getIamgeX());
+        flipler.setY(imageBean.getIamgeY());
+        for (int j = 0; j < files.length; j++) {
+            File file1 = files[j];
+            View imageviews = View.inflate(this, R.layout.image_item, null);
+            ImageView imageView = (ImageView) imageviews.findViewById(R.id.imageitem);
+            ViewGroup.LayoutParams il = imageView.getLayoutParams();
+            il.width = imageBean.getIamgeWidth();
+            il.height = imageBean.getIamgeHeidht();
+            imageView.setLayoutParams(il);
+            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+            Glide.with(this).load(file1.getPath()).into(imageView);
+            flipler.addView(imageviews);
+        }
+        text_layout.addView(view);
     }
+
+    /*
+   添加视频显示
+    */
+    private void showVedio(){
+        String fileVedioPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                + "EQVedio";
+        File fileAll = new File(fileVedioPath);
+        if (!fileAll.exists()) {
+            fileAll.mkdir();
+        }
+        File[] files = fileAll.listFiles();
+        for (int j = 0; j < files.length; j++) {
+
+            //定义父容器为填充窗口
+            View view = View.inflate(this,R.layout.videoshow,null);
+            RelativeLayout mvideolayout = (RelativeLayout) view.findViewById(R.id.videoparent);
+            RelativeLayout.LayoutParams ll = (RelativeLayout.LayoutParams) mvideolayout.getLayoutParams();
+            ll.width = windowWidth;
+            ll.height = windowHeight;
+            mvideolayout.setLayoutParams(ll);
+
+            //定义显示播放的视频的宽高和x y 的距离
+            RelativeLayout vl = (RelativeLayout) view.findViewById(R.id.videolayout);
+            RelativeLayout.LayoutParams rl = (RelativeLayout.LayoutParams) vl.getLayoutParams();
+            rl.width = 300;
+            rl.height = 300;
+            vl.setLayoutParams(rl);
+            vl.setOnTouchListener(listener);
+            vl.setX(100);
+            vl.setY(100);
+
+            //取出视频的地址并且进行播放
+            File file1 = files[j];
+            VideoView vv = (VideoView) view.findViewById(R.id.videoview);
+            vv.setVideoPath(file1.getPath());
+
+            // 开始播放
+            vv.start();
+            vv.setOnTouchListener(listener);
+
+            //监听视频播放完的后循环播放
+            vv.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                @Override
+                public void onCompletion(MediaPlayer mPlayer) {
+                    // TODO Auto-generated method stub
+                    mPlayer.start();
+                    mPlayer.setLooping(true);
+                }
+            });
+            text_layout.addView(view);
+        }
+
+    }
+
 
     private View getTypeWindowListView() {
         View view = this.getLayoutInflater().inflate(R.layout.recry_itme, null);
@@ -441,7 +551,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                     programListView.slideBack();
                     recyclerViewAdapter.notifyDataSetChanged();
                 }
-                showText();
             }
         });
         programListView.setAdapter(recyclerViewAdapter);
@@ -459,7 +568,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         intent.setClass(ProgramActivity.this, ImageActivity.class);
                         intent.putExtra(Constant.PROGRAM_ID, imageBean.getId());
                         startActivity(intent);
-                        showText();
                         customTypeWindow.dismiss();
                         ProgramActivity.this.finish();
                         break;
@@ -470,7 +578,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         intent.setClass(ProgramActivity.this, TextActivity.class);
                         intent.putExtra(Constant.PROGRAM_ID, textBean.getId());
                         startActivity(intent);
-                        showText();
                         customTypeWindow.dismiss();
                         ProgramActivity.this.finish();
                         break;
@@ -481,7 +588,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         intent.putExtra(Constant.PROGRAM_ID, timeBean.getId());
                         startActivity(intent);
                         customTypeWindow.dismiss();
-                        showText();
                         ProgramActivity.this.finish();
                         break;
                     case Constant.AREA_TYPE_VIDEO:
@@ -490,7 +596,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         intent.setClass(ProgramActivity.this, VedioActivity.class);
                         intent.putExtra(Constant.PROGRAM_ID, vedioBean.getId());
                         startActivity(intent);
-                        showText();
                         customTypeWindow.dismiss();
                         ProgramActivity.this.finish();
                         break;
@@ -533,9 +638,11 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 Log.d("..................", "tableBeens数据...............:" + tableBeens.toString());
                 ProgramBean programBean = (ProgramBean) tableBeens.get(position);
+                initDatas(programBean);
                 region_text.setText(programBean.getName());
                 selet = programBean.getId();
                 program_itme = position;
+                customPopWindow.dismiss();
                 Log.d("..................", "selet数据...............:" + selet);
             }
         });
@@ -565,7 +672,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 this.finish();
                 break;
             case R.id.region_jia:
-                showText();
                 // 设置进入屏幕的动画
                 text_ima.setInAnimation(AnimationUtils.loadAnimation(this, R.anim.push_left_in));
                 // 设置退出屏幕的动画
@@ -687,18 +793,19 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             float nextY = v.getY() + distanceY;
             float nextX = v.getX() + distanceX;
             // 不能移出屏幕
-            if (nextX < 0)
+            if (nextX < 0) {
                 nextX = 0;
-            else if (nextX > containerWidth - v.getWidth())
-                nextX = containerWidth - v.getWidth();
+            } else if (nextX + v.getWidth() > windowWidth) {
+                nextX = windowWidth - v.getWidth();
+            }
+            if (nextY < 0) {
+                nextY = 0;
+            } else if (nextY + v.getHeight() > windowHeight) {
+                nextY = windowHeight - v.getHeight();
+            }
             AnimatorUtils.translate(v, v.getX(), v.getY(), nextX, nextY);
             lastX_drag = event.getRawX();
             lastY_drag = event.getRawY();
-            if (nextY < 0) {
-                nextY = 0;
-            } else if (nextY > containerHeight - v.getHeight()) {
-                nextY = containerHeight - v.getHeight();
-            }
         }
 
         private float spacing(MotionEvent event) {
