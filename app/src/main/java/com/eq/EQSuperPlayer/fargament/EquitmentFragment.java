@@ -2,7 +2,9 @@ package com.eq.EQSuperPlayer.fargament;
 
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
+import android.net.DhcpInfo;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,7 +25,9 @@ import android.widget.Toast;
 
 
 import com.eq.EQSuperPlayer.R;
+import com.eq.EQSuperPlayer.adapter.ProgramAdapter;
 import com.eq.EQSuperPlayer.adapter.WifiListAdapter;
+import com.eq.EQSuperPlayer.communication.ConnectControlCard;
 import com.eq.EQSuperPlayer.utils.NetWorkCheck;
 import com.eq.EQSuperPlayer.utils.WifiPswDialog;
 
@@ -40,6 +44,7 @@ public class EquitmentFragment extends Fragment implements OnClickListener {
     private ProgressDialog proDialog; // 进度条
     private WifiListAdapter adapter = null; //
     public List<ScanResult> EqWifiList = null;
+    private DhcpInfo dhcpInfo;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -155,6 +160,12 @@ public class EquitmentFragment extends Fragment implements OnClickListener {
                     break;
 
                 case 2:
+                    //获取WiFi信息
+                    WifiManager my_wifiManager = ((WifiManager) getActivity().getSystemService(getActivity().WIFI_SERVICE));
+                    dhcpInfo = my_wifiManager.getDhcpInfo();
+                    String IP = intToIp(dhcpInfo.dns1);
+                    ProgramAdapter.ipAressd = IP;
+                    ConnectControlCard.HOSTAddress = IP;
                     proDialog.cancel();
                     updateWifiName();
                     Toast.makeText(getActivity(),getResources().getString(R.string.hint_connection_success),Toast.LENGTH_SHORT).show();
@@ -186,6 +197,11 @@ public class EquitmentFragment extends Fragment implements OnClickListener {
 
 
         }
+    }
+    //转换成DNS格式
+    private String intToIp(int paramInt) {
+        return (paramInt & 0xFF) + "." + (0xFF & paramInt >> 8) + "." + (0xFF & paramInt >> 16) + "."
+                + (0xFF & paramInt >> 24);
     }
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)

@@ -519,7 +519,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             }
         });
         textView.setText(getResources().getText(R.string.the_programme));
-        ProgramBean programBean = new ProgramBeanDao(this).get(selet);
+        final ProgramBean programBean = new ProgramBeanDao(this).get(selet);
         recyclerViewAdapter = new RecyclerViewAdapter(ProgramActivity.this, mDatas);
         recyclerViewAdapter.setmRemoveViewListener(new RecyclerViewAdapter.OnRemoveViewListener() {
             @Override
@@ -534,7 +534,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                     String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
                             + "textImage";
                     FileUtils.deleteDir(fileTextPath);
-                    showText();
                     recyclerViewAdapter.notifyDataSetChanged();
                 } else if (timeBean == totalBeens.get(position)) {
                     mDatas.remove(position);
@@ -550,7 +549,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                     String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
                             + "EQImage";
                     FileUtils.deleteDir(fileTextPath);
-                    showImageView();
                     recyclerViewAdapter.notifyDataSetChanged();
                 } else if (vedioBean == totalBeens.get(position)) {
                     mDatas.remove(position);
@@ -560,14 +558,15 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                     String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
                             + "EQVedio";
                     FileUtils.deleteDir(fileTextPath);
-                    showVedio();
                     recyclerViewAdapter.notifyDataSetChanged();
                 }
+                //获取当前显示的节目单，进行删除后刷新显示区
+                ProgramBean programBean = (ProgramBean) tableBeens.get(program_itme);
+                initDatas(programBean);
             }
         });
         programListView.setAdapter(recyclerViewAdapter);
         recyclerViewAdapter.notifyDataSetChanged();
-
 
         programListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
