@@ -211,6 +211,12 @@ public class ImageActivity extends Activity {
                 ImageActivity.this.finish();
                 break;
             case R.id.image_send://提交数据，同时将数据写入数据库，以供节目显示用。
+                imageSave();
+                Intent intent1 = new Intent(ImageActivity.this,ProgramActivity.class);
+                startActivity(intent1);
+                ImageActivity.this.finish();
+                break;
+            case R.id.iam_btn://图片添加按钮，点击跳转到图片添加界面。
                 String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
                         + "EQImage";
                 File file = new File(fileTextPath);
@@ -219,12 +225,6 @@ public class ImageActivity extends Activity {
                 }else {
                     FileUtils.deleteDir(fileTextPath);
                 }
-                imageSave();
-                Intent intent1 = new Intent(ImageActivity.this,ProgramActivity.class);
-                startActivity(intent1);
-                ImageActivity.this.finish();
-                break;
-            case R.id.iam_btn://图片添加按钮，点击跳转到图片添加界面。
                 ArrayList<String> imagePath = new ArrayList<>();
                 for (ImagePath imagePath1 : paths){
                     imagePath.add(imagePath1.getPath());
