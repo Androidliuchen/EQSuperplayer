@@ -414,7 +414,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             File file1 = files[j];
             VideoView vv = (VideoView) view.findViewById(R.id.videoview);
             vv.setVideoPath(file1.getPath());
-
             // 开始播放
             vv.start();
             vv.setOnTouchListener(listener);
