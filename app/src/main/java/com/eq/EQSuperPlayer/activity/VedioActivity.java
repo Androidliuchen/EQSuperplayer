@@ -254,14 +254,7 @@ public class VedioActivity extends AppCompatActivity {
                 VedioActivity.this.finish();
                 break;
             case R.id.vedio_send://提交修改后的数据
-                String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
-                        + "EQVedio";
-                File file = new File(fileTextPath);
-                if (!file.exists()) {
-                    file.mkdir();
-                }else {
-                    FileUtils.deleteDir(fileTextPath);
-                }
+
                 vedioSave();
                 Log.d("..........", "vedioBean改变数据内容...............:" + vedioBean.toString());
                 Intent intent1 = new Intent(VedioActivity.this, ProgramActivity.class);
@@ -270,7 +263,14 @@ public class VedioActivity extends AppCompatActivity {
                 break;
 
             case R.id.vedio_btn://点击打开手机视频
-
+                String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                        + "EQVedio";
+                File file = new File(fileTextPath);
+                if (!file.exists()) {
+                    file.mkdir();
+                }else {
+                    FileUtils.deleteDir(fileTextPath);
+                }
                 Intent intent2 = new Intent(Intent.ACTION_PICK);
                 intent2.setType("video/*");
                 startActivityForResult(intent2, VIDEO_CAPTURE1);

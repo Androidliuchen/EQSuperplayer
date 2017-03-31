@@ -374,7 +374,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
         Log.d(".....", "matrix缩放比。。。" + matrix);
         // 得到新的图片
         Bitmap newbm = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
-//        Utils.saveMyBitmap(bm, "text" + i);
+        Utils.saveMyBitmap(bm, "text" + i);
         return newbm;
     }
 }
