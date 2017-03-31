@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore.Images;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -30,10 +31,15 @@ import com.eq.EQSuperPlayer.custom.Constant;
 import com.eq.EQSuperPlayer.dao.ProgramBeanDao;
 import com.eq.EQSuperPlayer.dao.TextBeanDao;
 import com.eq.EQSuperPlayer.dao.VedioDao;
+import com.eq.EQSuperPlayer.utils.FileUtils;
 import com.eq.EQSuperPlayer.utils.TimeChange;
 import com.eq.EQSuperPlayer.utils.WindowSizeManager;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import butterknife.BindView;
@@ -82,7 +88,7 @@ public class VedioActivity extends AppCompatActivity {
     private ProgramBean programBean;
     private List<ProgramBean> programBeens;
     private Areabean areabean = new Areabean();
-
+    public static  String path;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,18 +111,20 @@ public class VedioActivity extends AppCompatActivity {
         windowHeight = windowSizeManager.getWindowHeight();
         // 视频窗宽高
         if (vedioBean.getVedioWidth() != 0 && vedioBean.getVedioHeidht() != 0) {
-            vedioHeigth.setText(vedioBean.getVedioWidth() + "");
-            vedioHeigth.setText(vedioBean.getVedioWidth() + "");
+            vedioWidth.setText(vedioBean.getVedioWidth() + "");
+            vedioHeigth.setText(vedioBean.getVedioHeidht() + "");
         } else {
             vedioWidth.setText(windowWidth + "");
             vedioHeigth.setText(windowHeight + "");
         }
-        if (vedioBean.getVedioX() != 0){
+        if (vedioBean.getVedioX() != 0 || vedioBean.getVedioY() != 0){
             vedioX.setText(vedioBean.getVedioX() + "");
             vedioY.setText(vedioBean.getVedioY() + "");
+        }else {
+            vedioX.setText(0 + "");
+            vedioY.setText(0 + "");
         }
-        vedioX.setText(0 + "");
-        vedioY.setText(0 + "");
+
         TypedArray typedArray = this.getResources().obtainTypedArray(R.array.textcolor);
         int[] color_id = new int[typedArray.length()];
         for (int i = 0; i < typedArray.length(); i++) {
@@ -141,8 +149,6 @@ public class VedioActivity extends AppCompatActivity {
                 vedioBean.setVedioHeidht(Integer.parseInt(vedioHeigth.getText().toString()));
                 vedioBean.setVedioX(Integer.parseInt(vedioX.getText().toString()));
                 vedioBean.setVedioY(Integer.parseInt(vedioY.getText().toString()));
-//                areabean.setArea_X(Integer.parseInt(vedioX.getText().toString()));
-//                areabean.setArea_Y(Integer.parseInt(vedioY.getText().toString()));
             } else {
                 Toast.makeText(this, "参数超出边界，请重新设置", Toast.LENGTH_SHORT).show();
             }
@@ -159,9 +165,12 @@ public class VedioActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && requestCode == VIDEO_CAPTURE1) {
-
+            String fileVedioPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                    + "EQVedio/" +  System.currentTimeMillis() + ".mp4";
+            File file1 = new File(fileVedioPath);
             Uri uri = data.getData();
             File file = getFileByUri(uri);
+            FileUtils.copyfile(file, file1,true );
             MediaMetadataRetriever mmr = new MediaMetadataRetriever();//实例化MediaMetadataRetriever对象
             mmr.setDataSource(file.getAbsolutePath());
             bitmap = mmr.getFrameAtTime();//获得视频第一帧的Bitmap对象
@@ -188,7 +197,6 @@ public class VedioActivity extends AppCompatActivity {
         }
 
     }
-
     public File getFileByUri(Uri uri) {
         String path = null;
         if ("file".equals(uri.getScheme())) {
@@ -237,7 +245,6 @@ public class VedioActivity extends AppCompatActivity {
         return null;
     }
 
-
     @OnClick({R.id.vedio_finsh, R.id.vedio_send, R.id.vedio_btn})
     public void onClick(View view) {
         switch (view.getId()) {
@@ -247,6 +254,14 @@ public class VedioActivity extends AppCompatActivity {
                 VedioActivity.this.finish();
                 break;
             case R.id.vedio_send://提交修改后的数据
+                String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                        + "EQVedio";
+                File file = new File(fileTextPath);
+                if (!file.exists()) {
+                    file.mkdir();
+                }else {
+                    FileUtils.deleteDir(fileTextPath);
+                }
                 vedioSave();
                 Log.d("..........", "vedioBean改变数据内容...............:" + vedioBean.toString());
                 Intent intent1 = new Intent(VedioActivity.this, ProgramActivity.class);
@@ -255,6 +270,7 @@ public class VedioActivity extends AppCompatActivity {
                 break;
 
             case R.id.vedio_btn://点击打开手机视频
+
                 Intent intent2 = new Intent(Intent.ACTION_PICK);
                 intent2.setType("video/*");
                 startActivityForResult(intent2, VIDEO_CAPTURE1);

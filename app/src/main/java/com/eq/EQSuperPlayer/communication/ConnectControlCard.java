@@ -20,7 +20,7 @@ import java.util.List;
 public class ConnectControlCard implements Runnable {
     private static final String TAG = "ConnectControlCard";
     public static int PORT = 5050;  // 端口
-    public static String HOSTAddress = "192.168.2.230";    // 主机地址
+    public static String HOSTAddress = null;    // 主机地址
     private DatagramSocket dataSocket = null;
     private DatagramPacket dataPacket = null;
     private int dataLength = 0;    //在当前类，竟然还要传个空值过来

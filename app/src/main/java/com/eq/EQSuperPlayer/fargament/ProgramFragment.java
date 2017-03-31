@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
@@ -23,13 +24,17 @@ import com.eq.EQSuperPlayer.R;
 import com.eq.EQSuperPlayer.activity.ProgramActivity;
 import com.eq.EQSuperPlayer.adapter.ProgramAdapter;
 import com.eq.EQSuperPlayer.bean.Areabean;
+import com.eq.EQSuperPlayer.communication.ConnectControlCard;
 import com.eq.EQSuperPlayer.custom.CustomPopWindow;
 import com.eq.EQSuperPlayer.custom.CustomTypeWindow;
 import com.eq.EQSuperPlayer.dao.AreabeanDao;
+import com.eq.EQSuperPlayer.utils.FileUtils;
 import com.eq.EQSuperPlayer.view.SlidingItemListView;
 import com.eq.EQSuperPlayer.utils.ProgramNameItemManager;
 import com.eq.EQSuperPlayer.utils.WindowSizeManager;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -49,14 +54,21 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
     private Areabean mAreabean;
     private int program_name_count;   //自动命名的数字
     private DhcpInfo dhcpInfo;
+    private int windowWidth;
+    private int windowHeight;
     private CustomTypeWindow customTypeWindow;
-    private Button btn_Dx;
-    private Button btn_Cx;
-    private Button btn_A60x;
-    private Button btn_Cxi;
-    private Button btn_AX0;
-    private Button btn_Dx0;
-    private Button btn_Cx0;
+    private Button btn_3;
+    private Button btn_A1;
+    private Button btn_A2;
+    private Button btn_A3;
+    private Button btn_A2L;
+    private Button btn_A3L;
+    private Button btn_Q1;
+    private Button btn_Q2;
+    private Button btn_Q3;
+    private Button btn_Q4;
+    private Button btn_Q3L;
+    private Button btn_Q4L;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -84,6 +96,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
         dhcpInfo = my_wifiManager.getDhcpInfo();
         String IP = intToIp(dhcpInfo.dns1);
         ProgramAdapter.ipAressd = IP;
+        ConnectControlCard.HOSTAddress = IP;
         return view;
     }
 
@@ -121,6 +134,27 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 // 删除按钮的回调，注意也可以放在adapter里面处理
                 new AreabeanDao(getActivity()).delete(areabeens.get(position).getId());
                 areabeens.remove(position);
+                List<String> filePath = new ArrayList<>();
+                String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                        + "textImage";
+                filePath.add(fileTextPath);
+                String fileImagePath = Environment.getExternalStorageDirectory().toString() + File.separator
+                        + "EQImage";
+                filePath.add(fileImagePath);
+                String fileVedioPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                        + "EQVedio";
+                filePath.add(fileVedioPath);
+                String PROGRAME_ROOT = Environment
+                        .getExternalStorageDirectory()
+                        .getAbsolutePath() + "/EQPrograme/";
+                filePath.add(PROGRAME_ROOT);
+                for (int i = 0; i < filePath.size(); i++) {
+                    File fileAll = new File(filePath.get(i));
+                    if (!fileAll.exists()) {
+                        fileAll.mkdir();
+                    }
+                    FileUtils.deleteDir(fileAll.getPath());
+                }
                 mListView.slideBack();
                 mProgramAdapter.notifyDataSetChanged();
             }
@@ -151,122 +185,267 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 customTypeWindow.showPopupWindow(mImageView);
 
                 break;
-            case R.id.btn_Cx:
-                btn_Cx.setEnabled(false);
-                btn_Dx.setEnabled(true);
-                btn_A60x.setEnabled(true);
-                btn_AX0.setEnabled(true);
-                btn_Cx0.setEnabled(true);
-                btn_Cxi.setEnabled(true);
-                btn_Dx0.setEnabled(true);
-                program_type.setText("Cx");
-                program_width.setText("2048");
-                program_height.setText("2048");
-                int windowWidth = 2048;
-                int windowHeight = 2048;
+            case R.id.btn_3:
+                btn_3.setEnabled(false);
+                btn_A1.setEnabled(true);
+                btn_A2.setEnabled(true);
+                btn_A3.setEnabled(true);
+                btn_A2L.setEnabled(true);
+                btn_A3L.setEnabled(true);
+                btn_Q1.setEnabled(true);
+                btn_Q2.setEnabled(true);
+                btn_Q3.setEnabled(true);
+                btn_Q4.setEnabled(true);
+                btn_Q3L.setEnabled(true);
+                btn_Q4L.setEnabled(true);
+                program_type.setText("3");
+                program_width.setText("640");
+                program_height.setText("480");
+                windowWidth = 640;
+                windowHeight = 480;
                 WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                 customTypeWindow.dismiss();
                 addPopWindow.showPopupWindow(mImageView);
                 break;
-            case R.id.btn_Dx:
-                btn_Cx.setEnabled(true);
-                btn_Dx.setEnabled(false);
-                btn_A60x.setEnabled(true);
-                btn_AX0.setEnabled(true);
-                btn_Cx0.setEnabled(true);
-                btn_Cxi.setEnabled(true);
-                btn_Dx0.setEnabled(true);
-                int windowWidth2 = 2048;
-                int windowHeight2 = 2048;
-                WindowSizeManager.setSharedPreference(getActivity(), windowWidth2, windowHeight2);
-                program_type.setText("Dx");
-                program_width.setText("2048");
-                program_height.setText("2048");
+            case R.id.btn_A1:
+                btn_3.setEnabled(true);
+                btn_A1.setEnabled(false);
+                btn_A2.setEnabled(true);
+                btn_A3.setEnabled(true);
+                btn_A2L.setEnabled(true);
+                btn_A3L.setEnabled(true);
+                btn_Q1.setEnabled(true);
+                btn_Q2.setEnabled(true);
+                btn_Q3.setEnabled(true);
+                btn_Q4.setEnabled(true);
+                btn_Q3L.setEnabled(true);
+                btn_Q4L.setEnabled(true);
+                program_type.setText("A1");
+                program_width.setText("384");
+                program_height.setText("128");
+                windowWidth = 384;
+                windowHeight = 128;
+                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                 customTypeWindow.dismiss();
                 addPopWindow.showPopupWindow(mImageView);
                 break;
-            case R.id.btn_A60x:
-                btn_Cx.setEnabled(true);
-                btn_Dx.setEnabled(true);
-                btn_A60x.setEnabled(false);
-                btn_AX0.setEnabled(true);
-                btn_Cx0.setEnabled(true);
-                btn_Cxi.setEnabled(true);
-                btn_Dx0.setEnabled(true);
-                int windowWidth1 = 1920;
-                int windowHeight1 = 1080;
-                WindowSizeManager.setSharedPreference(getActivity(), windowWidth1, windowHeight1);
-                program_type.setText("A60x");
-                program_width.setText("1920");
-                program_height.setText("1080");
+            case R.id.btn_A2:
+                btn_3.setEnabled(true);
+                btn_A1.setEnabled(true);
+                btn_A2.setEnabled(false);
+                btn_A3.setEnabled(true);
+                btn_A2L.setEnabled(true);
+                btn_A3L.setEnabled(true);
+                btn_Q1.setEnabled(true);
+                btn_Q2.setEnabled(true);
+                btn_Q3.setEnabled(true);
+                btn_Q4.setEnabled(true);
+                btn_Q3L.setEnabled(true);
+                btn_Q4L.setEnabled(true);
+                program_type.setText("A2");
+                program_width.setText("512");
+                program_height.setText("256");
+                windowWidth = 512;
+                windowHeight = 256;
+                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                 customTypeWindow.dismiss();
                 addPopWindow.showPopupWindow(mImageView);
                 break;
-            case R.id.btn_Cxi:
-                btn_Cx.setEnabled(true);
-                btn_Dx.setEnabled(true);
-                btn_A60x.setEnabled(true);
-                btn_AX0.setEnabled(true);
-                btn_Cx0.setEnabled(true);
-                btn_Cxi.setEnabled(false);
-                btn_Dx0.setEnabled(true);
-                int windowWidth3 = 2048;
-                int windowHeight3 = 2048;
-                WindowSizeManager.setSharedPreference(getActivity(), windowWidth3, windowHeight3);
-                program_type.setText("Cxi");
-                program_width.setText("2048");
-                program_height.setText("2048");
-                customTypeWindow.dismiss();
-                addPopWindow.showPopupWindow(mImageView);
-                break;
-            case R.id.btn_AX0:
-                btn_Cx.setEnabled(true);
-                btn_Dx.setEnabled(true);
-                btn_A60x.setEnabled(true);
-                btn_AX0.setEnabled(false);
-                btn_Cx0.setEnabled(true);
-                btn_Cxi.setEnabled(true);
-                btn_Dx0.setEnabled(true);
-                int windowWidth4 = 1024;
-                int windowHeight4 = 512;
-                WindowSizeManager.setSharedPreference(getActivity(), windowWidth4, windowHeight4);
-                program_type.setText("AX0");
-                program_width.setText("1024");
-                program_height.setText("512");
-                customTypeWindow.dismiss();
-                addPopWindow.showPopupWindow(mImageView);
-                break;
-            case R.id.btn_Dx0:
-                btn_Cx.setEnabled(true);
-                btn_Dx.setEnabled(true);
-                btn_A60x.setEnabled(true);
-                btn_AX0.setEnabled(true);
-                btn_Cx0.setEnabled(true);
-                btn_Cxi.setEnabled(true);
-                btn_Dx0.setEnabled(false);
-                int windowWidth5 = 1024;
-                int windowHeight5 = 64;
-                WindowSizeManager.setSharedPreference(getActivity(), windowWidth5, windowHeight5);
-                program_type.setText("Dx0");
-                program_width.setText("1024");
-                program_height.setText("64");
-                customTypeWindow.dismiss();
-                addPopWindow.showPopupWindow(mImageView);
-                break;
-            case R.id.btn_Cx0:
-                btn_Cx.setEnabled(true);
-                btn_Dx.setEnabled(true);
-                btn_A60x.setEnabled(true);
-                btn_AX0.setEnabled(true);
-                btn_Cx0.setEnabled(false);
-                btn_Cxi.setEnabled(true);
-                btn_Dx0.setEnabled(true);
-                int windowWidth6 = 640;
-                int windowHeight6 = 480;
-                WindowSizeManager.setSharedPreference(getActivity(), windowWidth6, windowHeight6);
-                program_type.setText("Dx");
+            case R.id.btn_A3:
+                btn_3.setEnabled(true);
+                btn_A1.setEnabled(true);
+                btn_A2.setEnabled(true);
+                btn_A3.setEnabled(false);
+                btn_A2L.setEnabled(true);
+                btn_A3L.setEnabled(true);
+                btn_Q1.setEnabled(true);
+                btn_Q2.setEnabled(true);
+                btn_Q3.setEnabled(true);
+                btn_Q4.setEnabled(true);
+                btn_Q3L.setEnabled(true);
+                btn_Q4L.setEnabled(true);
+                program_type.setText("A3");
                 program_width.setText("640");
                 program_height.setText("480");
+                windowWidth = 640;
+                windowHeight = 480;
+                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
+                customTypeWindow.dismiss();
+                addPopWindow.showPopupWindow(mImageView);
+                break;
+            case R.id.btn_A2L:
+                btn_3.setEnabled(true);
+                btn_A1.setEnabled(true);
+                btn_A2.setEnabled(true);
+                btn_A3.setEnabled(true);
+                btn_A2L.setEnabled(false);
+                btn_A3L.setEnabled(true);
+                btn_Q1.setEnabled(true);
+                btn_Q2.setEnabled(true);
+                btn_Q3.setEnabled(true);
+                btn_Q4.setEnabled(true);
+                btn_Q3L.setEnabled(true);
+                btn_Q4L.setEnabled(true);
+                program_type.setText("A2L");
+                program_width.setText("1024");
+                program_height.setText("128");
+                windowWidth = 1024;
+                windowHeight = 128;
+                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
+                customTypeWindow.dismiss();
+                addPopWindow.showPopupWindow(mImageView);
+                break;
+            case R.id.btn_A3L:
+                btn_3.setEnabled(true);
+                btn_A1.setEnabled(true);
+                btn_A2.setEnabled(true);
+                btn_A3.setEnabled(true);
+                btn_A2L.setEnabled(true);
+                btn_A3L.setEnabled(false);
+                btn_Q1.setEnabled(true);
+                btn_Q2.setEnabled(true);
+                btn_Q3.setEnabled(true);
+                btn_Q4.setEnabled(true);
+                btn_Q3L.setEnabled(true);
+                btn_Q4L.setEnabled(true);
+                program_type.setText("A3L");
+                program_width.setText("2048");
+                program_height.setText("128");
+                windowWidth = 2048;
+                windowHeight = 128;
+                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
+                customTypeWindow.dismiss();
+                addPopWindow.showPopupWindow(mImageView);
+                break;
+            case R.id.btn_Q1:
+                btn_3.setEnabled(true);
+                btn_A1.setEnabled(true);
+                btn_A2.setEnabled(true);
+                btn_A3.setEnabled(true);
+                btn_A2L.setEnabled(true);
+                btn_A3L.setEnabled(true);
+                btn_Q1.setEnabled(false);
+                btn_Q2.setEnabled(true);
+                btn_Q3.setEnabled(true);
+                btn_Q4.setEnabled(true);
+                btn_Q3L.setEnabled(true);
+                btn_Q4L.setEnabled(true);
+                program_type.setText("Q1");
+                program_width.setText("640");
+                program_height.setText("480");
+                windowWidth = 640;
+                windowHeight = 480;
+                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
+                customTypeWindow.dismiss();
+                addPopWindow.showPopupWindow(mImageView);
+                break;
+            case R.id.btn_Q2:
+                btn_3.setEnabled(true);
+                btn_A1.setEnabled(true);
+                btn_A2.setEnabled(true);
+                btn_A3.setEnabled(true);
+                btn_A2L.setEnabled(true);
+                btn_A3L.setEnabled(true);
+                btn_Q1.setEnabled(false);
+                btn_Q2.setEnabled(true);
+                btn_Q3.setEnabled(true);
+                btn_Q4.setEnabled(true);
+                btn_Q3L.setEnabled(true);
+                btn_Q4L.setEnabled(true);
+                program_type.setText("Q2");
+                program_width.setText("800");
+                program_height.setText("600");
+                windowWidth = 800;
+                windowHeight = 600;
+                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
+                customTypeWindow.dismiss();
+                addPopWindow.showPopupWindow(mImageView);
+                break;
+            case R.id.btn_Q3:
+                btn_3.setEnabled(true);
+                btn_A1.setEnabled(true);
+                btn_A2.setEnabled(true);
+                btn_A3.setEnabled(true);
+                btn_A2L.setEnabled(true);
+                btn_A3L.setEnabled(true);
+                btn_Q1.setEnabled(true);
+                btn_Q2.setEnabled(true);
+                btn_Q3.setEnabled(false);
+                btn_Q4.setEnabled(true);
+                btn_Q3L.setEnabled(true);
+                btn_Q4L.setEnabled(true);
+                program_type.setText("Q3");
+                program_width.setText("1280");
+                program_height.setText("800");
+                windowWidth = 1280;
+                windowHeight = 800;
+                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
+                customTypeWindow.dismiss();
+                addPopWindow.showPopupWindow(mImageView);
+                break;
+            case R.id.btn_Q4:
+                btn_3.setEnabled(true);
+                btn_A1.setEnabled(true);
+                btn_A2.setEnabled(true);
+                btn_A3.setEnabled(true);
+                btn_A2L.setEnabled(true);
+                btn_A3L.setEnabled(true);
+                btn_Q1.setEnabled(true);
+                btn_Q2.setEnabled(true);
+                btn_Q3.setEnabled(true);
+                btn_Q4.setEnabled(false);
+                btn_Q3L.setEnabled(true);
+                btn_Q4L.setEnabled(true);
+                program_type.setText("Q4");
+                program_width.setText("1920");
+                program_height.setText("1024");
+                windowWidth = 1920;
+                windowHeight = 1024;
+                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
+                customTypeWindow.dismiss();
+                addPopWindow.showPopupWindow(mImageView);
+                break;
+            case R.id.btn_Q3L:
+                btn_3.setEnabled(true);
+                btn_A1.setEnabled(true);
+                btn_A2.setEnabled(true);
+                btn_A3.setEnabled(true);
+                btn_A2L.setEnabled(true);
+                btn_A3L.setEnabled(true);
+                btn_Q1.setEnabled(true);
+                btn_Q2.setEnabled(true);
+                btn_Q3.setEnabled(true);
+                btn_Q4.setEnabled(true);
+                btn_Q3L.setEnabled(false);
+                btn_Q4L.setEnabled(true);
+                program_type.setText("Q3L");
+                program_width.setText("2048");
+                program_height.setText("384");
+                windowWidth = 2048;
+                windowHeight = 384;
+                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
+                customTypeWindow.dismiss();
+                addPopWindow.showPopupWindow(mImageView);
+                break;
+            case R.id.btn_Q4L:
+                btn_3.setEnabled(true);
+                btn_A1.setEnabled(true);
+                btn_A2.setEnabled(true);
+                btn_A3.setEnabled(true);
+                btn_A2L.setEnabled(true);
+                btn_A3L.setEnabled(true);
+                btn_Q1.setEnabled(true);
+                btn_Q2.setEnabled(true);
+                btn_Q3.setEnabled(true);
+                btn_Q4.setEnabled(true);
+                btn_Q3L.setEnabled(true);
+                btn_Q4L.setEnabled(false);
+                program_type.setText("Q4L");
+                program_width.setText("7680");
+                program_height.setText("256");
+                windowWidth = 7680;
+                windowHeight = 256;
+                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                 customTypeWindow.dismiss();
                 addPopWindow.showPopupWindow(mImageView);
                 break;
@@ -283,10 +462,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
      * 加载节目名称弹出窗体布局
      */
     private View getPopWindowView() {
-
         String IP = intToIp(dhcpInfo.dns1);
-        String port = intToIp(dhcpInfo.netmask);
-        Log.d("............", "port.........................." + port);
         View view = getActivity().getLayoutInflater().inflate(R.layout.add, null);
         program_name = (EditText) view.findViewById(R.id.progeam_name);
         program_type = (TextView) view.findViewById(R.id.progeam_type);
@@ -296,7 +472,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
         progeam_duan = (EditText) view.findViewById(R.id.progeam_duan);
         program_btn = (Button) view.findViewById(R.id.progeam_btn);
         program_ip.setText(IP);
-        progeam_duan.setText(port);
+        progeam_duan.setText(5050 + "");
         program_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -332,21 +508,31 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
      */
     private View getTypeWindowView() {
         View view = getActivity().getLayoutInflater().inflate(R.layout.program_type, null);
-        btn_Dx = (Button) view.findViewById(R.id.btn_Dx);
-        btn_Cx = (Button) view.findViewById(R.id.btn_Cx);
-        btn_A60x = (Button) view.findViewById(R.id.btn_A60x);
-        btn_Cxi = (Button) view.findViewById(R.id.btn_Cxi);
-        btn_AX0 = (Button) view.findViewById(R.id.btn_AX0);
-        btn_Dx0 = (Button) view.findViewById(R.id.btn_Dx0);
-        btn_Cx0 = (Button) view.findViewById(R.id.btn_Cx0);
+        btn_3 = (Button) view.findViewById(R.id.btn_3);
+        btn_A1 = (Button) view.findViewById(R.id.btn_A1);
+        btn_A2 = (Button) view.findViewById(R.id.btn_A2);
+        btn_A3 = (Button) view.findViewById(R.id.btn_A3);
+        btn_A2L = (Button) view.findViewById(R.id.btn_A2L);
+        btn_A3L = (Button) view.findViewById(R.id.btn_A3L);
+        btn_Q1 = (Button) view.findViewById(R.id.btn_Q1);
+        btn_Q2 = (Button) view.findViewById(R.id.btn_Q2);
+        btn_Q3 = (Button) view.findViewById(R.id.btn_Q3);
+        btn_Q4 = (Button) view.findViewById(R.id.btn_Q4);
+        btn_Q3L = (Button) view.findViewById(R.id.btn_Q3L);
+        btn_Q4L = (Button) view.findViewById(R.id.btn_Q4L);
 
-        btn_Dx.setOnClickListener(this);
-        btn_Cx.setOnClickListener(this);
-        btn_A60x.setOnClickListener(this);
-        btn_Cxi.setOnClickListener(this);
-        btn_AX0.setOnClickListener(this);
-        btn_Dx0.setOnClickListener(this);
-        btn_Cx0.setOnClickListener(this);
+        btn_3.setOnClickListener(this);
+        btn_A1.setOnClickListener(this);
+        btn_A2.setOnClickListener(this);
+        btn_A3.setOnClickListener(this);
+        btn_A2L.setOnClickListener(this);
+        btn_A3L.setOnClickListener(this);
+        btn_Q1.setOnClickListener(this);
+        btn_Q2.setOnClickListener(this);
+        btn_Q3.setOnClickListener(this);
+        btn_Q4.setOnClickListener(this);
+        btn_Q3L.setOnClickListener(this);
+        btn_Q4L.setOnClickListener(this);
         return view;
     }
 

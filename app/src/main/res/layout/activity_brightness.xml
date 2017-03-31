@@ -23,9 +23,75 @@
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
             android:gravity="center"
-            android:text="调节亮度"
+            android:text="@string/control_setbrightness"
             android:textColor="#fff"
             android:textSize="20sp" />
 
     </RelativeLayout>
+
+
+
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/brightness_bright"
+        android:textColor="@color/black"
+        android:textSize="15sp"
+        android:layout_above="@+id/bright_seekBar"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/brightness_dark"
+        android:textColor="@color/black"
+        android:textSize="15sp"
+        android:id="@+id/textView"
+        android:layout_above="@+id/bright_seekBar"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+
+        android:id="@+id/bright_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="50"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:layout_above="@+id/bright_seekBar"
+        android:layout_centerHorizontal="true" />
+    <SeekBar
+        android:id="@+id/bright_seekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="false"
+        android:max="100"
+        android:progress="50"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true" />
+    <RelativeLayout
+        android:id="@+id/bright_setting"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="#08B5C1"
+        android:orientation="horizontal"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:layout_below="@+id/bright_seekBar"
+        android:layout_alignParentStart="true">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="@string/brightness_setting"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:id="@+id/textView2"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+
 </RelativeLayout>

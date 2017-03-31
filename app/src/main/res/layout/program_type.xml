@@ -15,68 +15,154 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:orientation="horizontal">
-
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
             <Button
-                android:id="@+id/btn_Dx"
+                android:id="@+id/btn_3"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginLeft="10dp"
                 android:background="@drawable/btn_type_selector"
-                android:text="Dx" />
-
+                android:text="3" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
             <Button
-                android:id="@+id/btn_Cx"
+                android:id="@+id/btn_A1"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginLeft="30dp"
                 android:background="@drawable/btn_type_selector"
-                android:text="Cx" />
-
+                android:text="A1" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
             <Button
-                android:id="@+id/btn_A60x"
+                android:id="@+id/btn_A2"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginLeft="30dp"
                 android:background="@drawable/btn_type_selector"
-                android:text="A60x" />
-
+                android:text="A2" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
             <Button
-                android:id="@+id/btn_Cxi"
+                android:id="@+id/btn_A3"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginLeft="30dp"
                 android:background="@drawable/btn_type_selector"
-                android:text="Cxi" />
-
+                android:text="A3" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
             <Button
-                android:id="@+id/btn_AX0"
+                android:id="@+id/btn_A2L"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginLeft="30dp"
                 android:background="@drawable/btn_type_selector"
-                android:text="AX0" />
+                android:text="A2L" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingTop="20dp">
-
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
             <Button
-                android:id="@+id/btn_Dx0"
+                android:id="@+id/btn_A3L"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginLeft="10dp"
                 android:background="@drawable/btn_type_selector"
-                android:text="Dx0" />
-
+                android:text="A3L" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
             <Button
-                android:id="@+id/btn_Cx0"
+                android:id="@+id/btn_Q1"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginLeft="30dp"
                 android:background="@drawable/btn_type_selector"
-                android:text="Cx0" />
+                android:text="Q1" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <Button
+                android:id="@+id/btn_Q2"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/btn_type_selector"
+                android:text="Q2" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <Button
+                android:id="@+id/btn_Q3"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/btn_type_selector"
+                android:text="Q3" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <Button
+                android:id="@+id/btn_Q4"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/btn_type_selector"
+                android:text="Q4" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <Button
+                android:id="@+id/btn_Q3L"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/btn_type_selector"
+                android:text="Q3L" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <Button
+                android:id="@+id/btn_Q4L"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/btn_type_selector"
+                android:text="Q4L" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"/>
+            <TextView
+                android:layout_width="120dp"
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </LinearLayout>
 

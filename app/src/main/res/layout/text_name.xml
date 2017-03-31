@@ -17,7 +17,7 @@
             android:layout_width="340dp"
             android:layout_height="40dp"
             android:gravity="center"
-            android:text="节目"
+            android:text="@string/program"
             android:textColor="#000"
             android:textSize="16sp"
             android:layout_alignTop="@+id/iamge_pro"

@@ -60,8 +60,156 @@ public class SendPacket {
 
         return indexs;
     }
+/**
+ * 开启屏幕协议
+ *
+ * */
+    public static byte[] openScreen(){
+        byte[] b = new byte[42];
+        b[0] = (byte) 0xF6;
+        b[1] = (byte) 0x5A;
+        b[2] = (byte) ((42 >> 0) & 0xFF);
+        b[3] = (byte) ((42 >> 8) & 0xFF);
+        b[4] = (byte) 0xA4;
+        b[5] = (byte) 0xF0;
+        b[6] = (byte) 0x03;
+        b[7] = (byte) 0x01;
+        b[8] = (byte) 0x00;
+        b[9] = (byte) 0x00;
+        b[10] = (byte) 0x00;
+        b[11] = (byte) 0x00;
+        b[12] = (byte) 0x00;
+        b[13] = (byte) 0x00;
+        b[14] = (byte) 0x00;
+        b[15] = (byte) 0x00;
+        b[16] = (byte) 0x00;
+        b[17] = (byte) 0x00;
+        b[18] = (byte) 0x00;
+        b[19] = (byte) 0x00;
+        b[20] = (byte) 0x00;
+        b[21] = (byte) 0x00;
+        b[22] = (byte) 0x00;
+        b[23] = (byte) 0x00;
+        b[24] = (byte) 0x00;
+        b[25] = (byte) 0x00;
+        b[26] = (byte) 0x00;
+        b[27] = (byte) 0x00;
+        b[28] = (byte) 0x00;
+        b[29] = (byte) 0x00;
+        b[30] = (byte) 0x00;
+        b[31] = (byte) 0x00;
+        b[32] = (byte) 0x00;
+        b[33] = (byte) 0x00;
+        b[34] = (byte) 0x00;
+        b[35] = (byte) 0x00;
+        b[36] = (byte) 0x00;
+        b[37] = (byte) 0x00;
+        b[38] = (byte) 0x00;
+        b[39] = (byte) 0x00;
+        b[40] = (byte) 0x5A;
+        b[41] = (byte) 0xF6;
+        return b;
+    }
+/**
+ * 关闭屏幕协议
+ *
+ * */
+    public static byte[] guanScreen(){
+        byte[] b = new byte[42];
+        b[0] = (byte) 0xF6;
+        b[1] = (byte) 0x5A;
+        b[2] = (byte) ((42 >> 0) & 0xFF);
+        b[3] = (byte) ((42 >> 8) & 0xFF);
+        b[4] = (byte) 0xA4;
+        b[5] = (byte) 0xF0;
+        b[6] = (byte) 0x03;
+        b[7] = (byte) 0x02;
+        b[8] = (byte) 0x00;
+        b[9] = (byte) 0x00;
+        b[10] = (byte) 0x00;
+        b[11] = (byte) 0x00;
+        b[12] = (byte) 0x00;
+        b[13] = (byte) 0x00;
+        b[14] = (byte) 0x00;
+        b[15] = (byte) 0x00;
+        b[16] = (byte) 0x00;
+        b[17] = (byte) 0x00;
+        b[18] = (byte) 0x00;
+        b[19] = (byte) 0x00;
+        b[20] = (byte) 0x00;
+        b[21] = (byte) 0x00;
+        b[22] = (byte) 0x00;
+        b[23] = (byte) 0x00;
+        b[24] = (byte) 0x00;
+        b[25] = (byte) 0x00;
+        b[26] = (byte) 0x00;
+        b[27] = (byte) 0x00;
+        b[28] = (byte) 0x00;
+        b[29] = (byte) 0x00;
+        b[30] = (byte) 0x00;
+        b[31] = (byte) 0x00;
+        b[32] = (byte) 0x00;
+        b[33] = (byte) 0x00;
+        b[34] = (byte) 0x00;
+        b[35] = (byte) 0x00;
+        b[36] = (byte) 0x00;
+        b[37] = (byte) 0x00;
+        b[38] = (byte) 0x00;
+        b[39] = (byte) 0x00;
+        b[40] = (byte) 0x5A;
+        b[41] = (byte) 0xF6;
+        return b;
+    }
+    /**
+     * 亮度调节
+     * */
 
-
+    public static byte[]  brightness(int bht){
+        byte[] b = new byte[42];
+        b[0] = (byte) 0xF6;
+        b[1] = (byte) 0x5A;
+        b[2] = (byte) ((42 >> 0) & 0xFF);
+        b[3] = (byte) ((42 >> 8) & 0xFF);
+        b[4] = (byte) 0xA4;
+        b[5] = (byte) 0xF0;
+        b[6] = (byte) 0x04;
+        b[7] = (byte) 0x02;
+        b[8] = (byte) ((bht >> 0) & 0xFF);
+        b[9] = (byte) 0x00;
+        b[10] = (byte) 0x00;
+        b[11] = (byte) 0x00;
+        b[12] = (byte) 0x00;
+        b[13] = (byte) 0x00;
+        b[14] = (byte) 0x00;
+        b[15] = (byte) 0x00;
+        b[16] = (byte) 0x00;
+        b[17] = (byte) 0x00;
+        b[18] = (byte) 0x00;
+        b[19] = (byte) 0x00;
+        b[20] = (byte) 0x00;
+        b[21] = (byte) 0x00;
+        b[22] = (byte) 0x00;
+        b[23] = (byte) 0x00;
+        b[24] = (byte) 0x00;
+        b[25] = (byte) 0x00;
+        b[26] = (byte) 0x00;
+        b[27] = (byte) 0x00;
+        b[28] = (byte) 0x00;
+        b[29] = (byte) 0x00;
+        b[30] = (byte) 0x00;
+        b[31] = (byte) 0x00;
+        b[32] = (byte) 0x00;
+        b[33] = (byte) 0x00;
+        b[34] = (byte) 0x00;
+        b[35] = (byte) 0x00;
+        b[36] = (byte) 0x00;
+        b[37] = (byte) 0x00;
+        b[38] = (byte) 0x00;
+        b[39] = (byte) 0x00;
+        b[40] = (byte) 0x5A;
+        b[41] = (byte) 0xF6;
+        return b;
+    }
     /**
      * 开始发送节目命令 0x01**************************
      */

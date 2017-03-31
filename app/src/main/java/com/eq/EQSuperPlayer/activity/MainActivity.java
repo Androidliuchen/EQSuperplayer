@@ -1,6 +1,5 @@
 package com.eq.EQSuperPlayer.activity;
 
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.os.Environment;
@@ -21,24 +20,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eq.EQSuperPlayer.R;
+import com.eq.EQSuperPlayer.SlidingMenuActivity.LanguageActivity;
 import com.eq.EQSuperPlayer.bean.Areabean;
 import com.eq.EQSuperPlayer.bean.SendAdapter;
+import com.eq.EQSuperPlayer.bean.VedioBean;
 import com.eq.EQSuperPlayer.communication.ConnectControlCard;
 import com.eq.EQSuperPlayer.communication.InterfaceConnect;
 import com.eq.EQSuperPlayer.communication.SendPacket;
 import com.eq.EQSuperPlayer.custom.Constant;
 import com.eq.EQSuperPlayer.custom.CustomPopWindow;
+import com.eq.EQSuperPlayer.dao.VedioDao;
 import com.eq.EQSuperPlayer.fargament.LeftFragment;
 import com.eq.EQSuperPlayer.fargament.ProgramFragment;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -109,7 +109,6 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
         topButton.setOnClickListener(this);
         topTextView = (TextView) findViewById(R.id.topTv);
         mSend.setOnClickListener(this);
-        getImageName();
         //获取FragmentManager
         mFragmentManager = getSupportFragmentManager();
         ProgramFragment pregramFragment = new ProgramFragment();
@@ -134,6 +133,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 0:
+                    getImageName();
                     countOrAdress = 0;
                     manyStratIndex = 0;
                     resourcesIndex = 0;
@@ -423,7 +423,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                                     byte[] iangeData = SendPacket.prepareSendDataPkg(arrData, i);
                                     simallData.add(iangeData);
                                     countAdress++;
-                                    Log.d("countAdress....",countAdress +"");
+                                    Log.d("countAdress....", countAdress + "");
                                 }
                                 ccc = new ConnectControlCard(simallData, new InterfaceConnect() {
                                     @Override
@@ -665,11 +665,9 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
         String fileImagePath = Environment.getExternalStorageDirectory().toString() + File.separator
                 + "EQImage";
         filePath.add(fileImagePath);
-
         String fileVedioPath = Environment.getExternalStorageDirectory().toString() + File.separator
                 + "EQVedio";
         filePath.add(fileVedioPath);
-
         for (int i = 0; i < filePath.size(); i++) {
             File fileAll = new File(filePath.get(i));
             if (!fileAll.exists()) {

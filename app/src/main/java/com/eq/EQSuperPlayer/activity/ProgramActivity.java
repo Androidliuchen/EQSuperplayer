@@ -9,6 +9,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
@@ -52,6 +53,7 @@ import com.eq.EQSuperPlayer.dao.TextBeanDao;
 import com.eq.EQSuperPlayer.dao.TimeDao;
 import com.eq.EQSuperPlayer.dao.VedioDao;
 import com.eq.EQSuperPlayer.utils.AnimatorUtils;
+import com.eq.EQSuperPlayer.utils.FileUtils;
 import com.eq.EQSuperPlayer.utils.ProgramNameItemManager;
 import com.eq.EQSuperPlayer.utils.Utils;
 import com.eq.EQSuperPlayer.utils.WindowSizeManager;
@@ -69,9 +71,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProgramActivity extends Activity implements View.OnClickListener, View.OnTouchListener {
-    private Button mProgram_image;
-    private Button mJian;
-    private ViewFlipper text_ima;
     private RelativeLayout relt;
     private ImageView out_image;
     private TextView region_text;
@@ -138,13 +137,11 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
      * 初始化数据
      */
     private void initView() {
+        xmldata();
         textBean = new TextBean();
         region_text = (TextView) findViewById(R.id.region_text);
         out_image = (ImageView) findViewById(R.id.out_iamge);
-        mProgram_image = (Button) findViewById(R.id.region_jia);
-        mJian = (Button) findViewById(R.id.region_jian);
         prog_btn = (Button) findViewById(R.id.region_program);
-        text_ima = (ViewFlipper) findViewById(R.id.program_iamge);
         text_layout = (RelativeLayout) findViewById(R.id.program_text_background);
         relt = (RelativeLayout) findViewById(R.id.relt);
         listener = new MyOnTouchListener();
@@ -164,11 +161,9 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         region_btn = (Button) findViewById(R.id.region);
         send_btn = (Button) findViewById(R.id.region_send);
         out_image.setOnClickListener(this);
-        mJian.setOnClickListener(this);
         prog_btn.setOnClickListener(this);
         region_btn.setOnClickListener(this);
         send_btn.setOnClickListener(this);
-        mProgram_image.setOnClickListener(this);
     }
 
     /**
@@ -200,7 +195,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
     private void initDatas(ProgramBean programBean) {
         totalBeens.clear();
         mDatas.clear();
-        text_ima.removeAllViews();
         text_layout.removeAllViews();
         int num = 0;
         //查询是否有视频
@@ -251,7 +245,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 textBean.setType(Constant.AREA_TYPE_TEXT);
                 Log.d("..............", "查询设备所有节目内容:" + textBean.toString());
                 totalBeens.add(textBean);
-                showText(num);
+                showText();
                 num++;
             }
         }
@@ -292,7 +286,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
     /*
       显示文本内容
     */
-    private void showText(int num) {
+    private void showText() {
         int[] number_colors = new int[]{textBean.getBorderColor(), textBean.getStBackground(), textBean.getStColor()};
         for (int i = 0; i < number_colors.length; i++) {
             switch (number_colors[i]) {
@@ -332,7 +326,8 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         textview.setWidth(textBean.getWidth());
         textview.setHeight(textBean.getHeidht());
         textview.setBackgroundColor(0x0000);
-        textview.setId(num);
+//        textview.setId(num);
+        textview.setBackgroundResource(R.drawable.bodler_shape);
         text_layout.addView(textview);
 
     }
@@ -377,6 +372,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             il.height = imageBean.getIamgeHeidht();
             imageView.setLayoutParams(il);
             imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+            imageView.setBackgroundResource(R.drawable.bodler_shape);
             Glide.with(this).load(file1.getPath()).into(imageView);
             flipler.addView(imageviews);
         }
@@ -407,12 +403,12 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             //定义显示播放的视频的宽高和x y 的距离
             RelativeLayout vl = (RelativeLayout) view.findViewById(R.id.videolayout);
             RelativeLayout.LayoutParams rl = (RelativeLayout.LayoutParams) vl.getLayoutParams();
-            rl.width = 300;
-            rl.height = 300;
+            rl.width = vedioBean.getVedioWidth();
+            rl.height = vedioBean.getVedioHeidht();
             vl.setLayoutParams(rl);
             vl.setOnTouchListener(listener);
-            vl.setX(100);
-            vl.setY(100);
+            vl.setX(vedioBean.getVedioX());
+            vl.setY(vedioBean.getVedioY());
 
             //取出视频的地址并且进行播放
             File file1 = files[j];
@@ -439,6 +435,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
     }
 
 
+
     private View getTypeWindowListView() {
         View view = this.getLayoutInflater().inflate(R.layout.recry_itme, null);
         programListView = (ProgramListView) view.findViewById(R.id.program_listview);
@@ -463,7 +460,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         ProgramBean programBean = new ProgramBeanDao(ProgramActivity.this).get(selet);
-                                        Log.d("...............", "programBean数据......." + programBean.toString());
+//                                        Log.d("...............", "programBean数据......." + programBean.toString());
                                         if (which == 0) {
                                             TextBean textBean = new TextBean();
                                             textBean.setProgramBean(programBean);
@@ -535,6 +532,10 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                     totalBeens.remove(position);
                     new TextBeanDao(ProgramActivity.this).delete(textBean);
                     programListView.slideBack();
+                    String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                            + "textImage";
+                    FileUtils.deleteDir(fileTextPath);
+                    showText();
                     recyclerViewAdapter.notifyDataSetChanged();
                 } else if (timeBean == totalBeens.get(position)) {
                     mDatas.remove(position);
@@ -547,12 +548,20 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                     totalBeens.remove(position);
                     new ImageDao(ProgramActivity.this).delete(imageBean);
                     programListView.slideBack();
+                    String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                            + "EQImage";
+                    FileUtils.deleteDir(fileTextPath);
+                    showImageView();
                     recyclerViewAdapter.notifyDataSetChanged();
                 } else if (vedioBean == totalBeens.get(position)) {
                     mDatas.remove(position);
                     totalBeens.remove(position);
                     new VedioDao(ProgramActivity.this).delete(vedioBean);
                     programListView.slideBack();
+                    String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                            + "EQVedio";
+                    FileUtils.deleteDir(fileTextPath);
+                    showVedio();
                     recyclerViewAdapter.notifyDataSetChanged();
                 }
             }
@@ -631,6 +640,27 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 regionListView.slideBack();
                 new ProgramBeanDao(ProgramActivity.this).delete(programBean.getId());
                 tableBeens.remove(position);
+                List<String> filePath = new ArrayList<>();
+                String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                        + "textImage";
+                filePath.add(fileTextPath);
+                String fileImagePath = Environment.getExternalStorageDirectory().toString() + File.separator
+                        + "EQImage";
+                filePath.add(fileImagePath);
+                String fileVedioPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                        + "EQVedio";
+                filePath.add(fileVedioPath);
+                String PROGRAME_ROOT = Environment
+                        .getExternalStorageDirectory()
+                        .getAbsolutePath() + "/EQPrograme/";
+                filePath.add(PROGRAME_ROOT);
+                for (int i = 0; i < filePath.size(); i++) {
+                    File fileAll = new File(filePath.get(i));
+                    if (!fileAll.exists()) {
+                        fileAll.mkdir();
+                    }
+                    FileUtils.deleteDir(fileAll.getPath());
+                }
                 textAdapter.notifyDataSetChanged();
             }
         });
@@ -675,23 +705,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             case R.id.out_iamge:
                 this.finish();
                 break;
-            case R.id.region_jia:
-                // 设置进入屏幕的动画
-                text_ima.setInAnimation(AnimationUtils.loadAnimation(this, R.anim.push_left_in));
-                // 设置退出屏幕的动画
-                text_ima.setOutAnimation(AnimationUtils.loadAnimation(this, R.anim.push_left_out));
-                // 显示下一个图层
-                text_ima.showNext();
-                break;
-            case R.id.region_jian:
-                small();
-                // 设置进入屏幕的动画
-                text_ima.setInAnimation(AnimationUtils.loadAnimation(this, R.anim.push_right_in));
-                // 设置退出屏幕的动画
-                text_ima.setOutAnimation(AnimationUtils.loadAnimation(this, R.anim.push_right_out));
-                // 显示上一个图层
-                text_ima.showPrevious();
-                break;
             case R.id.region_program:
                 if (customPopWindow == null) {
                     customPopWindow = new CustomPopWindow(this, R.id.region_program);
@@ -715,7 +728,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
 
                 break;
             case R.id.region_send:
-                xmldata();
                 break;
         }
     }
@@ -1286,10 +1298,8 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             serializer.endTag(null, "manifest");
             serializer.endDocument();
             fos.close();
-            Toast.makeText(ProgramActivity.this, getResources().getText(R.string.xml_success), Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(ProgramActivity.this, getResources().getText(R.string.xml_failure), Toast.LENGTH_SHORT).show();
         }
 
     }

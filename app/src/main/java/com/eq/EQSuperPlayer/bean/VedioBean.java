@@ -32,7 +32,6 @@ public class VedioBean extends TotalBean{
     @DatabaseField(columnName = "vediohour")
     public String vediohour;      //视频播放时长
 
-
     public VedioBean() {
     }
 
@@ -137,7 +136,7 @@ public class VedioBean extends TotalBean{
                 ", vedioWidth=" + vedioWidth +
                 ", vedioHeidht=" + vedioHeidht +
                 ", vedioSize=" + vedioSize +
-                ", vediohour=" + vediohour +
+                ", vediohour='" + vediohour + '\'' +
                 '}';
     }
 }

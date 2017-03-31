@@ -34,6 +34,7 @@ import com.eq.EQSuperPlayer.dao.ImagePathDao;
 import com.eq.EQSuperPlayer.dao.ProgramBeanDao;
 import com.eq.EQSuperPlayer.imageutils.GlideLoader;
 import com.eq.EQSuperPlayer.imageutils.SpacesItemDecoration;
+import com.eq.EQSuperPlayer.utils.FileUtils;
 import com.eq.EQSuperPlayer.utils.WindowSizeManager;
 import com.yancy.imageselector.ImageConfig;
 import com.yancy.imageselector.ImageSelector;
@@ -140,7 +141,7 @@ public class ImageActivity extends Activity {
             IMWidth.setText(windowWidth + "");
             IMHeigth.setText(windowHeight + "");
         }
-        if (imageBean.getIamgeX() != 0){
+        if (imageBean.getIamgeX() != 0 || imageBean.getIamgeY() != 0){
             IMx.setText(imageBean.getIamgeX() + "");
             IMy.setText(imageBean.getIamgeY() + "");
         }else {
@@ -210,6 +211,14 @@ public class ImageActivity extends Activity {
                 ImageActivity.this.finish();
                 break;
             case R.id.image_send://提交数据，同时将数据写入数据库，以供节目显示用。
+                String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                        + "EQImage";
+                File file = new File(fileTextPath);
+                if (!file.exists()) {
+                    file.mkdir();
+                }else {
+                    FileUtils.deleteDir(fileTextPath);
+                }
                 imageSave();
                 Intent intent1 = new Intent(ImageActivity.this,ProgramActivity.class);
                 startActivity(intent1);
@@ -267,7 +276,7 @@ public class ImageActivity extends Activity {
                 File file = new File(path);
                 if (file.exists()) {
                     Bitmap bm = BitmapFactory.decodeFile(path);
-                    zoomImg(bm,Integer.parseInt(IMWidth.getText().toString()), Integer.parseInt(IMHeigth.getText().toString()));
+                    FileUtils.zoomImg(bm,Integer.parseInt(IMWidth.getText().toString()), Integer.parseInt(IMHeigth.getText().toString()));
                     Log.d("...............", "BM............" + bm);
                 }
                     iamgID.add(imageName);
@@ -280,65 +289,7 @@ public class ImageActivity extends Activity {
                 photoAdapter.notifyDataSetChanged();
             }
         }
-    /**
-     *  处理图片
-     * @param bm 所要转换的bitmap
-     * @return 指定宽高的bitmap
-     */
-    public static Bitmap zoomImg(Bitmap bm, int newWidth ,int newHeight){
-        // 获得图片的宽高
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        // 计算缩放比例
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        // 取得想要缩放的matrix参数
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
-        // 得到新的图片
-        Bitmap newbm = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
-        saveImage(newbm);
-        return newbm;
-    }
-    public static File saveImage(Bitmap bmp) {
-        File appDir = new File(Environment.getExternalStorageDirectory(), "EQImage");
-        Log.d(".........","Environment.getExternalStorageDirectory()........" + Environment.getExternalStorageDirectory());
-        if (!appDir.exists()) {
-            appDir.mkdir();
-        }
-        String fileName = System.currentTimeMillis() + ".png";
-        File file = new File(appDir, fileName);
-        try {
-            FileOutputStream fos = new FileOutputStream(file);
-            bmp.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            fos.flush();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return appDir;
-    }
-    /**
-     * 检查扩展名，得到图片格式的文件
-     * @param fName  文件名
-     * @return
-     */
-    @SuppressLint("DefaultLocale")
-    private boolean checkIsImageFile(String fName) {
-        boolean isImageFile = false;
-        // 获取扩展名
-        String FileEnd = fName.substring(fName.lastIndexOf(".") + 1,
-                fName.length()).toLowerCase();
-        if (FileEnd.equals("jpg") || FileEnd.equals("png") || FileEnd.equals("gif")
-                || FileEnd.equals("jpeg")|| FileEnd.equals("bmp") ) {
-            isImageFile = true;
-        } else {
-            isImageFile = false;
-        }
-        return isImageFile;
-    }
+
     @OnClick(R.id.iam_btn)
     public void onClick() {
     }

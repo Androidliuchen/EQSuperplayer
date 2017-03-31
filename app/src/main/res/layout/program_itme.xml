@@ -61,7 +61,7 @@
         android:layout_height="30dp"
         android:background="@android:color/holo_red_light"
         android:gravity="center"
-        android:text="删除"
+        android:text="@string/popu_program_delete"
         android:textColor="@android:color/white"
         android:textSize="15sp"
         android:layout_marginEnd="29dp"

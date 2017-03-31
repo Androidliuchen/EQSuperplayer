@@ -60,6 +60,7 @@ public class LeftFragment extends Fragment implements View.OnClickListener {
             case R.id.tvLastlist:// 调节亮度
                 intent.setClass(getActivity(), BrightnessActivity.class);
                 startActivity(intent);
+                break;
             case R.id.tvMyComments: // 语言
                 intent.setClass(getActivity(), LanguageActivity.class);
                 startActivity(intent);
@@ -67,23 +68,5 @@ public class LeftFragment extends Fragment implements View.OnClickListener {
             default:
                 break;
         }
-//        if (newContent != null) {
-//            switchFragment(newContent);
-//        }
     }
-
-    /**
-     * 切换fragment
-     * @param fragment
-     */
-//    private void switchFragment(Fragment fragment) {
-//        if (getActivity() == null) {
-//            return;
-//        }
-//        if (getActivity() instanceof MainActivity) {
-//            MainActivity fca = (MainActivity) getActivity();
-//            fca.switchContent(fragment);
-//        }
-//    }
-
 }

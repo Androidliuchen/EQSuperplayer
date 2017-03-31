@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -31,9 +32,11 @@ import com.eq.EQSuperPlayer.bean.TextBean;
 import com.eq.EQSuperPlayer.custom.Constant;
 import com.eq.EQSuperPlayer.dao.ProgramBeanDao;
 import com.eq.EQSuperPlayer.dao.TextBeanDao;
+import com.eq.EQSuperPlayer.utils.FileUtils;
 import com.eq.EQSuperPlayer.utils.Utils;
 import com.eq.EQSuperPlayer.utils.WindowSizeManager;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,7 +132,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
             STWidth.setText(windowWidth + "");
             STHeigth.setText(windowHeight + "");
         }
-        if (textBean.getX() != 0) {
+        if (textBean.getX() != 0 || textBean.getY() != 0) {
             STx.setText(textBean.getX() + "");
             STy.setText(textBean.getY() + "");
         } else {
@@ -230,6 +233,14 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
                 finish();
                 break;
             case R.id.text_btn:
+                String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                        + "textImage";
+                File file = new File(fileTextPath);
+                if (!file.exists()) {
+                    file.mkdir();
+                }else {
+                    FileUtils.deleteDir(fileTextPath);
+                }
                 save();
                 copyBitmap();
                 Intent intent1 = new Intent(this, ProgramActivity.class);

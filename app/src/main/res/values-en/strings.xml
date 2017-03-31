@@ -35,6 +35,7 @@
 	<string name="scan_setting">scan</string>
 	<!--  MainActivity,提示用户点击退出   !-->
 	<string name="hint_exit">press back again to exit</string>
+	<string name="system_language">Follow the system language</string>
 	<!--  newworkActivity   !-->
 	<string name="hint_connection_to">connecting:</string>
 	<string name="regional_management">Regional management</string>
@@ -56,6 +57,7 @@
 	<string name="image">Image</string>
 	<string name="time">Time</string>
 	<string name="video">Vedio</string>
+	<string name="text">Text</string>
 	<string name="the_programme">Program type</string>
 	<string name="addthe_programme">Add the program type</string>
 	<string name="program_no">Have not show yo！</string>
@@ -146,6 +148,9 @@
 	<string name="text_parameter_w">Please enter the width of the</string>
 	<string name="text_parameter_h">Please enter the height of the</string>
 	<string name="submit">submit</string>
+	<string name="file_size">The file size</string>
+	<string name="video_format">Video format</string>
+	<string name="vedio_len">The length of the video</string>
 	<string name="parameter_Settings">Parameter Settings</string>
 	<string name="name">Type the name：</string>
 	<string name="single_line">Single-line text</string>
