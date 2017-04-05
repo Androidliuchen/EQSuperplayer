@@ -88,6 +88,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
                 mProgramAdapter.notifyDataSetChanged();
+                mProgramAdapter.notifyDataSetInvalidated();
             }
         };
         mListView.setAdapter(mProgramAdapter);

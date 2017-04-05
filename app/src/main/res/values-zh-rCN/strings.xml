@@ -125,10 +125,10 @@
     <string name="parameter_Settings">参数设置</string>
     <string name="name">类型名称:</string>
     <string name="single_line">单行文本</string>
-    <string name="side_frame">边框:</string>
+    <string name="side_frame">边    框:</string>
     <string name="border_color">边框颜色:</string>
-    <string name="text_parameters_w">宽度:</string>
-    <string name="text_parameters_h">高度:</string>
+    <string name="text_parameters_w">宽    度:</string>
+    <string name="text_parameters_h">高    度:</string>
     <string name="text_parameters_x">起点X:</string>
     <string name="text_parameters_y">起点Y:</string>
     <string name="text_parameters_content">请输入显示内容</string>
