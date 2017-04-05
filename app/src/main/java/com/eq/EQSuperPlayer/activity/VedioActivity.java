@@ -28,6 +28,7 @@ import com.eq.EQSuperPlayer.bean.Areabean;
 import com.eq.EQSuperPlayer.bean.ProgramBean;
 import com.eq.EQSuperPlayer.bean.VedioBean;
 import com.eq.EQSuperPlayer.custom.Constant;
+import com.eq.EQSuperPlayer.dao.AreabeanDao;
 import com.eq.EQSuperPlayer.dao.ProgramBeanDao;
 import com.eq.EQSuperPlayer.dao.TextBeanDao;
 import com.eq.EQSuperPlayer.dao.VedioDao;
@@ -98,6 +99,7 @@ public class VedioActivity extends AppCompatActivity {
     }
 
     private void initData() {
+        areabean = new AreabeanDao(this).get(ProgramActivity.program_id);
         int vedio_id = getIntent().getIntExtra(Constant.PROGRAM_ID, -1);
         vedioBean = new VedioDao(this).get(vedio_id);
         programBean = new ProgramBeanDao(this).get(ProgramActivity.selet);
@@ -114,15 +116,15 @@ public class VedioActivity extends AppCompatActivity {
             vedioWidth.setText(vedioBean.getVedioWidth() + "");
             vedioHeigth.setText(vedioBean.getVedioHeidht() + "");
         } else {
-            vedioWidth.setText(windowWidth + "");
-            vedioHeigth.setText(windowHeight + "");
+            vedioWidth.setText(areabean.getWindowWidth() + "");
+            vedioHeigth.setText(areabean.getWindowHeight() + "");
         }
         if (vedioBean.getVedioX() != 0 || vedioBean.getVedioY() != 0){
             vedioX.setText(vedioBean.getVedioX() + "");
             vedioY.setText(vedioBean.getVedioY() + "");
         }else {
-            vedioX.setText(0 + "");
-            vedioY.setText(0 + "");
+            vedioX.setText(areabean.getArea_X() + "");
+            vedioY.setText(areabean.getArea_Y() + "");
         }
 
         TypedArray typedArray = this.getResources().obtainTypedArray(R.array.textcolor);

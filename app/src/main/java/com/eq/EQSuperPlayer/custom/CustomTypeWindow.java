@@ -2,6 +2,7 @@ package com.eq.EQSuperPlayer.custom;
 
 import android.app.Activity;
 import android.graphics.drawable.ColorDrawable;
+import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.PopupWindow;
@@ -77,7 +78,7 @@ public class CustomTypeWindow extends PopupWindow {
     public void showPopupWindow(View parent) {
         if (!this.isShowing()) {
             // 以下拉方式显示popupwindow
-            this.showAsDropDown(parent, parent.getLayoutParams().width , 10);
+            this.showAtLocation(parent, Gravity.CENTER, 0, 0);
         } else {
             this.dismiss();
         }

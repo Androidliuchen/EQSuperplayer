@@ -29,6 +29,7 @@ import com.eq.EQSuperPlayer.bean.ImageBean;
 import com.eq.EQSuperPlayer.bean.ImagePath;
 import com.eq.EQSuperPlayer.bean.ProgramBean;
 import com.eq.EQSuperPlayer.custom.Constant;
+import com.eq.EQSuperPlayer.dao.AreabeanDao;
 import com.eq.EQSuperPlayer.dao.ImageDao;
 import com.eq.EQSuperPlayer.dao.ImagePathDao;
 import com.eq.EQSuperPlayer.dao.ProgramBeanDao;
@@ -97,6 +98,7 @@ public class ImageActivity extends Activity {
     private int windowWidth;
     private int windowHeight;
     private int text_id;
+    private Areabean areabean;
     private ImagePath imagePath = new ImagePath();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +126,7 @@ public class ImageActivity extends Activity {
     }
 
     private void initData() {
+        areabean = new AreabeanDao(this).get(ProgramActivity.program_id);
         text_id = getIntent().getIntExtra(Constant.PROGRAM_ID, -1);
         imageBean = new ImageDao(this).get(text_id);
         programBean = new ProgramBeanDao(this).get(ProgramActivity.selet);
@@ -138,15 +141,15 @@ public class ImageActivity extends Activity {
             IMWidth.setText(imageBean.getIamgeWidth() + "");
             IMHeigth.setText(imageBean.getIamgeHeidht() + "");
         } else {
-            IMWidth.setText(windowWidth + "");
-            IMHeigth.setText(windowHeight + "");
+            IMWidth.setText(areabean.getWindowWidth() + "");
+            IMHeigth.setText(areabean.getWindowHeight() + "");
         }
         if (imageBean.getIamgeX() != 0 || imageBean.getIamgeY() != 0){
             IMx.setText(imageBean.getIamgeX() + "");
             IMy.setText(imageBean.getIamgeY() + "");
         }else {
-            IMx.setText(0 + "");
-            IMy.setText(0 + "");
+            IMx.setText(areabean.getArea_X() + "");
+            IMy.setText(areabean.getArea_Y() + "");
         }
 
         TypedArray typedArray = this.getResources().obtainTypedArray(R.array.textcolor);

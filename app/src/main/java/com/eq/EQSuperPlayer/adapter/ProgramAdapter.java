@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.eq.EQSuperPlayer.R;
 import com.eq.EQSuperPlayer.bean.Areabean;
+import com.eq.EQSuperPlayer.custom.CustomPopWindow;
 
 import java.util.List;
 
@@ -20,8 +21,9 @@ public class ProgramAdapter extends BaseAdapter {
     private Context context;
     private static List<Areabean> areabeens;
     private LayoutInflater layoutInflr;
-    public static String ipAressd;
+//    public static String ipAressd;
     private OnRemoveListener mRemoveListener;
+    private OnListener mOnListener;
 
     public ProgramAdapter(Context context,List<Areabean> areabeens) {
         super();
@@ -32,6 +34,9 @@ public class ProgramAdapter extends BaseAdapter {
     }
     public void setRemoveListener(OnRemoveListener removeListener) {
         this.mRemoveListener = removeListener;
+    }
+    public void setListener(OnListener listener) {
+        this.mOnListener = listener;
     }
 
 
@@ -60,6 +65,7 @@ public class ProgramAdapter extends BaseAdapter {
 
     static class ViewHolder {
         TextView tvDelete;//隐藏的侧滑删除TextView
+        TextView tvbianji;
         TextView name;
         TextView num;
         TextView ip;
@@ -80,6 +86,8 @@ public class ProgramAdapter extends BaseAdapter {
                     .findViewById(R.id.tv_num);
             viewHolder.tvDelete = (TextView) convertView
                     .findViewById(R.id.tvDelete);
+            viewHolder.tvbianji = (TextView) convertView
+                    .findViewById(R.id.tvbianji);
             viewHolder.ip = (TextView) convertView
                     .findViewById(R.id.tv_ip);
             viewHolder.tvHeight = (TextView) convertView
@@ -90,9 +98,8 @@ public class ProgramAdapter extends BaseAdapter {
         }
         Areabean mAreabeen = areabeens.get(position);
         viewHolder.name.setText(mAreabeen.getName());
-        viewHolder.num.setText(mAreabeen.getNum());
         viewHolder.tvHeight.setText(mAreabeen.getWindowWidth() + "*" + mAreabeen.getWindowHeight());
-        viewHolder.ip.setText(ipAressd);
+        viewHolder.ip.setText(mAreabeen.getEquitTp());
         viewHolder.tvDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -100,10 +107,20 @@ public class ProgramAdapter extends BaseAdapter {
                     mRemoveListener.onRemoveItem(position);
             }
         });
+        viewHolder.tvbianji.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mOnListener != null)
+                    mOnListener.onClickListener(position);
+            }
+        });
         return convertView;
     }
     public interface OnRemoveListener {
         void onRemoveItem(int position);
+    }
+    public interface OnListener {
+        void onClickListener(int position);
     }
 }
 
