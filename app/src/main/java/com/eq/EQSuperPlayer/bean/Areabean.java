@@ -39,7 +39,10 @@ public class Areabean extends TableBean{
     private int index;  //区域转data以后在区域数据集合里，所在的位置的起点坐标
     @ForeignCollectionField(eager = true)    //必须是ForeignCollection<>
     public ForeignCollection<ProgramBean> programBeen;
-
+    @DatabaseField(columnName = "equitType")
+    public String equitType;
+    @DatabaseField(columnName = "equitIp")
+    public String equitTp;
     public List<ProgramBean> programBeens;
 
     public int getId() {
@@ -132,6 +135,22 @@ public class Areabean extends TableBean{
         this.index = index;
     }
 
+    public String getEquitType() {
+        return equitType;
+    }
+
+    public void setEquitType(String equitType) {
+        this.equitType = equitType;
+    }
+
+    public String getEquitTp() {
+        return equitTp;
+    }
+
+    public void setEquitTp(String equitTp) {
+        this.equitTp = equitTp;
+    }
+
     @Override
     public String toString() {
         return "Areabean{" +
@@ -142,6 +161,12 @@ public class Areabean extends TableBean{
                 ", windowHeight=" + windowHeight +
                 ", area_X=" + area_X +
                 ", area_Y=" + area_Y +
+                ", area_position=" + area_position +
+                ", index=" + index +
+                ", programBeen=" + programBeen +
+                ", equitType='" + equitType + '\'' +
+                ", equitTp='" + equitTp + '\'' +
+                ", programBeens=" + programBeens +
                 '}';
     }
 }

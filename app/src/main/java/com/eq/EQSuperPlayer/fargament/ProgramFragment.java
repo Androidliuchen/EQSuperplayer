@@ -24,7 +24,6 @@ import com.eq.EQSuperPlayer.R;
 import com.eq.EQSuperPlayer.activity.ProgramActivity;
 import com.eq.EQSuperPlayer.adapter.ProgramAdapter;
 import com.eq.EQSuperPlayer.bean.Areabean;
-import com.eq.EQSuperPlayer.communication.ConnectControlCard;
 import com.eq.EQSuperPlayer.custom.CustomPopWindow;
 import com.eq.EQSuperPlayer.custom.CustomTypeWindow;
 import com.eq.EQSuperPlayer.dao.AreabeanDao;
@@ -45,9 +44,10 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
     private EditText program_height;
     private EditText program_ip;
     private EditText progeam_duan;
+    private TextView tvbianji;
     private Button program_btn;
     private ImageView mImageView;
-    private CustomPopWindow addPopWindow;
+    public static CustomPopWindow addPopWindow;
     private SlidingItemListView mListView;
     private ProgramAdapter mProgramAdapter;
     private List<Areabean> areabeens;
@@ -69,7 +69,10 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
     private Button btn_Q4;
     private Button btn_Q3L;
     private Button btn_Q4L;
-
+    private int updataArea;
+    private boolean newOrupdata = true;
+    private Handler mhandler;
+    public static String ip;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -80,6 +83,13 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
         mImageView.setOnClickListener(this);
         mListView.setOnTouchListener(this);
         mProgramAdapter = new ProgramAdapter(getActivity(), areabeens);
+        mhandler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                mProgramAdapter.notifyDataSetChanged();
+            }
+        };
         mListView.setAdapter(mProgramAdapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -95,8 +105,9 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
         WifiManager my_wifiManager = ((WifiManager) getActivity().getSystemService(getActivity().WIFI_SERVICE));
         dhcpInfo = my_wifiManager.getDhcpInfo();
         String IP = intToIp(dhcpInfo.dns1);
-        ProgramAdapter.ipAressd = IP;
-        ConnectControlCard.HOSTAddress = IP;
+        Log.d(".....", IP + "");
+//        ProgramAdapter.ipAressd = IP;
+
         return view;
     }
 
@@ -125,7 +136,6 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
             program_name_count = 1;
         } else {
             program_name_count = ProgramNameItemManager.getSahrePreference(getActivity());
-
         }
         mProgramAdapter = new ProgramAdapter(getActivity(), areabeens);
         mProgramAdapter.setRemoveListener(new ProgramAdapter.OnRemoveListener() {
@@ -156,7 +166,25 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                     FileUtils.deleteDir(fileAll.getPath());
                 }
                 mListView.slideBack();
-                mProgramAdapter.notifyDataSetChanged();
+                mhandler.sendEmptyMessage(0);
+            }
+        });
+        mProgramAdapter.setListener(new ProgramAdapter.OnListener() {
+            @Override
+            public void onClickListener(int position) {
+                mAreabean = new AreabeanDao(getActivity()).get(areabeens.get(position).getId());
+                updataArea = position;
+                newOrupdata = false;
+                if (addPopWindow == null) {
+                    addPopWindow = new CustomPopWindow(getActivity(), R.id.iamge);
+                    addPopWindow.setView(getPopWindowView(), 0.8f, 0.50f);
+                }
+                addPopWindow.showPopupWindow(mImageView);
+                program_name.setText(mAreabean.getName());
+                program_type.setText(mAreabean.getEquitType());
+                program_height.setText(mAreabean.getWindowHeight() +"");
+                program_width.setText(mAreabean.getWindowWidth()+"");
+                program_ip.setText(mAreabean.getEquitTp());
             }
         });
         mListView.setAdapter(mProgramAdapter);
@@ -164,22 +192,22 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
 
     @Override
     public void onClick(View view) {
+        mAreabean = new Areabean();
         switch (view.getId()) {
             case R.id.iamge:
+                newOrupdata = true;
                 if (addPopWindow == null) {
-
                     addPopWindow = new CustomPopWindow(getActivity(), R.id.iamge);
-                    addPopWindow.setView(getPopWindowView(), 1.0f, 0.70f);
+                    addPopWindow.setView(getPopWindowView(),0.8f, 0.50f);
                 }
                 addPopWindow.showPopupWindow(mImageView);
                 break;
             case R.id.list_item:
-
                 break;
             case R.id.progeam_type:
                 if (customTypeWindow == null) {
                     customTypeWindow = new CustomTypeWindow(getActivity(), R.id.progeam_type);
-                    customTypeWindow.setView(getTypeWindowView(), 1.0f, 0.28f);
+                    customTypeWindow.setView(getTypeWindowView(), 0.8f, 0.5f);
                 }
                 addPopWindow.dismiss();
                 customTypeWindow.showPopupWindow(mImageView);
@@ -201,9 +229,6 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 program_type.setText("3");
                 program_width.setText("640");
                 program_height.setText("480");
-                windowWidth = 640;
-                windowHeight = 480;
-                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                 customTypeWindow.dismiss();
                 addPopWindow.showPopupWindow(mImageView);
                 break;
@@ -223,9 +248,6 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 program_type.setText("A1");
                 program_width.setText("384");
                 program_height.setText("128");
-                windowWidth = 384;
-                windowHeight = 128;
-                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                 customTypeWindow.dismiss();
                 addPopWindow.showPopupWindow(mImageView);
                 break;
@@ -245,9 +267,6 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 program_type.setText("A2");
                 program_width.setText("512");
                 program_height.setText("256");
-                windowWidth = 512;
-                windowHeight = 256;
-                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                 customTypeWindow.dismiss();
                 addPopWindow.showPopupWindow(mImageView);
                 break;
@@ -267,9 +286,6 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 program_type.setText("A3");
                 program_width.setText("640");
                 program_height.setText("480");
-                windowWidth = 640;
-                windowHeight = 480;
-                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                 customTypeWindow.dismiss();
                 addPopWindow.showPopupWindow(mImageView);
                 break;
@@ -289,9 +305,6 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 program_type.setText("A2L");
                 program_width.setText("1024");
                 program_height.setText("128");
-                windowWidth = 1024;
-                windowHeight = 128;
-                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                 customTypeWindow.dismiss();
                 addPopWindow.showPopupWindow(mImageView);
                 break;
@@ -311,9 +324,6 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 program_type.setText("A3L");
                 program_width.setText("2048");
                 program_height.setText("128");
-                windowWidth = 2048;
-                windowHeight = 128;
-                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                 customTypeWindow.dismiss();
                 addPopWindow.showPopupWindow(mImageView);
                 break;
@@ -333,9 +343,6 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 program_type.setText("Q1");
                 program_width.setText("640");
                 program_height.setText("480");
-                windowWidth = 640;
-                windowHeight = 480;
-                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                 customTypeWindow.dismiss();
                 addPopWindow.showPopupWindow(mImageView);
                 break;
@@ -355,9 +362,6 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 program_type.setText("Q2");
                 program_width.setText("800");
                 program_height.setText("600");
-                windowWidth = 800;
-                windowHeight = 600;
-                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                 customTypeWindow.dismiss();
                 addPopWindow.showPopupWindow(mImageView);
                 break;
@@ -377,9 +381,6 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 program_type.setText("Q3");
                 program_width.setText("1280");
                 program_height.setText("800");
-                windowWidth = 1280;
-                windowHeight = 800;
-                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                 customTypeWindow.dismiss();
                 addPopWindow.showPopupWindow(mImageView);
                 break;
@@ -399,9 +400,6 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 program_type.setText("Q4");
                 program_width.setText("1920");
                 program_height.setText("1024");
-                windowWidth = 1920;
-                windowHeight = 1024;
-                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                 customTypeWindow.dismiss();
                 addPopWindow.showPopupWindow(mImageView);
                 break;
@@ -421,9 +419,6 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 program_type.setText("Q3L");
                 program_width.setText("2048");
                 program_height.setText("384");
-                windowWidth = 2048;
-                windowHeight = 384;
-                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                 customTypeWindow.dismiss();
                 addPopWindow.showPopupWindow(mImageView);
                 break;
@@ -443,9 +438,6 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 program_type.setText("Q4L");
                 program_width.setText("7680");
                 program_height.setText("256");
-                windowWidth = 7680;
-                windowHeight = 256;
-                WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                 customTypeWindow.dismiss();
                 addPopWindow.showPopupWindow(mImageView);
                 break;
@@ -461,7 +453,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
     /**
      * 加载节目名称弹出窗体布局
      */
-    private View getPopWindowView() {
+    public View getPopWindowView() {
         String IP = intToIp(dhcpInfo.dns1);
         View view = getActivity().getLayoutInflater().inflate(R.layout.add, null);
         program_name = (EditText) view.findViewById(R.id.progeam_name);
@@ -471,33 +463,64 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
         program_ip = (EditText) view.findViewById(R.id.progeam_ip);
         progeam_duan = (EditText) view.findViewById(R.id.progeam_duan);
         program_btn = (Button) view.findViewById(R.id.progeam_btn);
-        program_ip.setText(IP);
+        program_ip.setText("0.0.0.0");
         progeam_duan.setText(5050 + "");
         program_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!program_name.getText().toString().equals("")) {
+                if(newOrupdata){
+                    mAreabean = new Areabean();
+                    if (program_type.getText().equals("")) {
+                        Toast.makeText(getActivity(), "请选择设备类型！", Toast.LENGTH_SHORT).show();
+                    }else {
+                        String program = program_name.getText().toString();
+                        int wdith = Integer.parseInt(program_width.getText().toString());
+                        int height = Integer.parseInt(program_height.getText().toString());
+                        Log.d("............", "program.........................." + program);
+                        mAreabean.setName(program);
+                        mAreabean.setWindowWidth(wdith);
+                        mAreabean.setWindowHeight(height);
+                        mAreabean.setEquitType(program_type.getText().toString());
+                        mAreabean.setEquitTp(program_ip.getText().toString());
+                        ip = program_ip.getText().toString();
+                        areabeens.add(mAreabean);
+                        new AreabeanDao(getActivity()).add(mAreabean);
+                        windowWidth = wdith;
+                        windowHeight = height;
+                        WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
+                        program_name_count++;
+                        ProgramNameItemManager.setSharedPreference(getActivity(), program_name_count);
+                        mhandler.sendEmptyMessage(0);
+                        addPopWindow.dismiss();
+                    }
+                }else {
+                    mAreabean = new AreabeanDao(getActivity()).get(areabeens.get(updataArea).getId());
                     String program = program_name.getText().toString();
                     int wdith = Integer.parseInt(program_width.getText().toString());
                     int height = Integer.parseInt(program_height.getText().toString());
                     Log.d("............", "program.........................." + program);
-                    mAreabean = new Areabean();
                     String s = String.valueOf(program_name_count);
                     mAreabean.setNum(s);
                     mAreabean.setName(program);
                     mAreabean.setWindowWidth(wdith);
                     mAreabean.setWindowHeight(height);
+                    mAreabean.setEquitType(program_type.getText().toString());
+                    ip = program_ip.getText().toString();
+                    mAreabean.setEquitTp(program_ip.getText().toString());
+                    areabeens.remove(updataArea);
                     areabeens.add(mAreabean);
-                    new AreabeanDao(getActivity()).add(mAreabean);
-                    Log.d("............", "mAreabean.........................." + mAreabean.toString());
-                    mProgramAdapter.notifyDataSetChanged();
+                    new AreabeanDao(getActivity()).update(mAreabean);
+                    windowWidth = wdith;
+                    windowHeight = height;
+                    WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                     program_name_count++;
                     ProgramNameItemManager.setSharedPreference(getActivity(), program_name_count);
+                    mhandler.sendEmptyMessage(0);
+                    mListView.slideBack();
                     addPopWindow.dismiss();
-                } else {
-                    Toast.makeText(getActivity(), "节目名称不能为空！", Toast.LENGTH_SHORT).show();
                 }
             }
+
         });
         program_type.setOnClickListener(this);
         return view;

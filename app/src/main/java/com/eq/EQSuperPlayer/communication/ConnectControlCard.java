@@ -2,7 +2,10 @@ package com.eq.EQSuperPlayer.communication;
 
 import android.util.Log;
 
+import com.eq.EQSuperPlayer.bean.Areabean;
 import com.eq.EQSuperPlayer.custom.Constant;
+import com.eq.EQSuperPlayer.dao.AreabeanDao;
+import com.eq.EQSuperPlayer.fargament.ProgramFragment;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -20,7 +23,8 @@ import java.util.List;
 public class ConnectControlCard implements Runnable {
     private static final String TAG = "ConnectControlCard";
     public static int PORT = 5050;  // 端口
-    public static String HOSTAddress = null;    // 主机地址
+//    public static String HOSTAddress = ProgramFragment.ip;    // 主机地址
+    public static String HOSTAddress ="192.168.43.1" ;    // 主机地址
     private DatagramSocket dataSocket = null;
     private DatagramPacket dataPacket = null;
     private int dataLength = 0;    //在当前类，竟然还要传个空值过来
@@ -45,6 +49,7 @@ public class ConnectControlCard implements Runnable {
     @Override
     public void run() {
         Log.d("......", "子线程。。。。。。" + 1);
+        Log.d("......", "HOSTAddress。。。。。。" + HOSTAddress);
         InetAddress local = null;
         try {
             local = InetAddress.getByName(HOSTAddress);

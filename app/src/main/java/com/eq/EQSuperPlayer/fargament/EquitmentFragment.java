@@ -45,14 +45,15 @@ public class EquitmentFragment extends Fragment implements OnClickListener {
     private WifiListAdapter adapter = null; //
     public List<ScanResult> EqWifiList = null;
     private DhcpInfo dhcpInfo;
+    private boolean wifidata = true;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_equitment, container,false);
+        View view = inflater.inflate(R.layout.fragment_equitment, container, false);
         initView(view);
         initeData();
-    return view;
-}
+        return view;
+    }
 
 
     private void openWifi() { // 打开wifi开关
@@ -63,16 +64,18 @@ public class EquitmentFragment extends Fragment implements OnClickListener {
         Thread thread = new Thread() {
             public void run() {
                 try {
-                    while (true) {
+                    while (wifidata) {
                         Thread.sleep(1000);
                         if (mNetWorkCheck.getWifiList() != null) {
                             handler.sendEmptyMessage(1);
+                            wifidata = false;
                             break;
                         }
                     }
 
                 } catch (Exception e) {
                     proDialog.cancel();
+                    proDialog.dismiss();
                     e.printStackTrace();
                 }
 
@@ -125,26 +128,29 @@ public class EquitmentFragment extends Fragment implements OnClickListener {
 
             try {
 
-                while (true) {
+                while (wifidata) {
                     Thread.sleep(100);
                     time += 100;
                     if (mNetWorkCheck.isWifiConnected(getActivity())) {
                         handler.sendEmptyMessage(2);
+                        wifidata = false;
                         break;
                     }
-                    if (time >= 3000) {
+                    if (time >= 10000) {
                         handler.sendEmptyMessage(3);
+                        wifidata = false;
                         break;
                     }
                 }
             } catch (InterruptedException e) {
-                proDialog.cancel();
+                proDialog.dismiss();
                 e.printStackTrace();
             }
 
         }
 
     }
+
     /**
      * handle
      */
@@ -152,11 +158,12 @@ public class EquitmentFragment extends Fragment implements OnClickListener {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            wifidata = true;
             switch (msg.what) {
                 case 1:
                     wifiSwitch.setChecked(true);
                     loadDada();
-                    proDialog.cancel();
+                    proDialog.dismiss();
                     break;
 
                 case 2:
@@ -164,16 +171,16 @@ public class EquitmentFragment extends Fragment implements OnClickListener {
                     WifiManager my_wifiManager = ((WifiManager) getActivity().getSystemService(getActivity().WIFI_SERVICE));
                     dhcpInfo = my_wifiManager.getDhcpInfo();
                     String IP = intToIp(dhcpInfo.dns1);
-                    ProgramAdapter.ipAressd = IP;
                     ConnectControlCard.HOSTAddress = IP;
-                    proDialog.cancel();
+                    proDialog.dismiss();
                     updateWifiName();
-                    Toast.makeText(getActivity(),getResources().getString(R.string.hint_connection_success),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), getResources().getString(R.string.hint_connection_success), Toast.LENGTH_SHORT).show();
+
                     break;
 
                 case 3:
-                    proDialog.cancel();
-                    Toast.makeText(getActivity(),getResources().getString(R.string.hint_connection_failure),Toast.LENGTH_SHORT).show();
+                    proDialog.dismiss();
+                    Toast.makeText(getActivity(), getResources().getString(R.string.hint_connection_failure), Toast.LENGTH_SHORT).show();
                     break;
 
                 default:
@@ -198,6 +205,7 @@ public class EquitmentFragment extends Fragment implements OnClickListener {
 
         }
     }
+
     //转换成DNS格式
     private String intToIp(int paramInt) {
         return (paramInt & 0xFF) + "." + (0xFF & paramInt >> 8) + "." + (0xFF & paramInt >> 16) + "."
@@ -283,7 +291,7 @@ public class EquitmentFragment extends Fragment implements OnClickListener {
         }
 
         if (mNetWorkCheck.mWifiList.size() == 0) {
-            Toast.makeText(getActivity(),getResources().getString(R.string.hint_control_wifi_failure) ,Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), getResources().getString(R.string.hint_control_wifi_failure), Toast.LENGTH_SHORT).show();
 
         } else { // 过滤wifi列表
             for (int i = 0; i < mNetWorkCheck.mWifiList.size(); i++) {

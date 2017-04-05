@@ -5,67 +5,70 @@
     android:orientation="vertical">
 
     <RelativeLayout
-    android:id="@+id/alertTitle"
-    android:layout_width="match_parent"
-    android:layout_height="50dp"
-    android:background="#0080FF">
+        android:id="@+id/alertTitle"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#0080FF">
 
-    <ImageView
-    android:id="@+id/topButton"
-    android:layout_width="wrap_content"
-    android:layout_height="match_parent"
-    android:src="@drawable/ic_top_bar_category" />
+        <ImageView
+            android:id="@+id/topButton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_top_bar_category" />
 
 
-    <TextView
-    android:id="@+id/topTv"
-    android:layout_width="wrap_content"
-    android:layout_height="match_parent"
-    android:layout_centerInParent="true"
-    android:gravity="center"
-    android:text="@string/app_name"
-    android:textColor="#fff"
-    android:textSize="20sp" />
+        <TextView
+            android:id="@+id/topTv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="@string/app_name"
+            android:textColor="#fff"
+            android:textSize="20sp" />
 
     </RelativeLayout>
 
     <FrameLayout
-    android:id="@+id/fragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_weight="1"
-    android:layout_above="@+id/line1"
-    android:layout_alignParentLeft="true"
-    android:layout_alignParentStart="true"
-    android:layout_below="@+id/alertTitle">
-    </FrameLayout>
+        android:id="@+id/fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/line1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/alertTitle"
+        android:layout_weight="1"></FrameLayout>
 
     <RadioGroup
-    android:id="@+id/radioGroup"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
-    <RadioButton
-    android:id="@+id/program"
-    style="@style/MTabStyle"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/program"
-    android:drawableTop="@drawable/program"/>
-    <Button
-    android:id="@+id/send"
-    style="@style/MTabStyle"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/hardware_send_button"
-    android:drawableTop="@drawable/send"/>
-    <RadioButton
-    android:id="@+id/equitment"
-    style="@style/MTabStyle"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/equipment"
-    android:drawableTop="@drawable/equitment"/>
+        android:id="@+id/radioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/program"
+            style="@style/MTabStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:drawableTop="@drawable/program"
+            android:text="@string/program" />
+
+        <Button
+            android:id="@+id/send"
+            style="@style/MTabStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/send"
+            android:text="@string/hardware_send_button" />
+
+        <RadioButton
+            android:id="@+id/equitment"
+            style="@style/MTabStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/equitment"
+            android:text="@string/equipment" />
     </RadioGroup>
 
 

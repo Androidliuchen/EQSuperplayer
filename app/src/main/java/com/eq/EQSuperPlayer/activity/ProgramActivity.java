@@ -43,6 +43,7 @@ import com.eq.EQSuperPlayer.bean.TextBean;
 import com.eq.EQSuperPlayer.bean.TimeBean;
 import com.eq.EQSuperPlayer.bean.TotalBean;
 import com.eq.EQSuperPlayer.bean.VedioBean;
+import com.eq.EQSuperPlayer.communication.ConnectControlCard;
 import com.eq.EQSuperPlayer.custom.Constant;
 import com.eq.EQSuperPlayer.custom.CustomPopWindow;
 import com.eq.EQSuperPlayer.custom.CustomTypeWindow;
@@ -155,7 +156,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         Log.d("...........", "显示屏宽高...............：" + text_layout.getLayoutParams().height);
         Log.d("...........", "显示屏宽高...............：" + text_layout.getLayoutParams().width);
         //手势缩放监听事件，有些瑕疵，有待完善
-//        text_layout.setOnTouchListener(listener);
+        text_layout.setOnTouchListener(listener);
         //节目区手势监听
 //        text_ima.setOnTouchListener(listener);
         region_btn = (Button) findViewById(R.id.region);
@@ -714,17 +715,19 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 break;
             case R.id.region:
                 if (tableBeens.size() != 0) {
-                    if (customTypeWindow == null) {
-                        customTypeWindow = new CustomTypeWindow(this, R.id.region);
-                        customTypeWindow.setView(getTypeWindowListView(), 1.0f, 0.57f);
-                        customTypeWindow.backgroundAlpha(10f);
+                    if (!(region_text.getText().toString()).equals("区域管理")) {
+                        if (customTypeWindow == null) {
+                            customTypeWindow = new CustomTypeWindow(this, R.id.region);
+                            customTypeWindow.setView(getTypeWindowListView(), 1.0f, 0.57f);
+                            customTypeWindow.backgroundAlpha(10f);
+                        }
+                        customTypeWindow.showPopupWindow(region_btn);
+                    } else {
+                        Toast.makeText(ProgramActivity.this, "请先选择节目！", Toast.LENGTH_SHORT).show();
                     }
-                    customTypeWindow.showPopupWindow(region_btn);
-
                 } else {
-                    Toast.makeText(ProgramActivity.this, getResources().getText(R.string.program_no), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProgramActivity.this, "还没有节目哟！", Toast.LENGTH_SHORT).show();
                 }
-
                 break;
             case R.id.region_send:
                 break;

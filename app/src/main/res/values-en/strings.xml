@@ -36,6 +36,7 @@
 	<!--  MainActivity,提示用户点击退出   !-->
 	<string name="hint_exit">press back again to exit</string>
 	<string name="system_language">Follow the system language</string>
+	<string name="popu_program_editor">Edit the program</string>
 	<!--  newworkActivity   !-->
 	<string name="hint_connection_to">connecting:</string>
 	<string name="regional_management">Regional management</string>
@@ -58,7 +59,8 @@
 	<string name="time">Time</string>
 	<string name="video">Vedio</string>
 	<string name="text">Text</string>
-	<string name="the_programme">Program type</string>
+	<string name="addEquit">Add equit</string>
+	<string name="the_programme">Equit type</string>
 	<string name="addthe_programme">Add the program type</string>
 	<string name="program_no">Have not show yo！</string>
 	<string name="xml_success">XML Generate success！</string>

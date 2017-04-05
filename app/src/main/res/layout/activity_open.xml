@@ -12,8 +12,10 @@
 
         <ImageView
             android:id="@+id/open_Button"
-            android:layout_width="wrap_content"
+            android:layout_width="40dp"
             android:layout_height="match_parent"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:src="@drawable/button_return" />
 
 
@@ -34,6 +36,7 @@
         android:orientation="horizontal"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true">
+
         <Button
             android:id="@+id/btn_open"
             android:layout_width="80dp"

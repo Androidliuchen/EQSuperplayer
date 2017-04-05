@@ -30,6 +30,7 @@ import com.eq.EQSuperPlayer.bean.Areabean;
 import com.eq.EQSuperPlayer.bean.ProgramBean;
 import com.eq.EQSuperPlayer.bean.TextBean;
 import com.eq.EQSuperPlayer.custom.Constant;
+import com.eq.EQSuperPlayer.dao.AreabeanDao;
 import com.eq.EQSuperPlayer.dao.ProgramBeanDao;
 import com.eq.EQSuperPlayer.dao.TextBeanDao;
 import com.eq.EQSuperPlayer.utils.FileUtils;
@@ -97,7 +98,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
     private List<TextBean> textBeens;
     private ProgramBean programBean;
     private List<ProgramBean> programBeans;
-    private Areabean areabean = new Areabean();
+    private Areabean areabean;
     private int windowWidth;//窗口宽度
     private int windowHeight; //窗口高度
     private WindowSizeManager windowSizeManager;
@@ -115,6 +116,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     protected void initData() {
+        areabean = new AreabeanDao(this).get(ProgramActivity.program_id);
         int text_id = getIntent().getIntExtra(Constant.PROGRAM_ID, -1);
         textBean = new TextBeanDao(this).get(text_id);
         programBean = new ProgramBeanDao(this).get(ProgramActivity.selet);
@@ -129,15 +131,15 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
             STWidth.setText(textBean.getWidth() + "");
             STHeigth.setText(textBean.getHeidht() + "");
         } else {
-            STWidth.setText(windowWidth + "");
-            STHeigth.setText(windowHeight + "");
+            STWidth.setText(areabean.getWindowWidth() + "");
+            STHeigth.setText(areabean.getWindowHeight() + "");
         }
         if (textBean.getX() != 0 || textBean.getY() != 0) {
             STx.setText(textBean.getX() + "");
             STy.setText(textBean.getY() + "");
         } else {
-            STx.setText(0 + "");
-            STy.setText(0 + "");
+            STx.setText(areabean.getArea_X() + "");
+            STy.setText(areabean.getArea_Y() + "");
         }
 
         //字体是否加粗

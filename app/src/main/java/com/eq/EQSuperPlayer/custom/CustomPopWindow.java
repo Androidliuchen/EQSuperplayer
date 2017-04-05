@@ -2,6 +2,7 @@ package com.eq.EQSuperPlayer.custom;
 
 import android.app.Activity;
 import android.graphics.drawable.ColorDrawable;
+import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.PopupWindow;
@@ -17,7 +18,6 @@ public class CustomPopWindow extends PopupWindow {
     private Activity at;
     private int id;   //控件的id。。位置xx控件之上下左右
     private InterfaceClick onClickListener;
-
     public CustomPopWindow(Activity at, int id) {
         super();
         this.at = at;
@@ -79,7 +79,7 @@ public class CustomPopWindow extends PopupWindow {
 //            parent.getLocationOnScreen(location);
 //            this.showAtLocation(parent, Gravity.NO_GRAVITY, location[0] + parent.getWidth(), location[1]);
             // 以下拉方式显示popupwindow
-            this.showAsDropDown(parent, parent.getLayoutParams().width , 10);
+            this.showAtLocation(parent, Gravity.CENTER, 0, 0);
         } else {
             this.dismiss();
         }
