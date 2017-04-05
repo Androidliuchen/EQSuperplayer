@@ -60,10 +60,26 @@ public class SendPacket {
 
         return indexs;
     }
-/**
- * 开启屏幕协议
- *
- * */
+    /**
+     * 查询在线设备
+     * */
+    public static byte[] findScreen(){
+        byte[] b = new byte[10];
+        b[0] = (byte) 0xF7;
+        b[1] = (byte) 0x5B;
+        b[2] = (byte) ((10 >> 0) & 0xFF);
+        b[3] = (byte) ((10 >> 8) & 0xFF);
+        b[4] = (byte) 0x01;
+        b[5] = (byte) 0x07;
+        b[6] = (byte) 0x00;
+        b[7] = (byte) 0x00;
+        b[8] = (byte) 0x5B;
+        b[9] = (byte) 0xF7;
+        return b;
+    }
+    /**
+     * 开启屏幕协议
+     */
     public static byte[] openScreen(){
         byte[] b = new byte[42];
         b[0] = (byte) 0xF6;

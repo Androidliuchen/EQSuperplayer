@@ -29,11 +29,9 @@ public class CustomTypeWindow extends PopupWindow {
     public void setView(View contentView, float width, float height) {
         // 设置SelectPicPopupWindow的View
         this.setContentView(contentView);
-        int w = (int) (Utils.getUiwidth(at) * width);
-        int h = (int) (Utils.getUiheight(at) * height);
-        this.setWidth(w);
-        // 设置SelectPicPopupWindow弹出窗体的高
-        this.setHeight(h);
+        //设置宽与高
+        setWidth(WindowManager.LayoutParams.MATCH_PARENT);
+        setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
 
         // 设置popWindow弹出窗体可点击，这句话必须添加，并且是true
         this.setFocusable(true);

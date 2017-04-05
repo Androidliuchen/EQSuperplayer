@@ -28,11 +28,12 @@ public class CustomPopWindow extends PopupWindow {
     public void setView(View contentView, float width, float height) {
         // 设置SelectPicPopupWindow的View
         this.setContentView(contentView);
-        int w = (int) (Utils.getUiwidth(at) * width);
-        int h = (int) (Utils.getUiheight(at) * height);
-        this.setWidth(w);
-        // 设置SelectPicPopupWindow弹出窗体的高
-        this.setHeight(h);
+//        int w = (int) (Utils.getUiwidth(at) * width);
+//        int h = (int) (Utils.getUiheight(at) * height);
+        //设置宽与高
+        this.setWidth(WindowManager.LayoutParams.MATCH_PARENT);
+
+        this.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
         // 设置popWindow弹出窗体可点击，这句话必须添加，并且是true
         this.setFocusable(true);
         this.setOutsideTouchable(true);
@@ -52,7 +53,7 @@ public class CustomPopWindow extends PopupWindow {
         // 刷新状态
         this.update();
         // 实例化一个ColorDrawable颜色为半透明
-        ColorDrawable dw = new ColorDrawable(0000000000);
+        ColorDrawable dw = new ColorDrawable(-00000);
         // 点back键和其他地方使其消失,设置了这个才能触发OnDismisslistener ，设置其他控件变化等操作
         this.setBackgroundDrawable(dw);
         this.setAnimationStyle(R.style.AnimationPreview);
@@ -65,6 +66,7 @@ public class CustomPopWindow extends PopupWindow {
      */
     public void backgroundAlpha(float bgAlpha) {
         WindowManager.LayoutParams lp = at.getWindow().getAttributes();
+        at.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         lp.alpha = bgAlpha; //0.0-1.0
         at.getWindow().setAttributes(lp);
     }
@@ -79,7 +81,7 @@ public class CustomPopWindow extends PopupWindow {
 //            parent.getLocationOnScreen(location);
 //            this.showAtLocation(parent, Gravity.NO_GRAVITY, location[0] + parent.getWidth(), location[1]);
             // 以下拉方式显示popupwindow
-            this.showAtLocation(parent, Gravity.CENTER, 0, 0);
+            this.showAtLocation(parent, Gravity.CENTER, 30, 30);
         } else {
             this.dismiss();
         }

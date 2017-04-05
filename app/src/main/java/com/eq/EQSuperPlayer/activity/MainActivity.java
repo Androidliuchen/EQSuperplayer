@@ -802,7 +802,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                 if (customPopWindow == null) {
                     customPopWindow = new CustomPopWindow(MainActivity.this, R.id.send);
                     customPopWindow.setView(getPopWindowListView(), 1.0f, 0.60f);
-                    customPopWindow.backgroundAlpha(10f);
+                    customPopWindow.backgroundAlpha(0.4f);
                 }
                 customPopWindow.showPopupWindow(mSend);
 

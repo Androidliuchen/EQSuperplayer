@@ -42,6 +42,7 @@ public class ConnectControlCard implements Runnable {
     }
 
     public ConnectControlCard(List<byte[]> sendByte) {
+
         super();
         this.sendByte = sendByte;
     }
@@ -100,6 +101,7 @@ public class ConnectControlCard implements Runnable {
                         interfaceConnect.success(buf); //传递返回值
                         Log.d("......", "子线程。。。。。。" + 2);
                     }
+                    dataSocket.close();
                 } catch (UnsupportedEncodingException e) {
                     Log.e(TAG, "接收数据包异常...");
                     if (interfaceConnect != null) {

@@ -193,8 +193,8 @@
         android:layout_marginTop="5dp"/>
     <Button
         android:id="@+id/progeam_btn"
-        android:layout_width="200dp"
-        android:layout_height="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:background="@drawable/button_down"
         android:layout_gravity="center"
         android:layout_marginTop="5dp"

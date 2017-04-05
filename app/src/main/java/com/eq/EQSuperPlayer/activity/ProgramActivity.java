@@ -707,8 +707,8 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             case R.id.region_program:
                 if (customPopWindow == null) {
                     customPopWindow = new CustomPopWindow(this, R.id.region_program);
-                    customPopWindow.setView(getPopWindowListView(), 1.0f, 0.57f);
-                    customPopWindow.backgroundAlpha(10f);
+                    customPopWindow.setView(getPopWindowListView(),0.60f, 0.57f);
+                    customPopWindow.backgroundAlpha(0.4f);
                 }
                 customPopWindow.showPopupWindow(prog_btn);
                 break;
@@ -718,7 +718,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         if (customTypeWindow == null) {
                             customTypeWindow = new CustomTypeWindow(this, R.id.region);
                             customTypeWindow.setView(getTypeWindowListView(), 1.0f, 0.57f);
-                            customTypeWindow.backgroundAlpha(10f);
+                            customTypeWindow.backgroundAlpha(0.4f);
                         }
                         customTypeWindow.showPopupWindow(region_btn);
                     } else {
