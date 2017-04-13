@@ -27,6 +27,7 @@ import com.eq.EQSuperPlayer.bean.Areabean;
 import com.eq.EQSuperPlayer.bean.SendAdapter;
 import com.eq.EQSuperPlayer.communication.ConnectControlCard;
 import com.eq.EQSuperPlayer.communication.InterfaceConnect;
+import com.eq.EQSuperPlayer.communication.ManyControlCard;
 import com.eq.EQSuperPlayer.communication.SendPacket;
 import com.eq.EQSuperPlayer.custom.CustomPopWindow;
 import com.eq.EQSuperPlayer.fargament.LeftFragment;
@@ -60,6 +61,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
     private int AllSize = 0;
     private ProgressDialog proDialog; // 进度条
     private ConnectControlCard ccc;
+    private ManyControlCard mcc;
     private byte[] proBytes;   //存放XML的byte数组
     private List<byte[]> program_lists = null;   //当xml数据包需要分包的时候
     private SendAdapter mSendAdapter;
@@ -98,7 +100,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
     private int EORRE_COUNT = 1;//错误次数
 //    private ExecutorService cachedThreadPool = Executors.newCachedThreadPool();//线程池
     private int resourcesIndex = 0;
-    private ExecutorService fixedThreadPool = Executors.newFixedThreadPool(3);
+    private ExecutorService fixedThreadPool = Executors.newFixedThreadPool(10);
     private DhcpInfo dhcpInfo;
     public static String IP;
     public static DatagramSocket dataSocket = null;
@@ -397,6 +399,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                                 ccc = new ConnectControlCard(MainActivity.this,manyData, new InterfaceConnect() {
                                     @Override
                                     public void success(byte[] result) {
+                                        start = 6;
                                         handler.sendEmptyMessage(7);
                                     }
 
@@ -473,7 +476,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                             String ss = SendPacket.byte2hex(manyIangeData);
                             manySnedBig.add(manyIangeData);
                         }
-                        ccc = new ConnectControlCard(MainActivity.this,manySnedBig, new InterfaceConnect() {
+                        mcc = new ManyControlCard(MainActivity.this,manySnedBig, new InterfaceConnect() {
                             @Override
                             public void success(byte[] result) {
 
@@ -490,12 +493,13 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                                 handler.sendEmptyMessage(8);
                             }
                         });
-                        fixedThreadPool.execute(ccc);
+                        fixedThreadPool.execute(mcc);
                         Log.d("....", "countAdress当前长度。。。。。：" + countAdress);
                     } else {
-                        if (1 < sendConten) {
+                        if (1 <= sendConten) {
                             for (int j = 0; j < sendConten; j++) {
                                 byte[] list = new byte[DATA_MAX_SIZE];
+                                Log.d(".................","countOrAdress.....:" +countOrAdress);
                                 System.arraycopy(buffer, (countOrAdress * MULTI_PACKAGE_MAX_COUNT + j) * DATA_MAX_SIZE, list, 0, DATA_MAX_SIZE);
                                 arrays.add(list);
                             }
@@ -510,7 +514,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                                 String ss = SendPacket.byte2hex(manyIangeData);
                                 manySnedBig.add(manyIangeData);
                             }
-                            ccc = new ConnectControlCard(MainActivity.this,manySnedBig, new InterfaceConnect() {
+                            mcc = new ManyControlCard(MainActivity.this,manySnedBig, new InterfaceConnect() {
 
                                 @Override
                                 public void success(byte[] result) {
@@ -526,7 +530,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                                     handler.sendEmptyMessage(8);
                                 }
                             });
-                            fixedThreadPool.execute(ccc);
+                            fixedThreadPool.execute(mcc);
                         }
                     }
                     countOrAdress++;
