@@ -96,8 +96,9 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
     private int manyStratIndex = 0;//多包发送的起始位置
     private int endLeng = 0;//最后一小包的长度
     private int EORRE_COUNT = 1;//错误次数
-    private ExecutorService cachedThreadPool = Executors.newCachedThreadPool();//线程池
+//    private ExecutorService cachedThreadPool = Executors.newCachedThreadPool();//线程池
     private int resourcesIndex = 0;
+    private ExecutorService fixedThreadPool = Executors.newFixedThreadPool(3);
     private DhcpInfo dhcpInfo;
     public static String IP;
     public static DatagramSocket dataSocket = null;
@@ -207,7 +208,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
 
                             }
                         });
-                        cachedThreadPool.execute(ccc);
+                        fixedThreadPool.execute(ccc);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     } catch (IOException e) {
@@ -267,7 +268,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
 
                         }
                     });
-                    cachedThreadPool.execute(ccc);
+                    fixedThreadPool.execute(ccc);
                     break;
                 case 3://发送文件名称指令
                     Log.d("....", "resourcesIndex33333333" + resourcesIndex);
@@ -306,7 +307,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
 
                         }
                     });
-                    cachedThreadPool.execute(ccc);
+                    fixedThreadPool.execute(ccc);
                     break;
                 case 4://节目发送完成指令
                     List<byte[]> programeData = new ArrayList<byte[]>();
@@ -330,7 +331,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
 
                         }
                     });
-                    cachedThreadPool.execute(ccc);
+                    fixedThreadPool.execute(ccc);
                     break;
                 case 6:
                     Log.d("......", "countAdress2222222:" + countAdress);
@@ -384,17 +385,18 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
 
                                 }
                             });
-                            cachedThreadPool.execute(ccc);
+                            fixedThreadPool.execute(ccc);
                         } else if (countOrAdress == manyAllConten - 2) {
                             if (1 <= sendConten) {
                                 Log.d("最后一包当前位置", "manyStratIndex....." + manyStratIndex);
                                 Log.d("最后一包当前位置", "sendConten....." + sendConten);
                                 byte[] manySendStart = SendPacket.manyPakStart(manyStratIndex, sendConten * DATA_MAX_SIZE, sendConten, DATA_MAX_SIZE);
+                                String many = SendPacket.byte2hex(manySendStart);
+                                Log.d("最后一包当前位置", "many....." + many);
                                 manyData.add(manySendStart);
                                 ccc = new ConnectControlCard(MainActivity.this,manyData, new InterfaceConnect() {
                                     @Override
                                     public void success(byte[] result) {
-                                        start = 6;
                                         handler.sendEmptyMessage(7);
                                     }
 
@@ -409,7 +411,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
 
                                     }
                                 });
-                                cachedThreadPool.execute(ccc);
+                                fixedThreadPool.execute(ccc);
                             }
                         } else {
                             byte[] list = new byte[DATA_MAX_SIZE];
@@ -443,7 +445,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
 
                                 }
                             });
-                            cachedThreadPool.execute(ccc);
+                            fixedThreadPool.execute(ccc);
                         }
 
                     } catch (FileNotFoundException e) {
@@ -488,7 +490,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                                 handler.sendEmptyMessage(8);
                             }
                         });
-                        cachedThreadPool.execute(ccc);
+                        fixedThreadPool.execute(ccc);
                         Log.d("....", "countAdress当前长度。。。。。：" + countAdress);
                     } else {
                         if (1 < sendConten) {
@@ -524,7 +526,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                                     handler.sendEmptyMessage(8);
                                 }
                             });
-                            cachedThreadPool.execute(ccc);
+                            fixedThreadPool.execute(ccc);
                         }
                     }
                     countOrAdress++;
@@ -585,7 +587,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
 
             }
         });
-        cachedThreadPool.execute(ccc);
+        fixedThreadPool.execute(ccc);
     }
 
 
@@ -623,7 +625,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
 
             }
         });
-        new Thread(ccc).start();
+            fixedThreadPool.execute(ccc);
         }else {
             Toast.makeText(this,"当前节目内容为空!",Toast.LENGTH_SHORT).show();
         }
