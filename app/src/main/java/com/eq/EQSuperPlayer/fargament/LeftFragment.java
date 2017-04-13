@@ -7,12 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.eq.EQSuperPlayer.R;
-import com.eq.EQSuperPlayer.SlidingMenuActivity.AboutActivity;
 import com.eq.EQSuperPlayer.SlidingMenuActivity.BrightnessActivity;
-import com.eq.EQSuperPlayer.SlidingMenuActivity.CorrectionActivity;
 import com.eq.EQSuperPlayer.SlidingMenuActivity.LanguageActivity;
 import com.eq.EQSuperPlayer.SlidingMenuActivity.OpenActivity;
-import com.eq.EQSuperPlayer.SlidingMenuActivity.WIFIActivity;
 
 public class LeftFragment extends Fragment implements View.OnClickListener {
     private View todayView;
@@ -56,14 +53,20 @@ public class LeftFragment extends Fragment implements View.OnClickListener {
             case R.id.tvToday: // 开关屏幕
                 intent.setClass(getActivity(), OpenActivity.class);
                 startActivity(intent);
+                getActivity(). overridePendingTransition(R.anim.push_left_in,
+                        R.anim.push_left_out);
                 break;
             case R.id.tvLastlist:// 调节亮度
                 intent.setClass(getActivity(), BrightnessActivity.class);
                 startActivity(intent);
+                getActivity(). overridePendingTransition(R.anim.push_left_in,
+                        R.anim.push_left_out);
                 break;
             case R.id.tvMyComments: // 语言
                 intent.setClass(getActivity(), LanguageActivity.class);
                 startActivity(intent);
+                getActivity(). overridePendingTransition(R.anim.push_left_in,
+                        R.anim.push_left_out);
                 break;
             default:
                 break;

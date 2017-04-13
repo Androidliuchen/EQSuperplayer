@@ -5,11 +5,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.eq.EQSuperPlayer.R;
 import com.eq.EQSuperPlayer.bean.Areabean;
 import com.eq.EQSuperPlayer.custom.CustomPopWindow;
+import com.eq.EQSuperPlayer.fargament.EquitmentFragment;
 
 import java.util.List;
 
@@ -21,20 +23,22 @@ public class ProgramAdapter extends BaseAdapter {
     private Context context;
     private static List<Areabean> areabeens;
     private LayoutInflater layoutInflr;
-//    public static String ipAressd;
     private OnRemoveListener mRemoveListener;
     private OnListener mOnListener;
+    private boolean isChanged = EquitmentFragment.indexChang;
 
-    public ProgramAdapter(Context context,List<Areabean> areabeens) {
+    public ProgramAdapter(Context context, List<Areabean> areabeens) {
         super();
         this.context = context;
         this.areabeens = areabeens;
         this.layoutInflr = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
+
     public void setRemoveListener(OnRemoveListener removeListener) {
         this.mRemoveListener = removeListener;
     }
+
     public void setListener(OnListener listener) {
         this.mOnListener = listener;
     }
@@ -62,12 +66,11 @@ public class ProgramAdapter extends BaseAdapter {
     }
 
 
-
     static class ViewHolder {
         TextView tvDelete;//隐藏的侧滑删除TextView
         TextView tvbianji;
         TextView name;
-        TextView num;
+        ImageView num;
         TextView ip;
         TextView tvHeight;
     }
@@ -82,7 +85,7 @@ public class ProgramAdapter extends BaseAdapter {
             convertView = layoutInflr.inflate(R.layout.program_itme, null);
             viewHolder.name = (TextView) convertView
                     .findViewById(R.id.tv_name);
-            viewHolder.num = (TextView) convertView
+            viewHolder.num = (ImageView) convertView
                     .findViewById(R.id.tv_num);
             viewHolder.tvDelete = (TextView) convertView
                     .findViewById(R.id.tvDelete);
@@ -100,11 +103,15 @@ public class ProgramAdapter extends BaseAdapter {
         viewHolder.name.setText(mAreabeen.getName());
         viewHolder.tvHeight.setText(mAreabeen.getWindowWidth() + "*" + mAreabeen.getWindowHeight());
         viewHolder.ip.setText(mAreabeen.getEquitTp());
+        if (isChanged) {
+            viewHolder.num.setImageResource(R.drawable.online);
+        }
         viewHolder.tvDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mRemoveListener != null)
                     mRemoveListener.onRemoveItem(position);
+                    ProgramAdapter.this.notifyDataSetChanged();
             }
         });
         viewHolder.tvbianji.setOnClickListener(new View.OnClickListener() {
@@ -116,9 +123,11 @@ public class ProgramAdapter extends BaseAdapter {
         });
         return convertView;
     }
+
     public interface OnRemoveListener {
         void onRemoveItem(int position);
     }
+
     public interface OnListener {
         void onClickListener(int position);
     }

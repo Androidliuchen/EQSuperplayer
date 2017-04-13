@@ -12,7 +12,7 @@
 
         <ImageView
             android:id="@+id/language_Button"
-            android:layout_width="40dp"
+            android:layout_width="50dp"
             android:layout_height="match_parent"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"

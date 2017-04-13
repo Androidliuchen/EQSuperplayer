@@ -12,14 +12,14 @@ import com.eq.EQSuperPlayer.utils.InterfaceClick;
 import com.eq.EQSuperPlayer.utils.Utils;
 
 /**
- * Created by Administrator on 2016/12/19.
+ * Created by Administrator on 2017/4/5.
  */
-public class CustomTypeWindow extends PopupWindow {
+public class ProgramePopWindow extends PopupWindow {
     private Activity at;
     private int id;   //控件的id。。位置xx控件之上下左右
     private InterfaceClick onClickListener;
 
-    public CustomTypeWindow(Activity at, int id) {
+    public ProgramePopWindow(Activity at, int id) {
         super();
         this.at = at;
         this.id = id;
@@ -38,7 +38,7 @@ public class CustomTypeWindow extends PopupWindow {
         // 设置popWindow弹出窗体可点击，这句话必须添加，并且是true
         this.setFocusable(true);
         this.setOutsideTouchable(true);
-        this.setOnDismissListener(new OnDismissListener() {
+        this.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
                 backgroundAlpha(1f);

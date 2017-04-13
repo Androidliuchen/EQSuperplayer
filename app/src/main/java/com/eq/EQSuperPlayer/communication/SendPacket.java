@@ -70,7 +70,7 @@ public class SendPacket {
         b[2] = (byte) ((10 >> 0) & 0xFF);
         b[3] = (byte) ((10 >> 8) & 0xFF);
         b[4] = (byte) 0x01;
-        b[5] = (byte) 0x07;
+        b[5] = (byte) 0x70;
         b[6] = (byte) 0x00;
         b[7] = (byte) 0x00;
         b[8] = (byte) 0x5B;
@@ -317,8 +317,8 @@ public class SendPacket {
         b[3] = (byte) ((16 + pkgIndex.length >> 8) & 0xFF);
         b[4] = (byte) 0xA5;
         b[5] = (byte) 0xF0;
-        b[6] = 0x04;
-        b[7] = 0x00;
+        b[6] =(byte) 0x03;
+        b[7] =(byte) 0x00;
         b[8] = (byte) ((indexData >> 0) & 0xFF);
         b[9] = (byte) ((indexData >> 8) & 0xFF);
         b[10] = (byte) ((indexData >> 16) & 0xff);
@@ -326,9 +326,9 @@ public class SendPacket {
         for (int i = 0; i < pkgIndex.length; i++) { // 包数据
             b[12 + i] = pkgIndex[i];
         }
-        b[pkgIndex.length + 12] = 0x00;
-        b[pkgIndex.length + 13] = 0x00;
-        b[pkgIndex.length + 14] = 0x5A;
+        b[pkgIndex.length + 12] =(byte) 0x00;
+        b[pkgIndex.length + 13] =(byte)0x00;
+        b[pkgIndex.length + 14] =(byte) 0x5A;
         b[pkgIndex.length + 15] = (byte) 0xF6;
         Log.d("..............", "pkgIndex.length................:" + pkgIndex.length);
         Log.d("..............", "b................:" + b.length);
@@ -498,7 +498,22 @@ public class SendPacket {
         return sb.toString();
     }
 
-
+    /**
+     * @Title:hexString2String
+     * @Description:16进制字符串转字符串
+     * @param src
+     *            16进制字符串
+     * @return 字节数组
+     * @throws
+     */
+    public static String hexString2String(String src) {
+        String temp = "";
+        for (int i = 0; i < src.length() / 2; i++) {
+            temp = temp+ (char) Integer.valueOf(src.substring(i * 2, i * 2 + 2),
+                    16).byteValue();
+        }
+        return temp;
+    }
     /**
      * byte 转String
      *
@@ -590,4 +605,5 @@ public class SendPacket {
         }
         return i;
     }
+
 }

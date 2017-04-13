@@ -43,6 +43,8 @@ public class Areabean extends TableBean{
     public String equitType;
     @DatabaseField(columnName = "equitIp")
     public String equitTp;
+    @DatabaseField(columnName = "equitProt")
+    public String equitProt;
     public List<ProgramBean> programBeens;
 
     public int getId() {
@@ -123,6 +125,14 @@ public class Areabean extends TableBean{
 
     public void setArea_position(int area_position) {
         this.area_position = area_position;
+    }
+
+    public String getEquitProt() {
+        return equitProt;
+    }
+
+    public void setEquitProt(String equitProt) {
+        this.equitProt = equitProt;
     }
 
     @Override

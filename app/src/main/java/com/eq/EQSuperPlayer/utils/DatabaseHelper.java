@@ -12,6 +12,7 @@ import com.eq.EQSuperPlayer.bean.ProgramBean;
 import com.eq.EQSuperPlayer.bean.TextBean;
 import com.eq.EQSuperPlayer.bean.TimeBean;
 import com.eq.EQSuperPlayer.bean.VedioBean;
+import com.eq.EQSuperPlayer.bean.WiFiBean;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
@@ -41,6 +42,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.createTable(connectionSource, TimeBean.class);
             TableUtils.createTable(connectionSource, VedioBean.class);
             TableUtils.createTable(connectionSource, ImagePath.class);
+            TableUtils.createTable(connectionSource, WiFiBean.class);
         } catch (SQLException e) {
             Log.e(DatabaseHelper.class.getName(), "创建数据库失败", e);
             e.printStackTrace();
@@ -58,6 +60,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.dropTable(connectionSource, TimeBean.class, true);
             TableUtils.dropTable(connectionSource, VedioBean.class, true);
             TableUtils.dropTable(connectionSource, ImagePath.class, true);
+            TableUtils.dropTable(connectionSource, WiFiBean.class, true);
             onCreate(database, connectionSource);
         } catch (SQLException e) {
             Log.e(DatabaseHelper.class.getName(), "更新数据库失败", e);

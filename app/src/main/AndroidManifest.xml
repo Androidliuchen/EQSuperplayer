@@ -6,15 +6,15 @@
     <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <android:uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <!--允许应用程序改变网络状态-->
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <!--允许应用程序改变WIFI连接状态-->
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <!--允许应用程序访问有关的网络信息-->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!--允许应用程序访问WIFI网卡的网络信息-->
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <!--允许应用程序完全使用网络-->
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- 获取图片列表的权限设置 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -25,21 +25,38 @@
     <uses-permission android:name="androd.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- !读取数据的权限 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--<uses-permission android:name="android.permission.READ_PHONE_STATE" />-->
+    <!--<uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />-->
+    <!--&lt;!&ndash; 允许应用程序改变网络状态 &ndash;&gt;-->
+    <!--<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />-->
+    <!--&lt;!&ndash; 允许应用程序改变WIFI连接状态 &ndash;&gt;-->
+    <!--<uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />-->
+    <!--&lt;!&ndash; 允许应用程序访问有关的网络信息 &ndash;&gt;-->
+    <!--<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />-->
+    <!--&lt;!&ndash; 允许应用程序访问WIFI网卡的网络信息 &ndash;&gt;-->
+    <!--<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />-->
+    <!--&lt;!&ndash; 允许应用程序完全使用网络 &ndash;&gt;-->
+    <!--<uses-permission android:name="android.permission.INTERNET" />-->
+    <!--&lt;!&ndash; 获取图片列表的权限设置 &ndash;&gt;-->
+    <!--<uses-permission android:name="android.permission.CAMERA" />-->
+    <!--&lt;!&ndash; !在SD卡中创建与删除文件权限 &ndash;&gt;-->
+    <!--<uses-permission android:name="android.permission.MOUNT_FORMAT_FILESYSTEMS" />-->
+    <!--&lt;!&ndash; !向SD卡写入数据的权限 &ndash;&gt;-->
+    <!--<uses-permission android:name="androd.permission.WRITE_EXTERNAL_STORAGE" />-->
+    <!--&lt;!&ndash; !读取数据的权限 &ndash;&gt;-->
+    <!--<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />-->
 
     <application
         android:name=".activity.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/logo"
         android:label="@string/app_name"
+        android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.ProgramActivity" />
         <activity android:name=".activity.TextActivity" />
         <activity android:name=".activity.ImageActivity" />
@@ -47,14 +64,20 @@
         <activity
             android:name=".activity.SelectPicPopupWindow"
             android:theme="@style/MyDialogStyleBottom" />
-        <activity android:name=".activity.WelcomeActivity" />
+        <activity android:name=".activity.WelcomeActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".activity.TimeActivity" />
         <activity android:name=".SlidingMenuActivity.OpenActivity" />
         <activity android:name=".SlidingMenuActivity.BrightnessActivity" />
         <activity android:name=".SlidingMenuActivity.CorrectionActivity" />
         <activity android:name=".SlidingMenuActivity.LanguageActivity" />
-        <activity android:name=".SlidingMenuActivity.WIFIActivity" />
-        <activity android:name=".SlidingMenuActivity.AboutActivity"></activity>
+        <activity android:name=".SlidingMenuActivity.AboutActivity" />
+        <activity android:name=".activity.WifiActivity" />
+        <activity android:name=".activity.RadioActivity" />
     </application>
 
 </manifest>

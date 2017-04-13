@@ -71,26 +71,43 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
     private Button btn_Q4L;
     private int updataArea;
     private boolean newOrupdata = true;
-    private Handler mhandler;
     public static String ip;
+    private View view;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_program, container, false);
+        view = inflater.inflate(R.layout.fragment_program, container, false);
         mImageView = (ImageView) view.findViewById(R.id.iamge);
         mListView = (SlidingItemListView) view.findViewById(R.id.program_list);
         mListView.setEmptyView(view.findViewById(R.id.myText));
+        areabeens = new AreabeanDao(getActivity()).getListAll();
+        if (areabeens.size() == 0) {
+            List<String> filePath = new ArrayList<>();
+            String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                    + "textImage";
+            filePath.add(fileTextPath);
+            String fileImagePath = Environment.getExternalStorageDirectory().toString() + File.separator
+                    + "EQImage";
+            filePath.add(fileImagePath);
+            String fileVedioPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                    + "EQVedio";
+            filePath.add(fileVedioPath);
+            String PROGRAME_ROOT = Environment
+                    .getExternalStorageDirectory()
+                    .getAbsolutePath() + "/EQPrograme/";
+            filePath.add(PROGRAME_ROOT);
+            for (int i = 0; i < filePath.size(); i++) {
+                File fileAll = new File(filePath.get(i));
+                if (!fileAll.exists()) {
+                    fileAll.mkdir();
+                }
+                FileUtils.deleteDir(fileAll.getPath());
+            }
+        }
         mImageView.setOnClickListener(this);
         mListView.setOnTouchListener(this);
         mProgramAdapter = new ProgramAdapter(getActivity(), areabeens);
-        mhandler = new Handler(){
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                mProgramAdapter.notifyDataSetChanged();
-                mProgramAdapter.notifyDataSetInvalidated();
-            }
-        };
         mListView.setAdapter(mProgramAdapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -99,6 +116,10 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 Intent intent = new Intent(getActivity(), ProgramActivity.class);
                 ProgramActivity.program_id = areabeens.get(position).getId();
                 getActivity().startActivity(intent);
+                getActivity(). overridePendingTransition(R.anim.push_left_in,
+                        R.anim.push_left_out);
+
+
             }
         });
 
@@ -107,8 +128,6 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
         dhcpInfo = my_wifiManager.getDhcpInfo();
         String IP = intToIp(dhcpInfo.dns1);
         Log.d(".....", IP + "");
-//        ProgramAdapter.ipAressd = IP;
-
         return view;
     }
 
@@ -128,7 +147,16 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
     private Handler handler = new Handler() {
 
         public void handleMessage(Message msg) {
-            updateList();
+            switch (msg.what) {
+                case 0:
+                    mProgramAdapter = new ProgramAdapter(getActivity(), areabeens);
+                    mListView.setAdapter(mProgramAdapter);
+                    break;
+                case 1:
+                    updateList();
+                    break;
+            }
+
         }
     };
 
@@ -143,8 +171,10 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
             @Override
             public void onRemoveItem(int position) {
                 // 删除按钮的回调，注意也可以放在adapter里面处理
+                areabeens = new AreabeanDao(getActivity()).getListAll();
                 new AreabeanDao(getActivity()).delete(areabeens.get(position).getId());
                 areabeens.remove(position);
+                handler.sendEmptyMessage(0);
                 List<String> filePath = new ArrayList<>();
                 String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
                         + "textImage";
@@ -167,13 +197,13 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                     FileUtils.deleteDir(fileAll.getPath());
                 }
                 mListView.slideBack();
-                mhandler.sendEmptyMessage(0);
             }
         });
         mProgramAdapter.setListener(new ProgramAdapter.OnListener() {
             @Override
             public void onClickListener(int position) {
-                mAreabean = new AreabeanDao(getActivity()).get(areabeens.get(position).getId());
+                areabeens = new AreabeanDao(getActivity()).getListAll();
+                mAreabean = areabeens.get(0);
                 updataArea = position;
                 newOrupdata = false;
                 if (addPopWindow == null) {
@@ -181,13 +211,14 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                     addPopWindow.setView(getPopWindowView(), 0.8f, 0.50f);
                 }
                 addPopWindow.showPopupWindow(mImageView);
-                program_name.setText(mAreabean.getName());
+                program_name.setText(mAreabean.getName() + "");
                 program_type.setText(mAreabean.getEquitType());
-                program_height.setText(mAreabean.getWindowHeight() +"");
-                program_width.setText(mAreabean.getWindowWidth()+"");
+                program_height.setText(mAreabean.getWindowHeight() + "");
+                program_width.setText(mAreabean.getWindowWidth() + "");
                 program_ip.setText(mAreabean.getEquitTp());
             }
         });
+
         mListView.setAdapter(mProgramAdapter);
     }
 
@@ -199,7 +230,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 newOrupdata = true;
                 if (addPopWindow == null) {
                     addPopWindow = new CustomPopWindow(getActivity(), R.id.iamge);
-                    addPopWindow.setView(getPopWindowView(),0.8f, 0.50f);
+                    addPopWindow.setView(getPopWindowView(), 0.8f, 0.50f);
                 }
                 addPopWindow.showPopupWindow(mImageView);
                 break;
@@ -455,7 +486,6 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
      * 加载节目名称弹出窗体布局
      */
     public View getPopWindowView() {
-        String IP = intToIp(dhcpInfo.dns1);
         View view = getActivity().getLayoutInflater().inflate(R.layout.add, null);
         program_name = (EditText) view.findViewById(R.id.progeam_name);
         program_type = (TextView) view.findViewById(R.id.progeam_type);
@@ -464,16 +494,16 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
         program_ip = (EditText) view.findViewById(R.id.progeam_ip);
         progeam_duan = (EditText) view.findViewById(R.id.progeam_duan);
         program_btn = (Button) view.findViewById(R.id.progeam_btn);
-        program_ip.setText("0.0.0.0");
+        program_ip.setText("192.168.43.1");
         progeam_duan.setText(5050 + "");
         program_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(newOrupdata){
+                if (newOrupdata) {
                     mAreabean = new Areabean();
                     if (program_type.getText().equals("")) {
                         Toast.makeText(getActivity(), "请选择设备类型！", Toast.LENGTH_SHORT).show();
-                    }else {
+                    } else {
                         String program = program_name.getText().toString();
                         int wdith = Integer.parseInt(program_width.getText().toString());
                         int height = Integer.parseInt(program_height.getText().toString());
@@ -488,13 +518,13 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                         new AreabeanDao(getActivity()).add(mAreabean);
                         windowWidth = wdith;
                         windowHeight = height;
-                        WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
+                        WindowSizeManager.setSharedPreference(getActivity(), windowWidth * 2, windowHeight * 2);
                         program_name_count++;
                         ProgramNameItemManager.setSharedPreference(getActivity(), program_name_count);
-                        mhandler.sendEmptyMessage(0);
+                        handler.sendEmptyMessage(0);
                         addPopWindow.dismiss();
                     }
-                }else {
+                } else {
                     mAreabean = new AreabeanDao(getActivity()).get(areabeens.get(updataArea).getId());
                     String program = program_name.getText().toString();
                     int wdith = Integer.parseInt(program_width.getText().toString());
@@ -516,7 +546,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                     WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                     program_name_count++;
                     ProgramNameItemManager.setSharedPreference(getActivity(), program_name_count);
-                    mhandler.sendEmptyMessage(0);
+                    handler.sendEmptyMessage(0);
                     mListView.slideBack();
                     addPopWindow.dismiss();
                 }

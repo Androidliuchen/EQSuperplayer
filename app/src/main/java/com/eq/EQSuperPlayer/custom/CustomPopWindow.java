@@ -28,11 +28,10 @@ public class CustomPopWindow extends PopupWindow {
     public void setView(View contentView, float width, float height) {
         // 设置SelectPicPopupWindow的View
         this.setContentView(contentView);
-//        int w = (int) (Utils.getUiwidth(at) * width);
-//        int h = (int) (Utils.getUiheight(at) * height);
+        int w = (int) (Utils.getUiwidth(at) * width);
+        int h = (int) (Utils.getUiheight(at) * height);
         //设置宽与高
-        this.setWidth(WindowManager.LayoutParams.MATCH_PARENT);
-
+        this.setWidth(w);
         this.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
         // 设置popWindow弹出窗体可点击，这句话必须添加，并且是true
         this.setFocusable(true);
@@ -53,7 +52,7 @@ public class CustomPopWindow extends PopupWindow {
         // 刷新状态
         this.update();
         // 实例化一个ColorDrawable颜色为半透明
-        ColorDrawable dw = new ColorDrawable(-00000);
+        ColorDrawable dw = new ColorDrawable(00000000);
         // 点back键和其他地方使其消失,设置了这个才能触发OnDismisslistener ，设置其他控件变化等操作
         this.setBackgroundDrawable(dw);
         this.setAnimationStyle(R.style.AnimationPreview);
@@ -81,7 +80,7 @@ public class CustomPopWindow extends PopupWindow {
 //            parent.getLocationOnScreen(location);
 //            this.showAtLocation(parent, Gravity.NO_GRAVITY, location[0] + parent.getWidth(), location[1]);
             // 以下拉方式显示popupwindow
-            this.showAtLocation(parent, Gravity.CENTER, 30, 30);
+            this.showAtLocation(parent, Gravity.CENTER, -10, 10);
         } else {
             this.dismiss();
         }

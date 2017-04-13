@@ -2,6 +2,8 @@ package com.eq.EQSuperPlayer.activity;
 
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
+import android.net.DhcpInfo;
+import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.os.Message;
 import android.support.v4.app.Fragment;
@@ -15,21 +17,18 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eq.EQSuperPlayer.R;
-import com.eq.EQSuperPlayer.SlidingMenuActivity.LanguageActivity;
 import com.eq.EQSuperPlayer.bean.Areabean;
 import com.eq.EQSuperPlayer.bean.SendAdapter;
-import com.eq.EQSuperPlayer.bean.VedioBean;
 import com.eq.EQSuperPlayer.communication.ConnectControlCard;
 import com.eq.EQSuperPlayer.communication.InterfaceConnect;
 import com.eq.EQSuperPlayer.communication.SendPacket;
-import com.eq.EQSuperPlayer.custom.Constant;
 import com.eq.EQSuperPlayer.custom.CustomPopWindow;
-import com.eq.EQSuperPlayer.dao.VedioDao;
 import com.eq.EQSuperPlayer.fargament.LeftFragment;
 import com.eq.EQSuperPlayer.fargament.ProgramFragment;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -39,6 +38,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -60,7 +62,6 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
     private ConnectControlCard ccc;
     private byte[] proBytes;   //存放XML的byte数组
     private List<byte[]> program_lists = null;   //当xml数据包需要分包的时候
-    private ArrayList<byte[]> arr = new ArrayList<byte[]>();
     private SendAdapter mSendAdapter;
     private CustomPopWindow customPopWindow;
     private List<byte[]> programe_lists = null;  //当数据需要分包时
@@ -75,7 +76,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
     private boolean isSuee = true;
     private ArrayList<byte[][]> arrayList = new ArrayList<byte[][]>();
     private List<byte[]> arrays = new ArrayList<byte[]>();
-    private int countAdress = 0;//当前发送的长度
+    private int countAdress = 0;//当前发送的个数
     private int manyAllConten = 0;//总包数
     private int sendLeng = 0;
     private int sendConten = 0;
@@ -97,7 +98,10 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
     private int EORRE_COUNT = 1;//错误次数
     private ExecutorService cachedThreadPool = Executors.newCachedThreadPool();//线程池
     private int resourcesIndex = 0;
-
+    private DhcpInfo dhcpInfo;
+    public static String IP;
+    public static DatagramSocket dataSocket = null;
+    private byte[] buffer;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,9 +114,11 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
         topTextView = (TextView) findViewById(R.id.topTv);
         mSend.setOnClickListener(this);
         //获取FragmentManager
+        //获取WiFi信息
+        WifiManager my_wifiManager = ((WifiManager) getSystemService(WIFI_SERVICE));
+        dhcpInfo = my_wifiManager.getDhcpInfo();
+        IP = intToIp(dhcpInfo.dns1);
         mFragmentManager = getSupportFragmentManager();
-        ProgramFragment pregramFragment = new ProgramFragment();
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment, pregramFragment).commit();
         //获取radioGroup控件
         radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
         //监听点击按钮事件,实现不同Fragment之间的切换
@@ -120,7 +126,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 FragmentTransaction transaction = mFragmentManager.beginTransaction();
-                Fragment fragment = FragmentFactory.getInstanceByIndex(checkedId);
+                Fragment fragment = FragmentFactory.getInstanceByIndex(checkedId,MainActivity.this);
                 transaction.replace(R.id.fragment, fragment);
                 transaction.commit();
             }
@@ -128,12 +134,18 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+       RadioButton rb = (RadioButton) radioGroup.getChildAt(0);
+        rb.setChecked(true);
+    }
+
     private android.os.Handler handler = new android.os.Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 0:
-                    getImageName();
                     countOrAdress = 0;
                     manyStratIndex = 0;
                     resourcesIndex = 0;
@@ -167,20 +179,20 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                                 xmlData = new byte[DATA_MAX_SIZE];
                                 System.arraycopy(buffer, i * DATA_MAX_SIZE, xmlData, 0, DATA_MAX_SIZE);
                             }
-                            byte[] proBytes = SendPacket.prepareSendDataPkg(xmlData, i);
+                            byte[] proBytes = SendPacket.prepareSendDataPkg(xmlData, 0);
                             cutXml.add(proBytes);
                         }
-                        ccc = new ConnectControlCard(cutXml, new InterfaceConnect() {
+                        ccc = new ConnectControlCard(MainActivity.this,cutXml, new InterfaceConnect() {
                             @Override
                             public void success(byte[] result) {
                                 start = 0;
-                                back(result, 2);
+                                handler.sendEmptyMessage(2);
                             }
 
                             @Override
                             public void failure(int stateCode) {
                                 start = 1;
-                                if (EORRE_COUNT == 3) {
+                                if (EORRE_COUNT >= 3) {
                                     handler.sendEmptyMessage(1);
                                     EORRE_COUNT = 1;
                                 } else {
@@ -208,10 +220,9 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     break;
                 case 2://文件发送完成指令
                     List<byte[]> sendEnd = new ArrayList<byte[]>();
-//                    Toast.makeText(MainActivity.this, "文件发送完毕，发送文件传输结束指令", Toast.LENGTH_SHORT).show();
                     byte[] managerSend = SendPacket.pkgHeadend();
                     sendEnd.add(managerSend);
-                    ccc = new ConnectControlCard(sendEnd, new InterfaceConnect() {
+                    ccc = new ConnectControlCard(MainActivity.this,sendEnd, new InterfaceConnect() {
                         @Override
                         public void success(byte[] result) {
                             if (start == 0) {
@@ -271,7 +282,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     Log.d(".........", "aa..............." + aa);
                     Log.d(".........", "bytes.length..............." + bytes.length);
                     controlData.add(controlCard2);
-                    ccc = new ConnectControlCard(controlData, new InterfaceConnect() {
+                    ccc = new ConnectControlCard(MainActivity.this,controlData, new InterfaceConnect() {
                         @Override
                         public void success(byte[] result) {
                             countOrAdress = 0;
@@ -299,10 +310,9 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     break;
                 case 4://节目发送完成指令
                     List<byte[]> programeData = new ArrayList<byte[]>();
-//                    Toast.makeText(MainActivity.this, "节目发送完毕，发送节目传输结束指令", Toast.LENGTH_SHORT).show();
                     byte[] endSend = SendPacket.pkgPingend();
                     programeData.add(endSend);
-                    ccc = new ConnectControlCard(programeData, new InterfaceConnect() {
+                    ccc = new ConnectControlCard(MainActivity.this,programeData, new InterfaceConnect() {
                         @Override
                         public void success(byte[] result) {
                             start = 4;
@@ -330,7 +340,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     File files = new File(pathData);
                     try {
                         FileInputStream ism = new FileInputStream(files);
-                        final byte[] buffer = new byte[ism.available()];
+                        buffer = new byte[ism.available()];
                         ism.read(buffer);
                         alllen = buffer.length;//总长度
                         count = alllen / DATA_MAX_SIZE;//总包以50包为单位可以分多少个
@@ -339,21 +349,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                             count += 1;
                             endLeng = alllen % DATA_MAX_SIZE;
                         }
-                        arr.clear();
-                        for (int j = 0; j < count; j++) {
-                            byte[] list = new byte[DATA_MAX_SIZE];
-                            if (j == count - 1) {
-                                if (alllen % DATA_MAX_SIZE > 0) {
-                                    System.arraycopy(buffer, j * DATA_MAX_SIZE, list, 0, alllen % DATA_MAX_SIZE);
-                                    arr.add(list);
-                                }
-                            } else {
-                                System.arraycopy(buffer, j * DATA_MAX_SIZE, list, 0, DATA_MAX_SIZE);
-                                arr.add(list);
-                            }
-                        }
-                        AllSize = arr.size();//总包数
-                        Log.d("...", "arr...." + arr);
+                        AllSize = count;//总包数
                         if ((AllSize - 1) % MULTI_PACKAGE_MAX_COUNT > 0) {
                             sendLeng = (AllSize - 1) % MULTI_PACKAGE_MAX_COUNT;//最后一包个数
                             manyAllConten = (AllSize - 1) / MULTI_PACKAGE_MAX_COUNT + 2;//数据总长度可以分为多少个50包
@@ -368,7 +364,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                             countAdress = (countOrAdress + 1) * MULTI_PACKAGE_MAX_COUNT;
                             manyStratIndex = countAdress * DATA_MAX_SIZE;//每包起始位置长度
                             manyData.add(manySendStart);
-                            ccc = new ConnectControlCard(manyData, new InterfaceConnect() {
+                            ccc = new ConnectControlCard(MainActivity.this,manyData, new InterfaceConnect() {
                                 @Override
                                 public void success(byte[] result) {
                                     String results = SendPacket.byte2hex(result);
@@ -390,12 +386,12 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                             });
                             cachedThreadPool.execute(ccc);
                         } else if (countOrAdress == manyAllConten - 2) {
-                            if (MULTI_PACKAGE_MIN_COUNT <= sendConten) {
+                            if (1 <= sendConten) {
                                 Log.d("最后一包当前位置", "manyStratIndex....." + manyStratIndex);
                                 Log.d("最后一包当前位置", "sendConten....." + sendConten);
                                 byte[] manySendStart = SendPacket.manyPakStart(manyStratIndex, sendConten * DATA_MAX_SIZE, sendConten, DATA_MAX_SIZE);
                                 manyData.add(manySendStart);
-                                ccc = new ConnectControlCard(manyData, new InterfaceConnect() {
+                                ccc = new ConnectControlCard(MainActivity.this,manyData, new InterfaceConnect() {
                                     @Override
                                     public void success(byte[] result) {
                                         start = 6;
@@ -414,45 +410,13 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                                     }
                                 });
                                 cachedThreadPool.execute(ccc);
-
-                            } else {
-                                arrays = arr.subList(countAdress, AllSize);
-                                List<byte[]> simallData = new ArrayList<byte[]>();
-                                for (int i = 0; i < arrays.size(); i++) {
-                                    byte[] arrData = arrays.get(i);
-                                    byte[] iangeData = SendPacket.prepareSendDataPkg(arrData, i);
-                                    simallData.add(iangeData);
-                                    countAdress++;
-                                    Log.d("countAdress....", countAdress + "");
-                                }
-                                ccc = new ConnectControlCard(simallData, new InterfaceConnect() {
-                                    @Override
-                                    public void success(byte[] result) {
-                                        String results = SendPacket.byte2hex(result);
-                                        Log.d(".........", "results..........:" + results);
-                                        start = 6;
-                                        handler.sendEmptyMessage(2);
-                                    }
-
-                                    @Override
-                                    public void failure(int stateCode) {
-                                        handler.sendEmptyMessage(1);
-                                    }
-
-                                    @Override
-                                    public void dataSuccess(String str) {
-
-                                    }
-                                });
-                                cachedThreadPool.execute(ccc);
-                                countOrAdress += 1;
-
                             }
                         } else {
+                            byte[] list = new byte[DATA_MAX_SIZE];
+                            System.arraycopy(buffer, alllen - endLeng, list, 0, alllen % DATA_MAX_SIZE);
                             Log.d("......", "countAdress1111111111:" + countAdress);
-                            Log.d("......", "arr1111111111:" + arr.size());
                             arrays = new ArrayList<byte[]>();
-                            arrays.add(arr.get(countAdress));
+                            arrays.add(list);
                             countAdress++;
                             List<byte[]> simallData = new ArrayList<byte[]>();
                             for (int i = 0; i < arrays.size(); i++) {
@@ -460,7 +424,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                                 byte[] iangeData = SendPacket.prepareSendDataPkg(arrData, i);
                                 simallData.add(iangeData);
                             }
-                            ccc = new ConnectControlCard(simallData, new InterfaceConnect() {
+                            ccc = new ConnectControlCard(MainActivity.this,simallData, new InterfaceConnect() {
                                 @Override
                                 public void success(byte[] result) {
                                     String results = SendPacket.byte2hex(result);
@@ -493,7 +457,11 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                 case 7:
                     Log.d("...", "countOrAdress.jjjj.." + countOrAdress);
                     if (countOrAdress < manyAllConten - 2) {
-                        arrays = arr.subList(countOrAdress * MULTI_PACKAGE_MAX_COUNT, countOrAdress * MULTI_PACKAGE_MAX_COUNT + MULTI_PACKAGE_MAX_COUNT);
+                        for (int j = 0; j < MULTI_PACKAGE_MAX_COUNT; j++) {
+                            byte[] list = new byte[DATA_MAX_SIZE];
+                                    System.arraycopy(buffer, (countOrAdress * MULTI_PACKAGE_MAX_COUNT + j) * DATA_MAX_SIZE, list, 0, DATA_MAX_SIZE);
+                            arrays.add(list);
+                        }
                         Log.d(".....", "arrays....." + arrays.size());
                         List<byte[]> manySnedBig = new ArrayList<byte[]>();
                         for (int i = 0; i < arrays.size(); i++) {
@@ -503,7 +471,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                             String ss = SendPacket.byte2hex(manyIangeData);
                             manySnedBig.add(manyIangeData);
                         }
-                        ccc = new ConnectControlCard(manySnedBig, new InterfaceConnect() {
+                        ccc = new ConnectControlCard(MainActivity.this,manySnedBig, new InterfaceConnect() {
                             @Override
                             public void success(byte[] result) {
 
@@ -523,9 +491,13 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                         cachedThreadPool.execute(ccc);
                         Log.d("....", "countAdress当前长度。。。。。：" + countAdress);
                     } else {
-                        if (MULTI_PACKAGE_MIN_COUNT < sendConten) {
+                        if (1 < sendConten) {
+                            for (int j = 0; j < sendConten; j++) {
+                                byte[] list = new byte[DATA_MAX_SIZE];
+                                System.arraycopy(buffer, (countOrAdress * MULTI_PACKAGE_MAX_COUNT + j) * DATA_MAX_SIZE, list, 0, DATA_MAX_SIZE);
+                                arrays.add(list);
+                            }
                             Log.d("....", "countAdress当前长度。。。。。：" + countAdress + "countAdress当前长度。。。。。：" + (AllSize - countAdress));
-                            arrays = arr.subList(countAdress, AllSize - 1);
                             countAdress = countAdress + sendLeng;
                             Log.d(".....", "arrays2....." + arrays.size());
                             List<byte[]> manySnedBig = new ArrayList<byte[]>();
@@ -536,7 +508,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                                 String ss = SendPacket.byte2hex(manyIangeData);
                                 manySnedBig.add(manyIangeData);
                             }
-                            ccc = new ConnectControlCard(manySnedBig, new InterfaceConnect() {
+                            ccc = new ConnectControlCard(MainActivity.this,manySnedBig, new InterfaceConnect() {
 
                                 @Override
                                 public void success(byte[] result) {
@@ -575,16 +547,9 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
             super.handleMessage(msg);
         }
     };
-
-    public void back(byte[] backData, int data) {
-        if (backData != null) {
-            handler.sendEmptyMessage(data);
-        }
-    }
-
     //接受错误回报
     public void erro(List<byte[]> bytes, final int erroData) {
-        ccc = new ConnectControlCard(bytes, new InterfaceConnect() {
+        ccc = new ConnectControlCard(MainActivity.this,bytes, new InterfaceConnect() {
             @Override
             public void success(byte[] result) {
                 String come = SendPacket.byte2hex(result);
@@ -628,15 +593,23 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
      * 节目发送指令
      */
     public void Sendprogram() {
+        getImageName();
+        if (progrmae.size() > 0){
         List<byte[]> manySnedStart = new ArrayList<byte[]>();
         proDialog = android.app.ProgressDialog.show(this, null,
                 getResources().getString(R.string.program_sending));
         byte[] controlCard = SendPacket.pkgHeadInterface();
         manySnedStart.add(controlCard);
-        ccc = new ConnectControlCard(manySnedStart, new InterfaceConnect() {
+        ccc = new ConnectControlCard(MainActivity.this,manySnedStart, new InterfaceConnect() {
             @Override
             public void success(byte[] result) {
-                handler.sendEmptyMessage(0);
+                try {
+                    Thread.sleep(1000);
+                    handler.sendEmptyMessage(0);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
             }
 
             @Override
@@ -651,8 +624,10 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
             }
         });
         new Thread(ccc).start();
+        }else {
+            Toast.makeText(this,"当前节目内容为空!",Toast.LENGTH_SHORT).show();
+        }
     }
-
 
     public void getImageName() {
         iamgID = new ArrayList<String>();
@@ -708,31 +683,10 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
      * 初始化侧边栏
      */
     private void initSlidingMenu(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {//== null的时候新建MainFragment
-            mContent = new ProgramFragment();
-        } else {//不等于null，直接get出来
-            //不等于null，找出之前保存的当前Activity显示的Fragment
-            mContent = getSupportFragmentManager().getFragment(savedInstanceState, "mContent");
-        }
-        //设置内容Fragment
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment, mContent)
-                .commit();
         // 设置侧面隐藏的布局
         setBehindContentView(R.layout.menu_frame_left);
         // 增加碎片
         final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
-        //监听点击按钮事件,实现不同Fragment之间的切换
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                Fragment fragment = FragmentFactory.getInstanceByIndex(checkedId);
-                ft.replace(R.id.fragment, fragment);
-                ft.commit();
-            }
-        });
         LeftFragment leftFragment = new LeftFragment();
         ft.replace(R.id.menu_frame, leftFragment);
         ft.commit();
@@ -802,12 +756,16 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                 if (customPopWindow == null) {
                     customPopWindow = new CustomPopWindow(MainActivity.this, R.id.send);
                     customPopWindow.setView(getPopWindowListView(), 1.0f, 0.60f);
-                    customPopWindow.backgroundAlpha(0.4f);
+                    customPopWindow.backgroundAlpha(1f);
                 }
                 customPopWindow.showPopupWindow(mSend);
 
                 break;
         }
     }
-
+    //转换成DNS格式
+    private String intToIp(int paramInt) {
+        return (paramInt & 0xFF) + "." + (0xFF & paramInt >> 8) + "." + (0xFF & paramInt >> 16) + "."
+                + (0xFF & paramInt >> 24);
+    }
 }

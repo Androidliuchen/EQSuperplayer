@@ -47,6 +47,7 @@ import com.eq.EQSuperPlayer.communication.ConnectControlCard;
 import com.eq.EQSuperPlayer.custom.Constant;
 import com.eq.EQSuperPlayer.custom.CustomPopWindow;
 import com.eq.EQSuperPlayer.custom.CustomTypeWindow;
+import com.eq.EQSuperPlayer.custom.ProgramePopWindow;
 import com.eq.EQSuperPlayer.dao.AreabeanDao;
 import com.eq.EQSuperPlayer.dao.ImageDao;
 import com.eq.EQSuperPlayer.dao.ProgramBeanDao;
@@ -85,7 +86,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
     private ProgramListView programListView;
     private RecyclerViewAdapter recyclerViewAdapter;
     private CustomTypeWindow customTypeWindow;
-    private CustomPopWindow customPopWindow;
+    private ProgramePopWindow programePopWindow;
     private Areabean areabean;
     private ProgramBean programBean;
     private RelativeLayout text_layout;//显示屏
@@ -110,7 +111,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
     private float lastDistance;
     private float lastScale = 1;
     private int count = 0;
-    private static final double ZOOM_IN_SCALE = 1.25;//放大系数
+    private float scale = 0;//放大系数
     private static final double ZOOM_OUT_SCALE = 0.8;//缩小系数
     private float scaleWidth = 1;
     private float scaleHeight = 1;
@@ -581,6 +582,8 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         intent.setClass(ProgramActivity.this, ImageActivity.class);
                         intent.putExtra(Constant.PROGRAM_ID, imageBean.getId());
                         startActivity(intent);
+                        overridePendingTransition(R.anim.push_left_in,
+                                R.anim.push_left_out);
                         customTypeWindow.dismiss();
                         ProgramActivity.this.finish();
                         break;
@@ -593,6 +596,8 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         startActivity(intent);
                         customTypeWindow.dismiss();
                         ProgramActivity.this.finish();
+                        overridePendingTransition(R.anim.push_left_in,
+                                R.anim.push_left_out);
                         break;
                     case Constant.AREA_TYPE_TIME:
                         intent = new Intent();
@@ -600,6 +605,8 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         intent.setClass(ProgramActivity.this, TimeActivity.class);
                         intent.putExtra(Constant.PROGRAM_ID, timeBean.getId());
                         startActivity(intent);
+                        overridePendingTransition(R.anim.push_left_in,
+                                R.anim.push_left_out);
                         customTypeWindow.dismiss();
                         ProgramActivity.this.finish();
                         break;
@@ -609,10 +616,13 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         intent.setClass(ProgramActivity.this, VedioActivity.class);
                         intent.putExtra(Constant.PROGRAM_ID, vedioBean.getId());
                         startActivity(intent);
+                        overridePendingTransition(R.anim.push_left_in,
+                                R.anim.push_left_out);
                         customTypeWindow.dismiss();
                         ProgramActivity.this.finish();
                         break;
                 }
+
             }
         });
         recyclerViewAdapter.notifyDataSetChanged();
@@ -676,7 +686,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 region_text.setText(programBean.getName());
                 selet = programBean.getId();
                 program_itme = position;
-                customPopWindow.dismiss();
+                programePopWindow.dismiss();
                 Log.d("..................", "selet数据...............:" + selet);
             }
         });
@@ -706,12 +716,12 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 this.finish();
                 break;
             case R.id.region_program:
-                if (customPopWindow == null) {
-                    customPopWindow = new CustomPopWindow(this, R.id.region_program);
-                    customPopWindow.setView(getPopWindowListView(),0.60f, 0.57f);
-                    customPopWindow.backgroundAlpha(0.4f);
+                if (programePopWindow == null) {
+                    programePopWindow = new ProgramePopWindow(this, R.id.region_program);
+                    programePopWindow.setView(getPopWindowListView(),1.0f, 0.57f);
+                    programePopWindow.backgroundAlpha(1f);
                 }
-                customPopWindow.showPopupWindow(prog_btn);
+                programePopWindow.showPopupWindow(prog_btn);
                 break;
             case R.id.region:
                 if (tableBeens.size() != 0) {
@@ -719,7 +729,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         if (customTypeWindow == null) {
                             customTypeWindow = new CustomTypeWindow(this, R.id.region);
                             customTypeWindow.setView(getTypeWindowListView(), 1.0f, 0.57f);
-                            customTypeWindow.backgroundAlpha(0.4f);
+                            customTypeWindow.backgroundAlpha(1f);
                         }
                         customTypeWindow.showPopupWindow(region_btn);
                     } else {
@@ -768,20 +778,21 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         //缩放倍数
                         float currentDistance = spacing(event);
                         Log.e("触摸_间距", currentDistance + "  " + lastDistance + " ");
-                        if (currentDistance > lastDistance) {
+                        if (currentDistance > lastRotation) {
                             Log.e("屏幕_缩放", "放大");
-                            float scale = (float) (lastScale + 0.1);
+                            scale = (float) (lastScale + (float)(currentDistance-lastRotation)/lastRotation);
                             AnimatorUtils.scale(v, lastScale, scale, lastScale, scale);
                             lastScale = scale;
                         }
-                        if (currentDistance < lastDistance) {
+                        if (currentDistance < lastRotation) {
                             Log.e("屏幕_缩放", "缩小");
-                            float scale = (float) (lastScale - 0.1);
+                            scale = (float) (lastScale -(float)(lastRotation-currentDistance)/lastRotation);
                             AnimatorUtils.scale(v, lastScale, scale, lastScale, scale);
                             lastScale = scale;
                         }
                         //获取当前手势中心点
                         lastDistance = currentDistance;
+
                     }
                     break;
                 //进入多点触控模式
@@ -839,40 +850,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             return point;
         }
     }
-
-    //按钮点击缩小函数
-    private void small() {
-        scaleWidth = (float) (scaleWidth * ZOOM_OUT_SCALE);
-        scaleHeight = (float) (scaleHeight * ZOOM_OUT_SCALE);
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
-    }
-
-    /**
-     * 从sd卡获取图片资源
-     *
-     * @return
-     */
-    private List<String> getImagePathFromSD() {
-        // 图片列表
-        List<String> imagePathList = new ArrayList<String>();
-        // 得到sd卡内image文件夹的路径   File.separator(/)
-        String filePath = Environment.getExternalStorageDirectory().toString() + File.separator
-                + "image";
-        // 得到该路径文件夹下所有的文件
-        File fileAll = new File(filePath);
-        File[] files = fileAll.listFiles();
-        // 将所有的文件存入ArrayList中,并过滤所有图片格式的文件
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
-            if (checkIsImageFile(file.getPath())) {
-                imagePathList.add(file.getPath());
-            }
-        }
-        // 返回得到的图片列表
-        return imagePathList;
-    }
-
     /**
      * 检查扩展名，得到图片格式的文件
      *

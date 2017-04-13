@@ -50,7 +50,7 @@ public class OpenActivity extends AppCompatActivity implements View.OnClickListe
                 List<byte[]> openPaks = new ArrayList<>();
                 byte[] openPak = SendPacket.openScreen();
                 openPaks.add(openPak);
-                ccc = new ConnectControlCard(openPaks, new InterfaceConnect() {
+                ccc = new ConnectControlCard(OpenActivity.this,openPaks, new InterfaceConnect() {
                     @Override
                     public void success(byte[] result) {
 //                        Toast.makeText(OpenActivity.this,"开启屏幕成功！",Toast.LENGTH_SHORT).show();
@@ -74,7 +74,7 @@ public class OpenActivity extends AppCompatActivity implements View.OnClickListe
                 List<byte[]> guanPaks = new ArrayList<>();
                 byte[] guanPak = SendPacket.guanScreen();
                 guanPaks.add(guanPak);
-                ccc = new ConnectControlCard(guanPaks, new InterfaceConnect() {
+                ccc = new ConnectControlCard(OpenActivity.this,guanPaks, new InterfaceConnect() {
                     @Override
                     public void success(byte[] result) {
 //                        Toast.makeText(OpenActivity.this,"关闭屏幕成功！",Toast.LENGTH_SHORT).show();
