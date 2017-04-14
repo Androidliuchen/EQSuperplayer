@@ -116,6 +116,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 Intent intent = new Intent(getActivity(), ProgramActivity.class);
                 ProgramActivity.program_id = areabeens.get(position).getId();
                 getActivity().startActivity(intent);
+                getActivity().finish();
 
 
             }

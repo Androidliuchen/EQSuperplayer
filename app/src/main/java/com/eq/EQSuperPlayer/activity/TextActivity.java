@@ -238,7 +238,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.text_btn:
                 String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
-                        + "textImage";
+                        + "EQText";
                 File file = new File(fileTextPath);
                 if (!file.exists()) {
                     file.mkdir();
@@ -273,28 +273,31 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
         for (int i = 0; i < number_colors.length; i++) {
             switch (number_colors[i]) {
                 case 0:
-                    number_colors[i] = Color.YELLOW;
+                    number_colors[i] = R.color.yellow;
                     break;
                 case 1:
                     number_colors[i] = R.color.dodgerblue;
                     break;
                 case 2:
-                    number_colors[i] = Color.RED;
+                    number_colors[i] = R.color.red;
                     break;
                 case 3:
-                    number_colors[i] = Color.GREEN;
+                    number_colors[i] =R.color.lime;
                     break;
                 case 4:
                     number_colors[i] = R.color.mediumorchid;
                     break;
                 case 5:
-                    number_colors[i] = Color.BLUE;
+                    number_colors[i] = R.color.blue;
                     break;
                 case 6:
-                    number_colors[i] = Color.BLACK;
+                    number_colors[i] =R.color.black;
                     break;
                 case 7:
-                    number_colors[i] = Color.GRAY;
+                    number_colors[i] = R.color.white;
+                    break;
+                case 8:
+                    number_colors[i] = R.color.grey;
                     break;
             }
         }

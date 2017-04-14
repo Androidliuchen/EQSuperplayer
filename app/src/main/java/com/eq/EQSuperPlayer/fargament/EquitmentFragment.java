@@ -30,10 +30,10 @@ public class EquitmentFragment extends Fragment {
         public void handleMessage(android.os.Message msg) {
             switch (msg.what){
                 case 0:
-                    Toast.makeText(getActivity(),"搜索设备失败",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),"暂无在线设备",Toast.LENGTH_SHORT).show();
                     break;
                 case 1:
-                    Toast.makeText(getActivity(),"搜索设备成功",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),"加载设备成功",Toast.LENGTH_SHORT).show();
                     break;
             }
             equitAdapter = new EquitAdapter(getActivity(), areabeans);

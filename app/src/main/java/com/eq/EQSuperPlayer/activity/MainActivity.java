@@ -6,6 +6,7 @@ import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -369,7 +370,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                         allFileSize = (int) ism.length();
                         alllen = allFileSize;//总长度
                         count = alllen / DATA_MAX_SIZE;//总包以50包为单位可以分多少个
-                        Log.d("...", "alllen...." + alllen);
+//                        Log.d("...", "alllen...." + alllen);
                         if (alllen % DATA_MAX_SIZE > 0) {
                             count += 1;
                             endLeng = alllen % DATA_MAX_SIZE;
@@ -458,7 +459,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                                 @Override
                                 public void success(byte[] result) {
                                     String results = SendPacket.byte2hex(result);
-                                    Log.d(".........", "results..........:" + results);
+//                                    Log.d(".........", "results..........:" + results);
                                     start = 6;
                                     handler.sendEmptyMessage(2);
                                 }
@@ -486,9 +487,12 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     break;
 
                 case 7:
+
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
+                            long time = SystemClock.currentThreadTimeMillis();
+                            System.out.print("开始时间"+time);
 //                            Log.d("...", "countOrAdress.jjjj.." + countOrAdress);
                             if (countOrAdress < manyAllConten - 2) {
                                 byte[] list = new byte[DATA_MAX_SIZE * MULTI_PACKAGE_MAX_COUNT];
@@ -562,8 +566,11 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                                 }
                             }
                             countOrAdress++;
+                            long time2 = SystemClock.currentThreadTimeMillis();
+                            System.out.print("开始时间2"+time2);
                         }
                     }).start();
+
                     break;
                 case 8:
                     List<byte[]> manySnedEnd = new ArrayList<byte[]>();
@@ -626,6 +633,9 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
      */
     public void Sendprogram() {
         getImageName();
+        if (sendSocket != null){
+            sendSocket.close();
+        }
         List<Areabean> areabeans = new AreabeanDao(this).getListAll();
         Areabean areabean = areabeans.get(0);
         HOSTAddress = areabean.getEquitTp();

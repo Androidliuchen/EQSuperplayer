@@ -590,9 +590,9 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         intent.setClass(ProgramActivity.this, TextActivity.class);
                         intent.putExtra(Constant.PROGRAM_ID, textBean.getId());
                         startActivity(intent);
-                        String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
-                                + "EQText";
-                        FileUtils.deleteDir(fileTextPath);
+//                        String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
+//                                + "EQText";
+//                        FileUtils.deleteDir(fileTextPath);
                         customTypeWindow.dismiss();
                         ProgramActivity.this.finish();
                         break;
@@ -710,6 +710,8 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.out_iamge:
+                Intent intent = new Intent(ProgramActivity.this,MainActivity.class);
+                startActivity(intent);
                 this.finish();
                 break;
             case R.id.region_program:

@@ -326,6 +326,7 @@
         <item>@drawable/accent</item>
         <item>@drawable/buld</item>
         <item>@drawable/black</item>
+        <item>@drawable/weitr</item>
         <item>@drawable/lightgrey</item>
     </integer-array>
 </resources>
