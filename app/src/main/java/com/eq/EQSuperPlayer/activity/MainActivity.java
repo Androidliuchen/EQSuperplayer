@@ -1,14 +1,15 @@
 package com.eq.EQSuperPlayer.activity;
 
 import android.app.ProgressDialog;
+import android.graphics.Bitmap;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
-import android.os.Bundle;
 import android.os.Environment;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -26,7 +27,6 @@ import com.eq.EQSuperPlayer.bean.Areabean;
 import com.eq.EQSuperPlayer.bean.SendAdapter;
 import com.eq.EQSuperPlayer.communication.ConnectControlCard;
 import com.eq.EQSuperPlayer.communication.InterfaceConnect;
-import com.eq.EQSuperPlayer.communication.ManyControlCard;
 import com.eq.EQSuperPlayer.communication.SendPacket;
 import com.eq.EQSuperPlayer.custom.CustomPopWindow;
 import com.eq.EQSuperPlayer.dao.AreabeanDao;
@@ -63,7 +63,6 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
     private int AllSize = 0;
     private ProgressDialog proDialog; // 进度条
     private ConnectControlCard ccc;
-    private ManyControlCard mcc;
     private byte[] proBytes;   //存放XML的byte数组
     private List<byte[]> program_lists = null;   //当xml数据包需要分包的时候
     private SendAdapter mSendAdapter;
@@ -74,7 +73,6 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
     private int allFileSize = 0;
     private List<String> progrmae = new ArrayList<String>(); //存放图片路径的数组
     private int start;//0 代表发送成功，发送文件数据，1 代表发送失败，2
-    //    private int arrds = 0;//去图片名称的位置
     private int imageAllSize = 0;//取出图片的总个数
     private List<byte[]> arrays = new ArrayList<byte[]>();
     private int countAdress = 0;//当前发送的个数
@@ -102,7 +100,6 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
     private int fileSzie = 0;
     public static int PORT = 5050;  // 端口
     public static String HOSTAddress = null;    // 主机地址
-    //        public static String HOSTAddress = "192.168.2.206";    // 主机地址
     private DatagramPacket dataPacket = null;
     private DatagramSocket sendSocket = null;
     private int dataLength = 0;    //在当前类，竟然还要传个空值过来
@@ -119,7 +116,6 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
         topButton.setOnClickListener(this);
         topTextView = (TextView) findViewById(R.id.topTv);
         mSend.setOnClickListener(this);
-        //获取FragmentManager
         //获取WiFi信息
         WifiManager my_wifiManager = ((WifiManager) getSystemService(WIFI_SERVICE));
         dhcpInfo = my_wifiManager.getDhcpInfo();
@@ -164,7 +160,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     try {
                         FileInputStream is = new FileInputStream(file);
                         byte[] buffer = new byte[is.available()];
-                        Log.d("...", "buffer.length....." + buffer.length);
+//                        Log.d("...", "buffer.length....." + buffer.length);
                         is.read(buffer);
                         if (buffer.length < DATA_MAX_SIZE) {
 
@@ -234,7 +230,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                             if (start == 0) {
                                 handler.sendEmptyMessage(3);
                             } else if (start == 8) {
-                                Log.d("....", "imageAllSize88888" + imageAllSize);
+//                                Log.d("....", "imageAllSize88888" + imageAllSize);
                                 if (resourcesIndex < imageAllSize) {
                                     resourcesIndex++;
                                     countOrAdress = 0;
@@ -244,16 +240,16 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                                     handler.sendEmptyMessage(4);
                                 }
                             } else if (start == 6) {
-                                Log.d("....", "countAdress" + countAdress);
-                                Log.d("....", "AllSize" + AllSize);
+//                                Log.d("....", "countAdress" + countAdress);
+//                                Log.d("....", "AllSize" + AllSize);
                                 if (countAdress == AllSize) {
                                     try {
                                         ism.close();
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
-                                    Log.d("....", "imageAllSize11111" + imageAllSize);
-                                    Log.d("....", "resourcesIndex2222222" + resourcesIndex);
+                                    Log.d("....", "imageAllSize11111:" + imageAllSize);
+                                    Log.d("....", "resourcesIndex2222222:" + resourcesIndex);
                                     if (resourcesIndex == imageAllSize - 1) {
                                         handler.sendEmptyMessage(4);
                                     } else {
@@ -270,7 +266,13 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
 
                         @Override
                         public void failure(int stateCode) {
-                            handler.sendEmptyMessage(1);
+                            if (EORRE_COUNT >= 3) {
+                                handler.sendEmptyMessage(1);
+                                EORRE_COUNT = 1;
+                            } else {
+                                handler.sendEmptyMessage(2);
+                                EORRE_COUNT++;
+                            }
                         }
 
                         @Override
@@ -281,17 +283,17 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     fixedThreadPool.execute(ccc);
                     break;
                 case 3://发送文件名称指令
-                    Log.d("....", "resourcesIndex33333333" + resourcesIndex);
+//                    Log.d("....", "resourcesIndex33333333" + resourcesIndex);
                     List<byte[]> controlData = new ArrayList<byte[]>();
                     String str = iamgID.get(resourcesIndex);
                     byte[] bytes = str.getBytes();
                     String a1 = SendPacket.bytes2HexString(bytes, bytes.length);
-                    Log.d(".........", "a1..............." + a1);
-                    Log.d(".........", "bytes.length..............." + bytes.length);
+//                    Log.d(".........", "a1..............." + a1);
+//                    Log.d(".........", "bytes.length..............." + bytes.length);
                     byte[] controlCard2 = SendPacket.fileNameData(bytes.length, bytes);
                     String aa = SendPacket.bytes2HexString(controlCard2, controlCard2.length);
-                    Log.d(".........", "aa..............." + aa);
-                    Log.d(".........", "bytes.length..............." + bytes.length);
+//                    Log.d(".........", "aa..............." + aa);
+//                    Log.d(".........", "bytes.length..............." + bytes.length);
                     controlData.add(controlCard2);
                     ccc = new ConnectControlCard(MainActivity.this, controlData, new InterfaceConnect() {
                         @Override
@@ -305,9 +307,16 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                             start = 3;
                             handler.sendEmptyMessage(6);
                         }
+
                         @Override
                         public void failure(int stateCode) {
-                            handler.sendEmptyMessage(1);
+                            if (EORRE_COUNT >= 3) {
+                                handler.sendEmptyMessage(1);
+                                EORRE_COUNT = 1;
+                            } else {
+                                handler.sendEmptyMessage(3);
+                                EORRE_COUNT++;
+                            }
                         }
 
                         @Override
@@ -330,8 +339,13 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
 
                         @Override
                         public void failure(int stateCode) {
-                            start = 1;
-                            handler.sendEmptyMessage(1);
+                            if (EORRE_COUNT >= 3) {
+                                handler.sendEmptyMessage(1);
+                                EORRE_COUNT = 1;
+                            } else {
+                                handler.sendEmptyMessage(4);
+                                EORRE_COUNT++;
+                            }
                         }
 
                         @Override
@@ -342,8 +356,8 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     fixedThreadPool.execute(ccc);
                     break;
                 case 6:
-                    Log.d("......", "countAdress2222222:" + countAdress);
-                    Log.d("......", "resourcesIndex6666666:" + resourcesIndex);
+//                    Log.d("......", "countAdress2222222:" + countAdress);
+//                    Log.d("......", "resourcesIndex6666666:" + resourcesIndex);
                     List<byte[]> manyData = new ArrayList<byte[]>();
                     String pathData = progrmae.get(resourcesIndex + 1);
                     File files = new File(pathData);
@@ -368,7 +382,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                             sendLeng = MULTI_PACKAGE_MAX_COUNT;
                             manyAllConten = (AllSize - 1) / MULTI_PACKAGE_MAX_COUNT + 1;
                         }
-                        Log.d(".....", "manyAllConten返回的数据。。。：" + manyAllConten);
+//                        Log.d(".....", "manyAllConten返回的数据。。。：" + manyAllConten);
                         sendConten = sendLeng;//最后一组数据包的个数
                         if (countOrAdress < manyAllConten - 2) {
                             byte[] manySendStart = SendPacket.manyPakStart(manyStratIndex, MULTI_PACKAGE_MAX_COUNT * DATA_MAX_SIZE, MULTI_PACKAGE_MAX_COUNT, DATA_MAX_SIZE);
@@ -379,14 +393,14 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                                 @Override
                                 public void success(byte[] result) {
                                     String results = SendPacket.byte2hex(result);
-                                    Log.d(".....", "results返回的数据。。。：" + results);
+//                                    Log.d(".....", "results返回的数据。。。：" + results);
                                     start = 6;
                                     handler.sendEmptyMessage(7);
                                 }
 
                                 @Override
                                 public void failure(int stateCode) {
-                                    start = 1;
+                                    start = 6;
                                     handler.sendEmptyMessage(1);
                                 }
 
@@ -398,11 +412,11 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                             fixedThreadPool.execute(ccc);
                         } else if (countOrAdress == manyAllConten - 2) {
                             if (1 <= sendConten) {
-                                Log.d("最后一包当前位置", "manyStratIndex....." + manyStratIndex);
-                                Log.d("最后一包当前位置", "sendConten....." + sendConten);
+//                                Log.d("最后一包当前位置", "manyStratIndex....." + manyStratIndex);
+//                                Log.d("最后一包当前位置", "sendConten....." + sendConten);
                                 byte[] manySendStart = SendPacket.manyPakStart(manyStratIndex, sendConten * DATA_MAX_SIZE, sendConten, DATA_MAX_SIZE);
                                 String many = SendPacket.byte2hex(manySendStart);
-                                Log.d("最后一包当前位置", "many....." + many);
+//                                Log.d("最后一包当前位置", "many....." + many);
                                 manyData.add(manySendStart);
                                 ccc = new ConnectControlCard(MainActivity.this, manyData, new InterfaceConnect() {
                                     @Override
@@ -413,7 +427,6 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
 
                                     @Override
                                     public void failure(int stateCode) {
-                                        start = 1;
                                         handler.sendEmptyMessage(1);
                                     }
 
@@ -432,7 +445,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-                            Log.d("......", "countAdress1111111111:" + countAdress);
+//                            Log.d("......", "countAdress1111111111:" + countAdress);
                             arrays = new ArrayList<byte[]>();
                             arrays.add(list);
                             List<byte[]> simallData = new ArrayList<byte[]>();
@@ -476,7 +489,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            Log.d("...", "countOrAdress.jjjj.." + countOrAdress);
+//                            Log.d("...", "countOrAdress.jjjj.." + countOrAdress);
                             if (countOrAdress < manyAllConten - 2) {
                                 byte[] list = new byte[DATA_MAX_SIZE * MULTI_PACKAGE_MAX_COUNT];
                                 byte[] manyIangeData = new byte[DATA_MAX_SIZE + 14];
@@ -556,7 +569,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     List<byte[]> manySnedEnd = new ArrayList<byte[]>();
                     byte[] manySend = SendPacket.manySendComplete();
                     String SEND = SendPacket.byte2hex(manySend);
-                    Log.d("......", "SEND返回的数据是。。。。。。。：" + SEND);
+//                    Log.d("......", "SEND返回的数据是。。。。。。。：" + SEND);
                     manySnedEnd.add(manySend);
                     erro(manySnedEnd, EORRE_COUNT);
                     EORRE_COUNT++;
@@ -577,12 +590,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
             @Override
             public void success(byte[] result) {
                 String come = SendPacket.byte2hex(result);
-                Log.d("......", "result返回的数据是。。。。。。。：" + come);
                 String aa = SendPacket.toD(come, come.length());
-                Log.d("......", "aa 返回的数据是。。。。。。。：" + aa);
-                Log.d("......", "countAdress 返回的数据是。。。。。。。：" + countAdress);
-                Log.d("......", "countAdress2222222:" + countAdress);
-                Log.d("......", "countAdress66666:" + AllSize);
                 if (countAdress == AllSize + 1) {
                     handler.sendEmptyMessage(2);
                 } else {
@@ -618,10 +626,6 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
      */
     public void Sendprogram() {
         getImageName();
-        if (sendSocket != null){
-            sendSocket.close();
-            sendSocket = null;
-        }
         List<Areabean> areabeans = new AreabeanDao(this).getListAll();
         Areabean areabean = areabeans.get(0);
         HOSTAddress = areabean.getEquitTp();
@@ -675,7 +679,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
         List<String> filePath = new ArrayList<>();
         filePath.add(PROGRAME_ROOT);
         String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
-                + "textImage";
+                + "EQText";
         filePath.add(fileTextPath);
 
         String fileImagePath = Environment.getExternalStorageDirectory().toString() + File.separator
@@ -703,7 +707,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     imageAllSize = iamgID.size();
                 }
             }
-            Log.d(".......", "图片总个数。。。。:" + iamgID);
+//            Log.d(".......", "图片总个数。。。。:" + iamgID);
         }
 
     }
@@ -723,7 +727,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
             size = fis.available();
         } else {
             file.createNewFile();
-            Log.e("获取文件大小", "文件不存在!");
+//            Log.e("获取文件大小", "文件不存在!");
         }
         return size;
     }

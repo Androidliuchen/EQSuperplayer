@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.graphics.PointF;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -124,6 +125,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFormat(PixelFormat.TRANSLUCENT);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_program);
         initView();
@@ -526,7 +528,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                     new TextBeanDao(ProgramActivity.this).delete(textBean);
                     programListView.slideBack();
                     String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
-                            + "textImage";
+                            + "EQText";
                     FileUtils.deleteDir(fileTextPath);
                     recyclerViewAdapter.notifyDataSetChanged();
                     recyclerViewAdapter.notifyDataSetInvalidated();
@@ -588,6 +590,9 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         intent.setClass(ProgramActivity.this, TextActivity.class);
                         intent.putExtra(Constant.PROGRAM_ID, textBean.getId());
                         startActivity(intent);
+                        String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                                + "EQText";
+                        FileUtils.deleteDir(fileTextPath);
                         customTypeWindow.dismiss();
                         ProgramActivity.this.finish();
                         break;
@@ -641,7 +646,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 tableBeens.remove(position);
                 List<String> filePath = new ArrayList<>();
                 String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
-                        + "textImage";
+                        + "EQText";
                 filePath.add(fileTextPath);
                 String fileImagePath = Environment.getExternalStorageDirectory().toString() + File.separator
                         + "EQImage";
@@ -936,7 +941,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         List<String> imagePathList = new ArrayList<String>();
                         // 得到sd卡内image文件夹的路径   File.separator(/)
                         String filePath = Environment.getExternalStorageDirectory().toString() + File.separator
-                                + "textImage";
+                                + "EQText";
                         // 得到该路径文件夹下所有的文件
                         File fileAll = new File(filePath);
                         File[] files = fileAll.listFiles();

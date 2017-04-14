@@ -71,8 +71,8 @@ public class Utils {
     /*
     * bitmap 转存 图片到本地
     */
-    public static void saveMyBitmap(Bitmap mBitmap, String bitName,int index) {
-        File appDir = new File(Environment.getExternalStorageDirectory(), "textImage");
+    public static void saveMyBitmap(Bitmap mBitmap, String bitName) {
+        File appDir = new File(Environment.getExternalStorageDirectory(), "EQText");
         Log.d(".........","Environment.getExternalStorageDirectory()........" + Environment.getExternalStorageDirectory());
         if (!appDir.exists()) {
             appDir.mkdir();

@@ -33,7 +33,6 @@ public class ConnectControlCard implements Runnable {
     private int dataLength = 0;    //在当前类，竟然还要传个空值过来
     private List<byte[]> sendByte = new ArrayList<byte[]>();
     private String testStr = "";
-    //    private UdpMessageTool mUdpMessageTool;
     private InterfaceConnect interfaceConnect = null;
 
     public ConnectControlCard(Context context, List<byte[]> sendByte, InterfaceConnect interfaceConnect) {
@@ -53,32 +52,29 @@ public class ConnectControlCard implements Runnable {
 
     @Override
     public void run() {
-        Log.d("......", "HOSTAddress。。。。。。" + HOSTAddress);
         InetAddress local = null;
         try {
             local = InetAddress.getByName(HOSTAddress);
-            Log.e(TAG, "正在检测连接地址...");
+//            Log.e(TAG, "正在检测连接地址...");
         } catch (UnknownHostException e) {
-            Log.e(TAG, "未找到连接地址..." + e.toString());
+//            Log.e(TAG, "未找到连接地址..." + e.toString());
             if (interfaceConnect != null) {
                 interfaceConnect.failure(0);
             }
             e.printStackTrace();
         }
         try {
-            Log.e(TAG, "正在连接服务器...");
+            if (sendSocket != null){
+                sendSocket.close();
+            }
             sendSocket = new DatagramSocket();
-            Log.d("......", "PORT。。。。。。" + PORT);
-            Log.e(TAG, "正在准备数据...");
             try {
                 for (int i = 0; i < sendByte.size(); i++) {
                     byte[] arrData = sendByte.get(i);
-//                    dataLength = SendPacket.bytes2HexString(arrData, arrData.length).toString() == null ? 0 : arrData.length;
                     dataPacket = new DatagramPacket(arrData, arrData.length, local, PORT);
                     sendSocket.send(dataPacket);
                 }
                 interfaceConnect.dataSuccess("数据发送完！");
-                Log.e(TAG, "发送成功...");
                 byte[] buf = new byte[50];
                 dataPacket = new DatagramPacket(buf, buf.length);
                 try {
@@ -86,8 +82,6 @@ public class ConnectControlCard implements Runnable {
                     sendSocket.receive(dataPacket); //	 获得输入流
                     Thread.sleep(100);
                     testStr = new String(buf, "GBK").trim();
-                    System.out.println("______________" + testStr.length());
-                    System.out.println("有数据.............." + SendPacket.bytes2HexString(buf, buf.length));
                     if (interfaceConnect != null) {
                         String s1 = SendPacket.bytes2HexString(buf, buf.length);
                         interfaceConnect.success(buf); //传递返回值
@@ -99,7 +93,6 @@ public class ConnectControlCard implements Runnable {
                         sendSocket = null;
                     }
                 } catch (UnsupportedEncodingException e) {
-                    Log.e(TAG, "接收数据包异常...");
                     if (interfaceConnect != null) {
                         interfaceConnect.failure(0);
                     }
@@ -111,7 +104,6 @@ public class ConnectControlCard implements Runnable {
                     }
                 }
             } catch (IOException e) {
-                Log.e(TAG, "发送数据包异常...");
                 if (interfaceConnect != null) {
                     interfaceConnect.failure(0);
                 }

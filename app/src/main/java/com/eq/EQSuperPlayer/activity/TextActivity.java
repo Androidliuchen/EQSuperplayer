@@ -256,7 +256,8 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
 
     public Bitmap drawBitmap() {
         Paint paint = new Paint();
-        paint.setTextSize(textBean.getStSize() + 3);
+        int size = Integer.parseInt(this.getResources().getStringArray(R.array.text_size)[STSize.getSelectedItemPosition()]) + 3;
+        paint.setTextSize(size);
         String text = editText.getText().toString();
         textWidth = paint.measureText(text);
         textWidths = Integer.parseInt(STWidth.getText().toString());//文本框输入的长度
@@ -331,7 +332,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
         int y = Integer.parseInt(STHeigth.getText().toString());
         int endBitmapWidth;
         if (drawBitmap().getWidth() <= textWidths) {
-            Utils.saveMyBitmap(drawBitmap(), "text",text_id);
+            Utils.saveMyBitmap(drawBitmap(), "text");
         } else {
             bitmapWidth = drawBitmap().getWidth();
             int bitmapCount = bitmapWidth / textWidths;//按屏幕可截取多少张图片
@@ -347,38 +348,37 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
                 Bitmap bmp;
                 if (i == bitmapCount - 1) {
                     bmp = Bitmap.createBitmap(drawBitmap(), x, 0, endBitmapWidth, y, null, true);
-                    zoomImg(bmp, textWidths, textHeights, i);
+                    Utils.saveMyBitmap(bmp, "text" + i);
                     textWidths += textWidths;
                 } else {
                     bmp = Bitmap.createBitmap(drawBitmap(), x, 0, textWidths, y, null, true);
-                    Utils.saveMyBitmap(bmp, "text" + i,text_id);
+                    Utils.saveMyBitmap(bmp, "text" + i);
                 }
-
 
             }
         }
     }
 
-    /**
-     * 处理图片
-     *
-     * @param bm 所要转换的bitmap
-     * @return 指定宽高的bitmap
-     */
-    public Bitmap zoomImg(Bitmap bm, int newWidth, int newHeight, int i) {
-        // 获得图片的宽高
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        // 计算缩放比例
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        // 取得想要缩放的matrix参数
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
-        Log.d(".....", "matrix缩放比。。。" + matrix);
-        // 得到新的图片
-        Bitmap newbm = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
-        Utils.saveMyBitmap(bm, "text" + i,text_id);
-        return newbm;
-    }
+//    /**
+//     * 处理图片
+//     *
+//     * @param bm 所要转换的bitmap
+//     * @return 指定宽高的bitmap
+//     */
+//    public Bitmap zoomImg(Bitmap bm, int newWidth, int newHeight, int i) {
+//        // 获得图片的宽高
+//        int width = bm.getWidth();
+//        int height = bm.getHeight();
+//        // 计算缩放比例
+//        float scaleWidth = ((float) newWidth) / width;
+//        float scaleHeight = ((float) newHeight) / height;
+//        // 取得想要缩放的matrix参数
+//        Matrix matrix = new Matrix();
+//        matrix.postScale(scaleWidth, scaleHeight);
+//        Log.d(".....", "matrix缩放比。。。" + matrix);
+//        // 得到新的图片
+//        Bitmap newbm = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
+//        Utils.saveMyBitmap(bm, "text" + i);
+//        return newbm;
+//    }
 }

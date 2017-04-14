@@ -85,7 +85,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
         if (areabeens.size() == 0) {
             List<String> filePath = new ArrayList<>();
             String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
-                    + "textImage";
+                    + "EQText";
             filePath.add(fileTextPath);
             String fileImagePath = Environment.getExternalStorageDirectory().toString() + File.separator
                     + "EQImage";
@@ -175,7 +175,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 handler.sendEmptyMessage(0);
                 List<String> filePath = new ArrayList<>();
                 String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
-                        + "textImage";
+                        + "EQText";
                 filePath.add(fileTextPath);
                 String fileImagePath = Environment.getExternalStorageDirectory().toString() + File.separator
                         + "EQImage";
@@ -516,7 +516,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                         new AreabeanDao(getActivity()).add(mAreabean);
                         windowWidth = wdith;
                         windowHeight = height;
-                        WindowSizeManager.setSharedPreference(getActivity(), windowWidth * 2, windowHeight * 2);
+                        WindowSizeManager.setSharedPreference(getActivity(), windowWidth , windowHeight);
                         program_name_count++;
                         ProgramNameItemManager.setSharedPreference(getActivity(), program_name_count);
                         handler.sendEmptyMessage(0);

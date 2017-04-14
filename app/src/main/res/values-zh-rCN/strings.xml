@@ -63,6 +63,7 @@
     <string name="xml_failure">XML 生成失败！</string>
     <string name="program_send_success">节目发送成功......</string>
     <string name="program_send_failure">节目发送失败......</string>
+    <string name="program_send_failure1">Failed to send the program, please check whether the network connection</string>
     <string name="program_sending">节目正在发送......</string>
 
     <!--  controlFragment   !-->
