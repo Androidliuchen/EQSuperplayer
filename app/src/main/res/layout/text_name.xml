@@ -14,14 +14,13 @@
             android:src="@drawable/programe"/>
         <TextView
             android:id="@+id/tv_name_Re_left"
-            android:layout_width="340dp"
+            android:layout_width="match_parent"
             android:layout_height="40dp"
             android:gravity="center"
             android:text="@string/program"
             android:textColor="#000"
-            android:textSize="16sp"
-            android:layout_alignTop="@+id/iamge_pro"
-            android:layout_toEndOf="@+id/iamge_pro" />
+            android:layout_marginRight="90dp"
+            android:textSize="16sp"/>
 
     <TextView
         android:id="@+id/prmDelete"

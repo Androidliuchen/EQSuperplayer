@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BrightnessActivity extends AppCompatActivity implements View.OnClickListener {
-private ImageView bright_Button;
+    private ImageView bright_Button;
     private Dialog builder;
     private LinearLayout brightness;   //亮度调节
     private TextView bright_text;   //选择的亮度值
@@ -73,7 +73,7 @@ private ImageView bright_Button;
                 List<byte[]> brightPaks = new ArrayList<>();
                 byte[] brightPak = SendPacket.brightness(brightness_int);
                 brightPaks.add(brightPak);
-                ccc = new ConnectControlCard(brightPaks, new InterfaceConnect() {
+                ccc = new ConnectControlCard(BrightnessActivity.this,brightPaks, new InterfaceConnect() {
                     @Override
                     public void success(byte[] result) {
                     }

@@ -3,29 +3,89 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.eq.EQSuperPlayer.SlidingMenuActivity.WIFIActivity">
+    tools:context="com.eq.EQSuperPlayer.activity.WifiActivity">
     <RelativeLayout
-        android:id="@+id/alertTitle"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="#0080FF">
-
+        android:id="@+id/main_rl1"
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:background="@color/blud" >
         <ImageView
-            android:id="@+id/WIFI_Button"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:id="@+id/wifi_back"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:paddingLeft="15dip"
+            android:paddingRight="30dp"
             android:src="@drawable/button_return" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="@string/network_name"
+            android:textColor="@android:color/white"
+            android:textSize="20sp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/main_rl1"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textSize="20sp"
+                android:text="WIFI"/>
+
+            <Switch
+                android:id="@+id/wifiswitch"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"/>
+        </RelativeLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/dimgrey"/>
 
         <TextView
-            android:id="@+id/topTv"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:gravity="center"
-            android:text="WIFI设置"
-            android:textColor="#fff"
-            android:textSize="20sp" />
+            android:id="@+id/wifi_name"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center_vertical"
+            android:textSize="20sp"
+            android:text="@string/network_no_connection"/>
 
-    </RelativeLayout>
+
+        <ListView
+            android:id="@+id/wifi_listview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="230"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/dimgrey"/>
+        <Button
+            android:id="@+id/searchWifi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:background="@drawable/screen_button"
+            android:textSize="20dp"
+            android:text="@string/network_search_wifi"/>
+    </LinearLayout>
+
 </RelativeLayout>

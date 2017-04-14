@@ -100,6 +100,7 @@ public class ImageActivity extends Activity {
     private int text_id;
     private Areabean areabean;
     private ImagePath imagePath = new ImagePath();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,7 +113,7 @@ public class ImageActivity extends Activity {
         //3.为recyclerView设置布局管理器
         //设置item之间的间隔
 
-        if(imagePath.getPath() != null){
+        if (imagePath.getPath() != null) {
             imagePath = new ImagePathDao(this).get(text_id);
             paths.add(imagePath);
         }
@@ -131,11 +132,10 @@ public class ImageActivity extends Activity {
         imageBean = new ImageDao(this).get(text_id);
         programBean = new ProgramBeanDao(this).get(ProgramActivity.selet);
         imageTitle.setText(programBean.getName());
-            imageBean.setProgramBean(programBean);
+        imageBean.setProgramBean(programBean);
+        windowWidth = areabean.getWindowWidth();
+        windowHeight = areabean.getWindowHeight() ;
         IM.setText(imageBean.getIamgeName());
-        windowSizeManager = WindowSizeManager.getSahrePreference(this);
-        windowWidth = windowSizeManager.getWindowWidth();
-        windowHeight = windowSizeManager.getWindowHeight();
         // 图片窗宽高
         if (imageBean.getIamgeWidth() != 0) {
             IMWidth.setText(imageBean.getIamgeWidth() + "");
@@ -144,10 +144,10 @@ public class ImageActivity extends Activity {
             IMWidth.setText(areabean.getWindowWidth() + "");
             IMHeigth.setText(areabean.getWindowHeight() + "");
         }
-        if (imageBean.getIamgeX() != 0 || imageBean.getIamgeY() != 0){
+        if (imageBean.getIamgeX() != 0 || imageBean.getIamgeY() != 0) {
             IMx.setText(imageBean.getIamgeX() + "");
             IMy.setText(imageBean.getIamgeY() + "");
-        }else {
+        } else {
             IMx.setText(areabean.getArea_X() + "");
             IMy.setText(areabean.getArea_Y() + "");
         }
@@ -180,7 +180,8 @@ public class ImageActivity extends Activity {
         IMStandtime.setText(imageBean.getIamgeandtime() + "");
 
     }
-    public void imageSave(){
+
+    public void imageSave() {
         try {
             if (Integer.parseInt(IMWidth.getText().toString()) + Integer.parseInt(IMx.getText().toString()) <= windowWidth
                     && Integer.parseInt(IMHeigth.getText().toString()) + Integer.parseInt(IMy.getText().toString()) <= windowHeight) {
@@ -203,19 +204,20 @@ public class ImageActivity extends Activity {
         imageBean.setIamgeandtime(Integer.parseInt(IMStandtime.getText().toString()));
         new ImageDao(this).update(imageBean);
     }
+
     public static final int REQUEST_CODE = 1000;
 
     @OnClick({R.id.iamge_btn, R.id.image_send, R.id.iam_btn})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.iamge_btn:
-                Intent intent = new Intent(ImageActivity.this,ProgramActivity.class);
+                Intent intent = new Intent(ImageActivity.this, ProgramActivity.class);
                 startActivity(intent);
                 ImageActivity.this.finish();
                 break;
             case R.id.image_send://提交数据，同时将数据写入数据库，以供节目显示用。
                 imageSave();
-                Intent intent1 = new Intent(ImageActivity.this,ProgramActivity.class);
+                Intent intent1 = new Intent(ImageActivity.this, ProgramActivity.class);
                 startActivity(intent1);
                 ImageActivity.this.finish();
                 break;
@@ -225,11 +227,11 @@ public class ImageActivity extends Activity {
                 File file = new File(fileTextPath);
                 if (!file.exists()) {
                     file.mkdir();
-                }else {
+                } else {
                     FileUtils.deleteDir(fileTextPath);
                 }
                 ArrayList<String> imagePath = new ArrayList<>();
-                for (ImagePath imagePath1 : paths){
+                for (ImagePath imagePath1 : paths) {
                     imagePath.add(imagePath1.getPath());
                 }
                 ImageConfig imageConfig = new ImageConfig.Builder(
@@ -259,6 +261,7 @@ public class ImageActivity extends Activity {
                 ImageSelector.open(ImageActivity.this, imageConfig);   // 开启图片选择器
         }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -279,19 +282,19 @@ public class ImageActivity extends Activity {
                 File file = new File(path);
                 if (file.exists()) {
                     Bitmap bm = BitmapFactory.decodeFile(path);
-                    FileUtils.zoomImg(bm,Integer.parseInt(IMWidth.getText().toString()), Integer.parseInt(IMHeigth.getText().toString()));
+                    FileUtils.zoomImg(bm, Integer.parseInt(IMWidth.getText().toString()), Integer.parseInt(IMHeigth.getText().toString()));
                     Log.d("...............", "BM............" + bm);
                 }
-                    iamgID.add(imageName);
-                    Log.d("............", "iamgID............" + iamgID);
-                    for (int i = 0; i < iamgID.size(); i++) {
-                        imageBean.setIamgeId(iamgID);
-                        new ImageDao(this).update(imageBean);
-                    }
+                iamgID.add(imageName);
+                Log.d("............", "iamgID............" + iamgID);
+                for (int i = 0; i < iamgID.size(); i++) {
+                    imageBean.setIamgeId(iamgID);
+                    new ImageDao(this).update(imageBean);
                 }
-                photoAdapter.notifyDataSetChanged();
             }
+            photoAdapter.notifyDataSetChanged();
         }
+    }
 
     @OnClick(R.id.iam_btn)
     public void onClick() {

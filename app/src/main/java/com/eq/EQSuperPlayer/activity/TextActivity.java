@@ -106,7 +106,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
     private int textWidths;//文本框输入屏幕的宽度
     private int textHeights;//文本框输入屏幕的高度
     private int bitmapWidth;//生成图片的实际宽度
-
+    private int text_id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,7 +117,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
 
     protected void initData() {
         areabean = new AreabeanDao(this).get(ProgramActivity.program_id);
-        int text_id = getIntent().getIntExtra(Constant.PROGRAM_ID, -1);
+        text_id = getIntent().getIntExtra(Constant.PROGRAM_ID, -1);
         textBean = new TextBeanDao(this).get(text_id);
         programBean = new ProgramBeanDao(this).get(ProgramActivity.selet);
         textBean.setProgramBean(programBean);
@@ -232,7 +232,9 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.finshamg:
-                finish();
+                Intent intent1 = new Intent(this, ProgramActivity.class);
+                startActivity(intent1);
+                TextActivity.this.finish();
                 break;
             case R.id.text_btn:
                 String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
@@ -245,8 +247,8 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 save();
                 copyBitmap();
-                Intent intent1 = new Intent(this, ProgramActivity.class);
-                startActivity(intent1);
+                Intent intent2 = new Intent(this, ProgramActivity.class);
+                startActivity(intent2);
                 TextActivity.this.finish();
                 break;
         }
@@ -329,7 +331,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
         int y = Integer.parseInt(STHeigth.getText().toString());
         int endBitmapWidth;
         if (drawBitmap().getWidth() <= textWidths) {
-            Utils.saveMyBitmap(drawBitmap(), "text");
+            Utils.saveMyBitmap(drawBitmap(), "text",text_id);
         } else {
             bitmapWidth = drawBitmap().getWidth();
             int bitmapCount = bitmapWidth / textWidths;//按屏幕可截取多少张图片
@@ -349,7 +351,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
                     textWidths += textWidths;
                 } else {
                     bmp = Bitmap.createBitmap(drawBitmap(), x, 0, textWidths, y, null, true);
-                    Utils.saveMyBitmap(bmp, "text" + i);
+                    Utils.saveMyBitmap(bmp, "text" + i,text_id);
                 }
 
 
@@ -363,7 +365,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
      * @param bm 所要转换的bitmap
      * @return 指定宽高的bitmap
      */
-    public static Bitmap zoomImg(Bitmap bm, int newWidth, int newHeight, int i) {
+    public Bitmap zoomImg(Bitmap bm, int newWidth, int newHeight, int i) {
         // 获得图片的宽高
         int width = bm.getWidth();
         int height = bm.getHeight();
@@ -376,7 +378,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
         Log.d(".....", "matrix缩放比。。。" + matrix);
         // 得到新的图片
         Bitmap newbm = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
-        Utils.saveMyBitmap(bm, "text" + i);
+        Utils.saveMyBitmap(bm, "text" + i,text_id);
         return newbm;
     }
 }

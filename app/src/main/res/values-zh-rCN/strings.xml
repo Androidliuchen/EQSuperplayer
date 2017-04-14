@@ -4,6 +4,7 @@
     <!--  EquitmentFragment   !-->
     <string name="hint_connection_to">已连接：</string>
     <string name="hint_start_wifi">开启wifi中...</string>
+    <string name="hint_start_equit">搜索设备...</string>
     <string name="hint_connection_wifi">连接wifi中...</string>
     <string name="hint_control_wifi_failure">没有搜索到wifi</string>
     <string name="hint_connection_success">连接成功</string>
