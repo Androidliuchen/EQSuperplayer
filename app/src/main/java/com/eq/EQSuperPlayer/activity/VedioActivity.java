@@ -256,7 +256,6 @@ public class VedioActivity extends AppCompatActivity {
                 VedioActivity.this.finish();
                 break;
             case R.id.vedio_send://提交修改后的数据
-
                 vedioSave();
                 Log.d("..........", "vedioBean改变数据内容...............:" + vedioBean.toString());
                 Intent intent1 = new Intent(VedioActivity.this, ProgramActivity.class);

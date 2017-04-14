@@ -5,7 +5,7 @@ package com.eq.EQSuperPlayer.custom;
  */
 public class Constant {
     public static final String PROGRAM_ID = "program_id";  //传递节目id 的键
-    public static final int UDP_WAIT = 5000;  //UDP接收数据包等待时长
+    public static final int UDP_WAIT = 1000;  //UDP接收数据包等待时长
     public static final int DATA_SPLIT = 1000;  //数据分包大小
     //区域种类 参数 枚举值
     public static final int AREA_TYPE_PROGRAM = 0;  //节目参数本身

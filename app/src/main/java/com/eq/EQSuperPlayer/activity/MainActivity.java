@@ -27,10 +27,11 @@ import com.eq.EQSuperPlayer.bean.Areabean;
 import com.eq.EQSuperPlayer.bean.SendAdapter;
 import com.eq.EQSuperPlayer.communication.ConnectControlCard;
 import com.eq.EQSuperPlayer.communication.InterfaceConnect;
+import com.eq.EQSuperPlayer.communication.ManyControlCard;
 import com.eq.EQSuperPlayer.communication.SendPacket;
 import com.eq.EQSuperPlayer.custom.CustomPopWindow;
+import com.eq.EQSuperPlayer.dao.AreabeanDao;
 import com.eq.EQSuperPlayer.fargament.LeftFragment;
-import com.eq.EQSuperPlayer.fargament.ProgramFragment;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
@@ -38,9 +39,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -60,21 +64,19 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
     private int AllSize = 0;
     private ProgressDialog proDialog; // 进度条
     private ConnectControlCard ccc;
+    private ManyControlCard mcc;
     private byte[] proBytes;   //存放XML的byte数组
     private List<byte[]> program_lists = null;   //当xml数据包需要分包的时候
     private SendAdapter mSendAdapter;
     private CustomPopWindow customPopWindow;
-    private List<byte[]> programe_lists = null;  //当数据需要分包时
-    private List<Integer> programe_size = null;  //存放当前包长度
+    private RandomAccessFile ism;
     private ArrayList<String> iamgID; //存放图片名的数组
     private List<String> filr = new ArrayList<String>();
-    private List<Bitmap> bitmaps; //存放图片的数组
+    private int allFileSize = 0;
     private List<String> progrmae = new ArrayList<String>(); //存放图片路径的数组
     private int start;//0 代表发送成功，发送文件数据，1 代表发送失败，2
     //    private int arrds = 0;//去图片名称的位置
     private int imageAllSize = 0;//取出图片的总个数
-    private boolean isSuee = true;
-    private ArrayList<byte[][]> arrayList = new ArrayList<byte[][]>();
     private List<byte[]> arrays = new ArrayList<byte[]>();
     private int countAdress = 0;//当前发送的个数
     private int manyAllConten = 0;//总包数
@@ -84,25 +86,29 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
     private int MULTI_PACKAGE_MIN_COUNT = 10;//多包发送时最小的包个数
     private int DATA_MAX_SIZE = 1024;// 数据最大长度
     private int TIMEOUT = 3;//丢包时发送次数
-    private byte[] backData = new byte[100];
     private String PROGRAME_ROOT = Environment
             .getExternalStorageDirectory()
             .getAbsolutePath() + "/EQPrograme/";
-    private int indexdata = 0;
-    private int errorbig = -1;//那一大包
-    private int errorsimall = -1;//那个小包
     private int alllen; //数据包总长度
     private int countOrAdress = 0;
     private int manyStratIndex = 0;//多包发送的起始位置
     private int endLeng = 0;//最后一小包的长度
     private int EORRE_COUNT = 1;//错误次数
-//    private ExecutorService cachedThreadPool = Executors.newCachedThreadPool();//线程池
     private int resourcesIndex = 0;
-    private ExecutorService fixedThreadPool = Executors.newFixedThreadPool(3);
+    private ExecutorService fixedThreadPool = Executors.newFixedThreadPool(10);
     private DhcpInfo dhcpInfo;
     public static String IP;
     public static DatagramSocket dataSocket = null;
     private byte[] buffer;
+    private int fileSzie = 0;
+    public static int PORT = 5050;  // 端口
+    public static String HOSTAddress = null;    // 主机地址
+    //        public static String HOSTAddress = "192.168.2.206";    // 主机地址
+    private DatagramPacket dataPacket = null;
+    private DatagramSocket sendSocket = null;
+    private int dataLength = 0;    //在当前类，竟然还要传个空值过来
+    private InetAddress local;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,7 +133,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 FragmentTransaction transaction = mFragmentManager.beginTransaction();
-                Fragment fragment = FragmentFactory.getInstanceByIndex(checkedId,MainActivity.this);
+                Fragment fragment = FragmentFactory.getInstanceByIndex(checkedId, MainActivity.this);
                 transaction.replace(R.id.fragment, fragment);
                 transaction.commit();
             }
@@ -138,7 +144,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
     @Override
     protected void onStart() {
         super.onStart();
-       RadioButton rb = (RadioButton) radioGroup.getChildAt(0);
+        RadioButton rb = (RadioButton) radioGroup.getChildAt(0);
         rb.setChecked(true);
     }
 
@@ -183,7 +189,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                             byte[] proBytes = SendPacket.prepareSendDataPkg(xmlData, 0);
                             cutXml.add(proBytes);
                         }
-                        ccc = new ConnectControlCard(MainActivity.this,cutXml, new InterfaceConnect() {
+                        ccc = new ConnectControlCard(MainActivity.this, cutXml, new InterfaceConnect() {
                             @Override
                             public void success(byte[] result) {
                                 start = 0;
@@ -223,7 +229,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     List<byte[]> sendEnd = new ArrayList<byte[]>();
                     byte[] managerSend = SendPacket.pkgHeadend();
                     sendEnd.add(managerSend);
-                    ccc = new ConnectControlCard(MainActivity.this,sendEnd, new InterfaceConnect() {
+                    ccc = new ConnectControlCard(MainActivity.this, sendEnd, new InterfaceConnect() {
                         @Override
                         public void success(byte[] result) {
                             if (start == 0) {
@@ -242,6 +248,11 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                                 Log.d("....", "countAdress" + countAdress);
                                 Log.d("....", "AllSize" + AllSize);
                                 if (countAdress == AllSize) {
+                                    try {
+                                        ism.close();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
                                     Log.d("....", "imageAllSize11111" + imageAllSize);
                                     Log.d("....", "resourcesIndex2222222" + resourcesIndex);
                                     if (resourcesIndex == imageAllSize - 1) {
@@ -283,7 +294,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     Log.d(".........", "aa..............." + aa);
                     Log.d(".........", "bytes.length..............." + bytes.length);
                     controlData.add(controlCard2);
-                    ccc = new ConnectControlCard(MainActivity.this,controlData, new InterfaceConnect() {
+                    ccc = new ConnectControlCard(MainActivity.this, controlData, new InterfaceConnect() {
                         @Override
                         public void success(byte[] result) {
                             countOrAdress = 0;
@@ -294,9 +305,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                             sendConten = 0;
                             start = 3;
                             handler.sendEmptyMessage(6);
-                            isSuee = true;
                         }
-
                         @Override
                         public void failure(int stateCode) {
                             handler.sendEmptyMessage(1);
@@ -313,7 +322,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     List<byte[]> programeData = new ArrayList<byte[]>();
                     byte[] endSend = SendPacket.pkgPingend();
                     programeData.add(endSend);
-                    ccc = new ConnectControlCard(MainActivity.this,programeData, new InterfaceConnect() {
+                    ccc = new ConnectControlCard(MainActivity.this, programeData, new InterfaceConnect() {
                         @Override
                         public void success(byte[] result) {
                             start = 4;
@@ -340,12 +349,14 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     String pathData = progrmae.get(resourcesIndex + 1);
                     File files = new File(pathData);
                     try {
-                        FileInputStream ism = new FileInputStream(files);
-                        buffer = new byte[ism.available()];
-                        ism.read(buffer);
-                        alllen = buffer.length;//总长度
+                        if (ism != null) {
+                            ism.close();
+                        }
+                        ism = new RandomAccessFile(files, "r");
+                        allFileSize = (int) ism.length();
+                        alllen = allFileSize;//总长度
                         count = alllen / DATA_MAX_SIZE;//总包以50包为单位可以分多少个
-                        Log.d("...", "COUNT...." + count);
+                        Log.d("...", "alllen...." + alllen);
                         if (alllen % DATA_MAX_SIZE > 0) {
                             count += 1;
                             endLeng = alllen % DATA_MAX_SIZE;
@@ -365,7 +376,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                             countAdress = (countOrAdress + 1) * MULTI_PACKAGE_MAX_COUNT;
                             manyStratIndex = countAdress * DATA_MAX_SIZE;//每包起始位置长度
                             manyData.add(manySendStart);
-                            ccc = new ConnectControlCard(MainActivity.this,manyData, new InterfaceConnect() {
+                            ccc = new ConnectControlCard(MainActivity.this, manyData, new InterfaceConnect() {
                                 @Override
                                 public void success(byte[] result) {
                                     String results = SendPacket.byte2hex(result);
@@ -394,9 +405,10 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                                 String many = SendPacket.byte2hex(manySendStart);
                                 Log.d("最后一包当前位置", "many....." + many);
                                 manyData.add(manySendStart);
-                                ccc = new ConnectControlCard(MainActivity.this,manyData, new InterfaceConnect() {
+                                ccc = new ConnectControlCard(MainActivity.this, manyData, new InterfaceConnect() {
                                     @Override
                                     public void success(byte[] result) {
+                                        start = 6;
                                         handler.sendEmptyMessage(7);
                                     }
 
@@ -415,18 +427,22 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                             }
                         } else {
                             byte[] list = new byte[DATA_MAX_SIZE];
-                            System.arraycopy(buffer, alllen - endLeng, list, 0, alllen % DATA_MAX_SIZE);
+                            try {
+                                ism.seek(alllen - endLeng);
+                                ism.read(list, 0, endLeng);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                             Log.d("......", "countAdress1111111111:" + countAdress);
                             arrays = new ArrayList<byte[]>();
                             arrays.add(list);
-                            countAdress++;
                             List<byte[]> simallData = new ArrayList<byte[]>();
                             for (int i = 0; i < arrays.size(); i++) {
                                 byte[] arrData = arrays.get(i);
                                 byte[] iangeData = SendPacket.prepareSendDataPkg(arrData, i);
                                 simallData.add(iangeData);
                             }
-                            ccc = new ConnectControlCard(MainActivity.this,simallData, new InterfaceConnect() {
+                            ccc = new ConnectControlCard(MainActivity.this, simallData, new InterfaceConnect() {
                                 @Override
                                 public void success(byte[] result) {
                                     String results = SendPacket.byte2hex(result);
@@ -446,6 +462,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                                 }
                             });
                             fixedThreadPool.execute(ccc);
+                            countAdress++;
                         }
 
                     } catch (FileNotFoundException e) {
@@ -457,79 +474,84 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     break;
 
                 case 7:
-                    Log.d("...", "countOrAdress.jjjj.." + countOrAdress);
-                    if (countOrAdress < manyAllConten - 2) {
-                        for (int j = 0; j < MULTI_PACKAGE_MAX_COUNT; j++) {
-                            byte[] list = new byte[DATA_MAX_SIZE];
-                                    System.arraycopy(buffer, (countOrAdress * MULTI_PACKAGE_MAX_COUNT + j) * DATA_MAX_SIZE, list, 0, DATA_MAX_SIZE);
-                            arrays.add(list);
-                        }
-                        Log.d(".....", "arrays....." + arrays.size());
-                        List<byte[]> manySnedBig = new ArrayList<byte[]>();
-                        for (int i = 0; i < arrays.size(); i++) {
-                            errorsimall = i;
-                            byte[] arrData = arrays.get(i);
-                            byte[] manyIangeData = SendPacket.manyData(arrData, i);
-                            String ss = SendPacket.byte2hex(manyIangeData);
-                            manySnedBig.add(manyIangeData);
-                        }
-                        ccc = new ConnectControlCard(MainActivity.this,manySnedBig, new InterfaceConnect() {
-                            @Override
-                            public void success(byte[] result) {
-
-                            }
-
-                            @Override
-                            public void failure(int stateCode) {
-
-                            }
-
-                            @Override
-                            public void dataSuccess(String str) {
-                                start = 7;
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("...", "countOrAdress.jjjj.." + countOrAdress);
+                            if (countOrAdress < manyAllConten - 2) {
+                                byte[] list = new byte[DATA_MAX_SIZE * MULTI_PACKAGE_MAX_COUNT];
+                                byte[] manyIangeData = new byte[DATA_MAX_SIZE + 14];
+                                manyIangeData[0] = (byte) 0xF6;
+                                manyIangeData[1] = (byte) 0x5A;
+                                manyIangeData[2] = (byte) ((1038 >> 0) & 0xFF);
+                                manyIangeData[3] = (byte) ((1038 >> 8) & 0xFF);
+                                manyIangeData[4] = (byte) 0xA5;
+                                manyIangeData[5] = (byte) 0xF0;
+                                manyIangeData[6] = (byte) 0x07;
+                                manyIangeData[7] = (byte) 0x02;
+                                manyIangeData[1024 + 10] = (byte) 0x00;
+                                manyIangeData[1024 + 11] = (byte) 0x00;
+                                manyIangeData[1024 + 12] = (byte) 0x5A;
+                                manyIangeData[1024 + 13] = (byte) 0xF6;
+                                try {
+                                    ism.seek((countOrAdress * MULTI_PACKAGE_MAX_COUNT) * DATA_MAX_SIZE);
+                                    ism.read(list, 0, DATA_MAX_SIZE * MULTI_PACKAGE_MAX_COUNT);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                for (int i = 0; i < MULTI_PACKAGE_MAX_COUNT; i++) {
+                                    System.arraycopy(list, i * DATA_MAX_SIZE, manyIangeData, 8, DATA_MAX_SIZE);
+                                    manyIangeData[1024 + 8] = (byte) ((i >> 0) & 0xFF);
+                                    manyIangeData[1024 + 9] = (byte) ((i >> 8) & 0xFF);
+                                    dataPacket = new DatagramPacket(manyIangeData, manyIangeData.length, local, PORT);
+                                    try {
+                                        sendSocket.send(dataPacket);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                                 handler.sendEmptyMessage(8);
-                            }
-                        });
-                        fixedThreadPool.execute(ccc);
-                        Log.d("....", "countAdress当前长度。。。。。：" + countAdress);
-                    } else {
-                        if (1 < sendConten) {
-                            for (int j = 0; j < sendConten; j++) {
-                                byte[] list = new byte[DATA_MAX_SIZE];
-                                System.arraycopy(buffer, (countOrAdress * MULTI_PACKAGE_MAX_COUNT + j) * DATA_MAX_SIZE, list, 0, DATA_MAX_SIZE);
-                                arrays.add(list);
-                            }
-                            Log.d("....", "countAdress当前长度。。。。。：" + countAdress + "countAdress当前长度。。。。。：" + (AllSize - countAdress));
-                            countAdress = countAdress + sendLeng;
-                            Log.d(".....", "arrays2....." + arrays.size());
-                            List<byte[]> manySnedBig = new ArrayList<byte[]>();
-                            for (int i = 0; i < arrays.size(); i++) {
-                                errorsimall = i;
-                                byte[] arrData = arrays.get(i);
-                                byte[] manyIangeData = SendPacket.manyData(arrData, i);
-                                String ss = SendPacket.byte2hex(manyIangeData);
-                                manySnedBig.add(manyIangeData);
-                            }
-                            ccc = new ConnectControlCard(MainActivity.this,manySnedBig, new InterfaceConnect() {
+                            } else {
+                                if (1 <= sendConten) {
+                                    byte[] list = new byte[DATA_MAX_SIZE * MULTI_PACKAGE_MAX_COUNT];
+                                    byte[] manyIangeData = new byte[DATA_MAX_SIZE + 14];
+                                    manyIangeData[0] = (byte) 0xF6;
+                                    manyIangeData[1] = (byte) 0x5A;
+                                    manyIangeData[2] = (byte) ((1038 >> 0) & 0xFF);
+                                    manyIangeData[3] = (byte) ((1038 >> 8) & 0xFF);
+                                    manyIangeData[4] = (byte) 0xA5;
+                                    manyIangeData[5] = (byte) 0xF0;
+                                    manyIangeData[6] = (byte) 0x07;
+                                    manyIangeData[7] = (byte) 0x02;
+                                    manyIangeData[1024 + 10] = (byte) 0x00;
+                                    manyIangeData[1024 + 11] = (byte) 0x00;
+                                    manyIangeData[1024 + 12] = (byte) 0x5A;
+                                    manyIangeData[1024 + 13] = (byte) 0xF6;
+                                    try {
+                                        ism.seek((countOrAdress * MULTI_PACKAGE_MAX_COUNT) * DATA_MAX_SIZE);
+                                        ism.read(list, 0, DATA_MAX_SIZE * sendConten);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                    countAdress = countAdress + sendConten;
+                                    for (int i = 0; i < sendConten; i++) {
+                                        System.arraycopy(list, i * DATA_MAX_SIZE, manyIangeData, 8, DATA_MAX_SIZE);
+                                        manyIangeData[1024 + 8] = (byte) ((i >> 0) & 0xFF);
+                                        manyIangeData[1024 + 9] = (byte) ((i >> 8) & 0xFF);
+                                        dataPacket = new DatagramPacket(manyIangeData, manyIangeData.length, local, PORT);
+                                        try {
+                                            sendSocket.send(dataPacket);
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
 
-                                @Override
-                                public void success(byte[] result) {
-                                }
-
-                                @Override
-                                public void failure(int stateCode) {
-
-                                }
-
-                                @Override
-                                public void dataSuccess(String str) {
                                     handler.sendEmptyMessage(8);
                                 }
-                            });
-                            fixedThreadPool.execute(ccc);
+                            }
+                            countOrAdress++;
                         }
-                    }
-                    countOrAdress++;
+                    }).start();
                     break;
                 case 8:
                     List<byte[]> manySnedEnd = new ArrayList<byte[]>();
@@ -549,9 +571,10 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
             super.handleMessage(msg);
         }
     };
+
     //接受错误回报
     public void erro(List<byte[]> bytes, final int erroData) {
-        ccc = new ConnectControlCard(MainActivity.this,bytes, new InterfaceConnect() {
+        ccc = new ConnectControlCard(MainActivity.this, bytes, new InterfaceConnect() {
             @Override
             public void success(byte[] result) {
                 String come = SendPacket.byte2hex(result);
@@ -596,38 +619,51 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
      */
     public void Sendprogram() {
         getImageName();
-        if (progrmae.size() > 0){
-        List<byte[]> manySnedStart = new ArrayList<byte[]>();
-        proDialog = android.app.ProgressDialog.show(this, null,
-                getResources().getString(R.string.program_sending));
-        byte[] controlCard = SendPacket.pkgHeadInterface();
-        manySnedStart.add(controlCard);
-        ccc = new ConnectControlCard(MainActivity.this,manySnedStart, new InterfaceConnect() {
-            @Override
-            public void success(byte[] result) {
-                try {
-                    Thread.sleep(1000);
-                    handler.sendEmptyMessage(0);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+        List<Areabean> areabeans = new AreabeanDao(this).getListAll();
+        Areabean areabean = areabeans.get(0);
+        HOSTAddress = areabean.getEquitTp();
+        try {
+            local = InetAddress.getByName(HOSTAddress);
+            try {
+                sendSocket = new DatagramSocket();
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        if (progrmae.size() > 0) {
+            List<byte[]> manySnedStart = new ArrayList<byte[]>();
+            proDialog = android.app.ProgressDialog.show(this, null,
+                    getResources().getString(R.string.program_sending));
+            byte[] controlCard = SendPacket.pkgHeadInterface();
+            manySnedStart.add(controlCard);
+            ccc = new ConnectControlCard(MainActivity.this, manySnedStart, new InterfaceConnect() {
+                @Override
+                public void success(byte[] result) {
+                    try {
+                        Thread.sleep(1000);
+                        handler.sendEmptyMessage(0);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
                 }
 
-            }
+                @Override
+                public void failure(int stateCode) {
+                    start = 1;
+                    handler.sendEmptyMessage(1);
+                }
 
-            @Override
-            public void failure(int stateCode) {
-                start = 1;
-                handler.sendEmptyMessage(1);
-            }
+                @Override
+                public void dataSuccess(String str) {
 
-            @Override
-            public void dataSuccess(String str) {
-
-            }
-        });
+                }
+            });
             fixedThreadPool.execute(ccc);
-        }else {
-            Toast.makeText(this,"当前节目内容为空!",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "当前节目内容为空!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -669,6 +705,25 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
 
     }
 
+    /**
+     * 获取指定文件大小
+     *
+     * @param
+     * @return
+     * @throws Exception
+     */
+    private static long getFileSize(File file) throws Exception {
+        long size = 0;
+        if (file.exists()) {
+            FileInputStream fis = null;
+            fis = new FileInputStream(file);
+            size = fis.available();
+        } else {
+            file.createNewFile();
+            Log.e("获取文件大小", "文件不存在!");
+        }
+        return size;
+    }
 
     public View getPopWindowListView() {
         List<Areabean> areabeens = new ArrayList<Areabean>();
@@ -765,6 +820,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                 break;
         }
     }
+
     //转换成DNS格式
     private String intToIp(int paramInt) {
         return (paramInt & 0xFF) + "." + (0xFF & paramInt >> 8) + "." + (0xFF & paramInt >> 16) + "."
