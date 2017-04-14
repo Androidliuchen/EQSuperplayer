@@ -4,11 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="-2dp"
     tools:context="com.eq.EQSuperPlayer.activity.WelcomeActivity">
 <ImageView
     android:id="@+id/ima_wel"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:scaleType="centerCrop"
+    android:scaleType="fitXY"
+    android:layout_marginRight="-10dp"
+    android:layout_marginLeft="-10dp"
+    android:layout_marginTop="-10dp"
+    android:layout_marginBottom="-10dp"
     android:src="@drawable/welcome_itme"/>
 </RelativeLayout>

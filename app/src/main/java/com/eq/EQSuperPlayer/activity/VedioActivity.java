@@ -164,10 +164,17 @@ public class VedioActivity extends AppCompatActivity {
         if (resultCode == Activity.RESULT_OK && requestCode == VIDEO_CAPTURE1) {
             String fileVedioPath = Environment.getExternalStorageDirectory().toString() + File.separator
                     + "EQVedio/" +  System.currentTimeMillis() + ".mp4";
-            File file1 = new File(fileVedioPath);
+           final File file1 = new File(fileVedioPath);
             Uri uri = data.getData();
-            File file = getFileByUri(uri);
-            FileUtils.copyfile(file, file1,true );
+           final File file = getFileByUri(uri);
+            new Thread(){
+                @Override
+                public void run() {
+                    super.run();
+                    FileUtils.copyfile(file, file1,true );
+                }
+            }.start();
+
             MediaMetadataRetriever mmr = new MediaMetadataRetriever();//实例化MediaMetadataRetriever对象
             mmr.setDataSource(file.getAbsolutePath());
             bitmap = mmr.getFrameAtTime();//获得视频第一帧的Bitmap对象
