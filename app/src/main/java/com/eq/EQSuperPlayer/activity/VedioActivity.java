@@ -30,17 +30,12 @@ import com.eq.EQSuperPlayer.bean.VedioBean;
 import com.eq.EQSuperPlayer.custom.Constant;
 import com.eq.EQSuperPlayer.dao.AreabeanDao;
 import com.eq.EQSuperPlayer.dao.ProgramBeanDao;
-import com.eq.EQSuperPlayer.dao.TextBeanDao;
 import com.eq.EQSuperPlayer.dao.VedioDao;
 import com.eq.EQSuperPlayer.utils.FileUtils;
 import com.eq.EQSuperPlayer.utils.TimeChange;
 import com.eq.EQSuperPlayer.utils.WindowSizeManager;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 import butterknife.BindView;

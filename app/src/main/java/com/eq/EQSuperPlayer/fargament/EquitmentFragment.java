@@ -1,6 +1,5 @@
 package com.eq.EQSuperPlayer.fargament;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,10 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.eq.EQSuperPlayer.R;
 import com.eq.EQSuperPlayer.adapter.EquitAdapter;
-import com.eq.EQSuperPlayer.adapter.ProgramAdapter;
 import com.eq.EQSuperPlayer.bean.Areabean;
 import com.eq.EQSuperPlayer.communication.FindScreenThread;
 import com.eq.EQSuperPlayer.communication.InterfaceConnect;
@@ -29,6 +28,14 @@ public class EquitmentFragment extends Fragment {
     public static boolean indexChang = false;
     private Handler mHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
+            switch (msg.what){
+                case 0:
+                    Toast.makeText(getActivity(),"搜索设备失败",Toast.LENGTH_SHORT).show();
+                    break;
+                case 1:
+                    Toast.makeText(getActivity(),"搜索设备成功",Toast.LENGTH_SHORT).show();
+                    break;
+            }
             equitAdapter = new EquitAdapter(getActivity(), areabeans);
             mListView.setAdapter(equitAdapter);
             proDialog.dismiss();
@@ -50,12 +57,16 @@ public class EquitmentFragment extends Fragment {
                 } else {
                     indexChang = true;
                     areabeans.add(areabeanList.get(0));
-                    mHandler.sendEmptyMessage(0);
+                    mHandler.sendEmptyMessage(1);
                 }
             }
 
             @Override
             public void failure(int stateCode) {
+                if (stateCode == 1){
+                    indexChang = false;
+                    mHandler.sendEmptyMessage(0);
+                }
 
             }
 

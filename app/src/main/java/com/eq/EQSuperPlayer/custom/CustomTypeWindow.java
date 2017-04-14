@@ -60,6 +60,7 @@ public class CustomTypeWindow extends PopupWindow {
         this.setAnimationStyle(R.style.AnimationPreview);
     }
 
+
     /**
      * 设置添加屏幕的背景透明度
      *
@@ -68,7 +69,9 @@ public class CustomTypeWindow extends PopupWindow {
     public void backgroundAlpha(float bgAlpha) {
         WindowManager.LayoutParams lp = at.getWindow().getAttributes();
         lp.alpha = bgAlpha; //0.0-1.0
+        at.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         at.getWindow().setAttributes(lp);
+
     }
     /**
      * 显示popupWindow

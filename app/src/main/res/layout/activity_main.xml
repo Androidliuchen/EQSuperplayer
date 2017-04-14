@@ -37,7 +37,9 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/alertTitle"
-        android:layout_weight="1"></FrameLayout>
+        android:layout_weight="1">
+
+    </FrameLayout>
 
     <RadioGroup
         android:id="@+id/radioGroup"

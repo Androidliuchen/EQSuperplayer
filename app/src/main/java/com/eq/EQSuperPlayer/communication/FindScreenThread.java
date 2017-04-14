@@ -2,9 +2,8 @@ package com.eq.EQSuperPlayer.communication;
 
 import android.content.Context;
 import android.util.Log;
-import com.eq.EQSuperPlayer.activity.MainActivity;
+
 import com.eq.EQSuperPlayer.bean.Areabean;
-import com.eq.EQSuperPlayer.custom.Constant;
 import com.eq.EQSuperPlayer.dao.AreabeanDao;
 import com.eq.EQSuperPlayer.utils.WindowSizeManager;
 
@@ -29,6 +28,7 @@ public class FindScreenThread implements Runnable {
     private InterfaceConnect interfaceConnect = null;
     private boolean flag = true;
     public static String scrennIP;
+    private int screenNum = 0;
 
     public FindScreenThread(InterfaceConnect interfaceConnect, Context context) {
         super();
@@ -53,21 +53,27 @@ public class FindScreenThread implements Runnable {
             while (flag) {
                 try {
                     System.out.println("address : +要开始接收");
-                    dataSocket.setSoTimeout(5000);
+                    dataSocket.setSoTimeout(3000);
                     dataSocket.receive(inPacket);
                     byte[] data = inPacket.getData();
                     String s1 = SendPacket.byte2hex(data);
-                    Log.d("S1.......",s1+"");
-                    if (!s1.startsWith("f75b")){
-                        findScreenInfo(s1,inPacket.getAddress().toString().substring(1));
+                    Log.d("S1.......", s1 + "");
+                    if (!s1.startsWith("f75b")) {
+                        screenNum++;
+                        findScreenInfo(s1, inPacket.getAddress().toString().substring(1));
                     }
 
                 } catch (IOException e) {
                     System.out.println("address : +接收异常");
                     if (interfaceConnect != null) {
-                        interfaceConnect.success(buffer);
+                        if (screenNum > 0) {
+                            interfaceConnect.success(buffer);
+                        } else {
+                            interfaceConnect.failure(1);
+                        }
                     }
-                    flag=false;
+                    screenNum = 0;
+                    flag = false;
                     e.printStackTrace();
                 }
             }
@@ -85,58 +91,59 @@ public class FindScreenThread implements Runnable {
 
 
     }
-    public void findScreenInfo(String str,String ip){
+
+    public void findScreenInfo(String str, String ip) {
         List<Areabean> areabeans = new AreabeanDao(context).getListAll();
         Areabean areabean;
-        if (areabeans.size()<= 0){
+        if (areabeans.size() <= 0) {
             areabean = new Areabean();
-        }else {
+        } else {
             areabean = areabeans.get(0);
         }
         //获取端口起始11
         StringBuffer strPort = new StringBuffer();
         for (int i = 1; i <= 4; i++) {
-            strPort.append(str.substring(30-i*2,30-(i-1)*2));
+            strPort.append(str.substring(30 - i * 2, 30 - (i - 1) * 2));
 
         }
-        int port = Integer.parseInt(strPort.toString(),16);
-        areabean.setEquitProt(port +"");
+        int port = Integer.parseInt(strPort.toString(), 16);
+        areabean.setEquitProt(port + "");
         areabean.setEquitTp(ip);
         scrennIP = ip;
 
         //获取宽度
         StringBuffer strWidth = new StringBuffer();
         for (int i = 1; i <= 2; i++) {
-            strWidth.append(str.substring(12-i*2,12-(i-1)*2));
+            strWidth.append(str.substring(12 - i * 2, 12 - (i - 1) * 2));
 
         }
-        int width = Integer.parseInt(strWidth.toString(),16);
+        int width = Integer.parseInt(strWidth.toString(), 16);
         areabean.setWindowWidth(width);
         //获取高度
         StringBuffer strHeight = new StringBuffer();
         for (int i = 1; i <= 2; i++) {
-            strHeight.append(str.substring(16-i*2,16-(i-1)*2));
+            strHeight.append(str.substring(16 - i * 2, 16 - (i - 1) * 2));
         }
-        int height = Integer.parseInt(strHeight.toString(),16);
+        int height = Integer.parseInt(strHeight.toString(), 16);
         areabean.setWindowHeight(height);
         //获取型号
-        String model = str.substring(17,18)+str.substring(16,17);
+        String model = str.substring(17, 18) + str.substring(16, 17);
         areabean.setEquitType(model);
         //获取亮度
-        int brightness = Integer.parseInt(str.substring(186*2,187*2),16);
+        int brightness = Integer.parseInt(str.substring(186 * 2, 187 * 2), 16);
         //节目套数
-        int num = Integer.parseInt(str.substring(500,502),16);
+        int num = Integer.parseInt(str.substring(500, 502), 16);
         //屏幕名称
-        String ScreenName = SendPacket.hexString2String(str.substring(36*2,(36+7)*2));
+        String ScreenName = SendPacket.hexString2String(str.substring(36 * 2, (36 + 7) * 2));
         areabean.setName(ScreenName);
-        if (areabeans.size() <= 0){
+        if (areabeans.size() <= 0) {
             new AreabeanDao(context).add(areabean);
-        }else {
+        } else {
             new AreabeanDao(context).update(areabean);
         }
-        WindowSizeManager.setSharedPreference(context, width , height);
-        System.out.println("address :"+ip+" port:"+port+" width:"+width+" height:"+height+" model:"+model +" brightness:"+brightness+" num:"+num);
-        System.out.println("address ScreenName:"+ScreenName);
+        WindowSizeManager.setSharedPreference(context, width, height);
+        System.out.println("address :" + ip + " port:" + port + " width:" + width + " height:" + height + " model:" + model + " brightness:" + brightness + " num:" + num);
+        System.out.println("address ScreenName:" + ScreenName);
     }
 }
 

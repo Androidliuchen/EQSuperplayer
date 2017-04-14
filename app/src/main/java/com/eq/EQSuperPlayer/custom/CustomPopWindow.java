@@ -67,6 +67,7 @@ public class CustomPopWindow extends PopupWindow {
         WindowManager.LayoutParams lp = at.getWindow().getAttributes();
         at.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         lp.alpha = bgAlpha; //0.0-1.0
+        at.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         at.getWindow().setAttributes(lp);
     }
     /**

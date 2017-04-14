@@ -1,16 +1,13 @@
 package com.eq.EQSuperPlayer.SlidingMenuActivity;
 
-import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 
 import com.eq.EQSuperPlayer.R;
-import com.eq.EQSuperPlayer.activity.MainActivity;
 import com.eq.EQSuperPlayer.utils.LanguageUtil;
 
 import java.util.Locale;

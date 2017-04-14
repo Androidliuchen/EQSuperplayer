@@ -5,11 +5,9 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
@@ -20,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -43,9 +40,7 @@ import com.eq.EQSuperPlayer.bean.TextBean;
 import com.eq.EQSuperPlayer.bean.TimeBean;
 import com.eq.EQSuperPlayer.bean.TotalBean;
 import com.eq.EQSuperPlayer.bean.VedioBean;
-import com.eq.EQSuperPlayer.communication.ConnectControlCard;
 import com.eq.EQSuperPlayer.custom.Constant;
-import com.eq.EQSuperPlayer.custom.CustomPopWindow;
 import com.eq.EQSuperPlayer.custom.CustomTypeWindow;
 import com.eq.EQSuperPlayer.custom.ProgramePopWindow;
 import com.eq.EQSuperPlayer.dao.AreabeanDao;
@@ -122,6 +117,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
     int mode = NONE;
     private int program_name_count;
     private int zoneIndex = 0;
+    private boolean isScale=false;
 
     private MyOnTouchListener listener;
 
@@ -159,7 +155,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         //手势缩放监听事件，有些瑕疵，有待完善
         text_layout.setOnTouchListener(listener);
         //节目区手势监听
-//        text_ima.setOnTouchListener(listener);
         region_btn = (Button) findViewById(R.id.region);
         send_btn = (Button) findViewById(R.id.region_send);
         out_image.setOnClickListener(this);
@@ -198,7 +193,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         totalBeens.clear();
         mDatas.clear();
         text_layout.removeAllViews();
-        int num = 0;
         //查询是否有视频
         ForeignCollection<VedioBean> vedio = programBean.getVedioBeen();
         if (vedio != null) {
@@ -230,7 +224,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             }
         }
         //查询是否文本内容
-        num = 10;
         ForeignCollection<TextBean> text = programBean.getTextBeen();
         if (text != null) {
             CloseableIterator<TextBean> iterator1 = text.closeableIterator();
@@ -248,7 +241,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 Log.d("..............", "查询设备所有节目内容:" + textBean.toString());
                 totalBeens.add(textBean);
                 showText();
-                num++;
             }
         }
 
@@ -328,7 +320,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         textview.setWidth(textBean.getWidth());
         textview.setHeight(textBean.getHeidht());
         textview.setBackgroundColor(0x0000);
-//        textview.setId(num);
         textview.setBackgroundResource(R.drawable.bodler_shape);
         text_layout.addView(textview);
 
@@ -353,10 +344,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         ll.width = windowWidth;
         ll.height = windowHeight;
         mImagelayout.setLayoutParams(ll);
-
-
-        mImagelayout.setOnTouchListener(listener);
-
         ViewFlipper flipler = (ViewFlipper) view.findViewById(R.id.image_flipler);
 
         flipler.setOnTouchListener(listener);
@@ -418,6 +405,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             vv.setVideoPath(file1.getPath());
             // 开始播放
             vv.start();
+
             vv.setOnTouchListener(listener);
 
             //监听视频播放完的后循环播放
@@ -479,6 +467,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                                             Log.d("..............", "totalBeens...........:" + totalBeens);
                                             dialog.dismiss();
                                             recyclerViewAdapter.notifyDataSetChanged();
+                                            recyclerViewAdapter.notifyDataSetInvalidated();
                                         } else if (which == 1) {
                                             VedioBean vedioBean = new VedioBean();
                                             vedioBean.setProgramBean(programBean);
@@ -492,6 +481,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                                             totalBeens.add(vedioBean);
                                             dialog.dismiss();
                                             recyclerViewAdapter.notifyDataSetChanged();
+                                            recyclerViewAdapter.notifyDataSetInvalidated();
 
                                         } else if (which == 2) {
                                             ImageBean imageBean = new ImageBean();
@@ -503,6 +493,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                                             imageBeans.add(imageBean);
                                             mDatas.add(getString(R.string.image));
                                             recyclerViewAdapter.notifyDataSetChanged();
+                                            recyclerViewAdapter.notifyDataSetInvalidated();
                                             totalBeens.add(imageBean);
                                         } else if (which == 3) {
                                             TimeBean timeBean = new TimeBean();
@@ -514,6 +505,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                                             totalBeens.add(timeBean);
                                             dialog.dismiss();
                                             recyclerViewAdapter.notifyDataSetChanged();
+                                            recyclerViewAdapter.notifyDataSetInvalidated();
                                         }
                                     }
                                 });
@@ -537,12 +529,14 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                             + "textImage";
                     FileUtils.deleteDir(fileTextPath);
                     recyclerViewAdapter.notifyDataSetChanged();
+                    recyclerViewAdapter.notifyDataSetInvalidated();
                 } else if (timeBean == totalBeens.get(position)) {
                     mDatas.remove(position);
                     totalBeens.remove(position);
                     new TimeDao(ProgramActivity.this).delete(timeBean);
                     programListView.slideBack();
                     recyclerViewAdapter.notifyDataSetChanged();
+                    recyclerViewAdapter.notifyDataSetInvalidated();
                 } else if (imageBean == totalBeens.get(position)) {
                     mDatas.remove(position);
                     totalBeens.remove(position);
@@ -552,6 +546,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                             + "EQImage";
                     FileUtils.deleteDir(fileTextPath);
                     recyclerViewAdapter.notifyDataSetChanged();
+                    recyclerViewAdapter.notifyDataSetInvalidated();
                 } else if (vedioBean == totalBeens.get(position)) {
                     mDatas.remove(position);
                     totalBeens.remove(position);
@@ -561,6 +556,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                             + "EQVedio";
                     FileUtils.deleteDir(fileTextPath);
                     recyclerViewAdapter.notifyDataSetChanged();
+                    recyclerViewAdapter.notifyDataSetInvalidated();
                 }
                 //获取当前显示的节目单，进行删除后刷新显示区
                 ProgramBean programBean = (ProgramBean) tableBeens.get(program_itme);
@@ -569,6 +565,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         });
         programListView.setAdapter(recyclerViewAdapter);
         recyclerViewAdapter.notifyDataSetChanged();
+        recyclerViewAdapter.notifyDataSetInvalidated();
 
         programListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -617,6 +614,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             }
         });
         recyclerViewAdapter.notifyDataSetChanged();
+        recyclerViewAdapter.notifyDataSetInvalidated();
         return view;
     }
 
@@ -663,10 +661,12 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                     FileUtils.deleteDir(fileAll.getPath());
                 }
                 textAdapter.notifyDataSetChanged();
+                textAdapter.notifyDataSetInvalidated();
             }
         });
         regionListView.setAdapter(textAdapter);
         textAdapter.notifyDataSetChanged();
+        textAdapter.notifyDataSetInvalidated();
         //选中的节目itme， selet为选中itme的id，program_itme为选中的那个itme
         regionListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -694,6 +694,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 tableBeens.add(programBean);
                 new ProgramBeanDao(ProgramActivity.this).add(programBean);
                 textAdapter.notifyDataSetChanged();
+                textAdapter.notifyDataSetInvalidated();
             }
         });
         return view;
@@ -747,7 +748,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             containerHeight = relt.getWidth();
         }
     }
-
     class MyOnTouchListener implements View.OnTouchListener {
 
         @Override
@@ -755,6 +755,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             switch (event.getAction() & MotionEvent.ACTION_MASK) {
                 //进入拖拽模式
                 case MotionEvent.ACTION_DOWN:
+                    System.out.println("uuuu"+v.getMeasuredWidth());
                     mode = DRAG;
                     lastX_drag = event.getRawX();
                     lastY_drag = event.getRawY();
@@ -824,6 +825,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 nextY = windowHeight - v.getHeight();
             }
             AnimatorUtils.translate(v, v.getX(), v.getY(), nextX, nextY);
+            v.setX(v.getX()+nextX);
             lastX_drag = event.getRawX();
             lastY_drag = event.getRawY();
         }

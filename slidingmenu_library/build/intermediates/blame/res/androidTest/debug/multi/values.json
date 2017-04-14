@@ -1,6 +1,6 @@
 [
     {
-        "outputFile": "D:\\work\\EQSuperplayer\\slidingmenu_library\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
+        "outputFile": "F:\\QT\\EQSuperplayer\\slidingmenu_library\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
         "map": [
             {
                 "to": {
@@ -11,7 +11,7 @@
                     "endOffset": 941
                 },
                 "from": {
-                    "file": "D:\\work\\EQSuperplayer\\slidingmenu_library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "file": "F:\\QT\\EQSuperplayer\\slidingmenu_library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 3,
                         "startColumn": 4,

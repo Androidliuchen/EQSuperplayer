@@ -2,7 +2,6 @@ package com.eq.EQSuperPlayer.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 
 /**
