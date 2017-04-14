@@ -58,7 +58,7 @@ public class FindScreenThread implements Runnable {
                     byte[] data = inPacket.getData();
                     String s1 = SendPacket.byte2hex(data);
                     Log.d("S1.......", s1 + "");
-                    if (!s1.startsWith("f75b")) {
+                    if (!s1.startsWith("f75b0a00017000005bf7")) {
                         screenNum++;
                         findScreenInfo(s1, inPacket.getAddress().toString().substring(1));
                     }

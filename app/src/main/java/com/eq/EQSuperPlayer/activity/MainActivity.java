@@ -1,15 +1,14 @@
 package com.eq.EQSuperPlayer.activity;
 
 import android.app.ProgressDialog;
-import android.graphics.Bitmap;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -619,6 +618,10 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
      */
     public void Sendprogram() {
         getImageName();
+        if (sendSocket != null){
+            sendSocket.close();
+            sendSocket = null;
+        }
         List<Areabean> areabeans = new AreabeanDao(this).getListAll();
         Areabean areabean = areabeans.get(0);
         HOSTAddress = areabean.getEquitTp();

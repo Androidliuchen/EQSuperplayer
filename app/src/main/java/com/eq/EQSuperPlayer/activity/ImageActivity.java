@@ -86,6 +86,7 @@ public class ImageActivity extends Activity {
     private PhotoAdapter photoAdapter;
     private List<ProgramBean> programBeens;
     private List<ImagePath> paths = new ArrayList<>();
+    private List<String> pathStr = new ArrayList<>();
     private ImageBean imageBean;
     private ProgramBean programBean;
     private WindowSizeManager windowSizeManager;
@@ -111,11 +112,24 @@ public class ImageActivity extends Activity {
         if (imagePath.getPath() != null) {
             imagePath = new ImagePathDao(this).get(text_id);
             paths.add(imagePath);
+
         }
+        //读取已选择的图片
+        String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                + "EQImage";
+        File file = new File(fileTextPath);
+        if (!file.exists()) {
+            file.mkdir();
+        }
+        File[] files = file.listFiles();
+        for (int i = 0; i < files.length; i++) {
+            pathStr.add(files[i].getPath());
+        }
+
         rvResultPhoto.setLayoutManager(staggeredGridLayoutManager);
         SpacesItemDecoration decoration = new SpacesItemDecoration(8);
         rvResultPhoto.addItemDecoration(decoration);
-        photoAdapter = new PhotoAdapter(this, paths);
+        photoAdapter = new PhotoAdapter(this, pathStr);
         rvResultPhoto.setAdapter(photoAdapter);
         photoAdapter.notifyDataSetChanged();
 
@@ -264,6 +278,7 @@ public class ImageActivity extends Activity {
             List<String> pathList = data.getStringArrayListExtra(ImageSelectorActivity.EXTRA_RESULT);
             Log.v("............", "pathList都有什么..............：" + pathList);
             ArrayList<String> iamgID = new ArrayList<String>();
+            pathStr.clear();
             for (String path : pathList) {
                 Log.i("ImagePathList", path);
                 imagePath.setPath(path);
@@ -271,6 +286,7 @@ public class ImageActivity extends Activity {
                 imagePath.setImageBean(imageBean);
 //                new ImagePathDao(ImageActivity.this).add(imagePath);
                 paths.add(imagePath);
+                pathStr.add(path);
                 Log.d("............", "paths............" + paths);
                 String imageName = path.substring(path.lastIndexOf("/") + 1, path.length());
                 Log.d("............", "imageName............" + imageName);
