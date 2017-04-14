@@ -32,8 +32,6 @@ public class WelcomeActivity extends AppCompatActivity {
                 }
                 Intent intent = new Intent(WelcomeActivity.this,MainActivity.class);
                 startActivity(intent);
-                overridePendingTransition(R.anim.push_left_in,
-                        R.anim.push_left_out);
                 finish();
             }
         }).start();

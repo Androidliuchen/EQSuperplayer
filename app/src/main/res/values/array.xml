@@ -68,6 +68,20 @@
         <item>右覆盖</item>
         <item>上覆盖</item>
         <item>下覆盖</item>
+        <item>左上角覆盖(斜线)</item>
+        <item>右上角覆盖(斜线)</item>
+        <item>左下角覆盖(斜线)</item>
+        <item>右下角覆盖(斜线)</item>
+        <item>左上角覆盖(直线)</item>
+        <item>右上角覆盖(直线)</item>
+        <item>左下角覆盖(直线)</item>
+        <item>右下角覆盖(直线)</item>
+        <item>水平百合</item>
+        <item>垂直百合</item>
+        <item>左右对开</item>
+        <item>上下对开</item>
+        <item>左右闭合</item>
+        <item>上下闭合</item>
         <item>左移</item>
         <item>右移</item>
         <item>上移</item>
@@ -76,12 +90,27 @@
 
     <!--清场特技-->
     <string-array name="cleartrick">
-        <item>不清楚</item>
-        <item>快速显示</item>
+        <item>随机</item>
+        <item>不清除</item>
+        <item>快速清除</item>
         <item>左覆盖</item>
         <item>右覆盖</item>
         <item>上覆盖</item>
         <item>下覆盖</item>
+        <item>左上角覆盖(斜线)</item>
+        <item>右上角覆盖(斜线)</item>
+        <item>左下角覆盖(斜线)</item>
+        <item>右下角覆盖(斜线)</item>
+        <item>左上角覆盖(直线)</item>
+        <item>右上角覆盖(直线)</item>
+        <item>左下角覆盖(直线)</item>
+        <item>右下角覆盖(直线)</item>
+        <item>水平百合</item>
+        <item>垂直百合</item>
+        <item>左右对开</item>
+        <item>上下对开</item>
+        <item>左右闭合</item>
+        <item>上下闭合</item>
         <item>左移</item>
         <item>右移</item>
         <item>上移</item>

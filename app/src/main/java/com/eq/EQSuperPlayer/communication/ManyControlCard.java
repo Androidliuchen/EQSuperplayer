@@ -24,7 +24,7 @@ public class ManyControlCard implements Runnable {
     private static final String TAG = "ConnectControlCard";
     public static int PORT = 5050;  // 端口
     public static String HOSTAddress = null;    // 主机地址
-    //    public static String HOSTAddress = "192.168.2.201";    // 主机地址
+//        public static String HOSTAddress = "192.168.2.206";    // 主机地址
     private DatagramPacket dataPacket = null;
     private DatagramSocket sendSocket = null;
     private int dataLength = 0;    //在当前类，竟然还要传个空值过来
@@ -43,7 +43,6 @@ public class ManyControlCard implements Runnable {
     }
     @Override
     public void run() {
-        Log.d("......", "子线程。。。。。。" + 1);
         Log.d("......", "HOSTAddress。。。。。。" + HOSTAddress);
         InetAddress local = null;
         try {
@@ -59,16 +58,15 @@ public class ManyControlCard implements Runnable {
         try {
             Log.e(TAG, "正在连接服务器...");
             sendSocket = new DatagramSocket();
-            Log.d("......", "PORT。。。。。。" + PORT);
             Log.e(TAG, "正在准备数据...");
             try {
                 for (int i = 0; i < sendByte.size(); i++) {
                     byte[] arrData = sendByte.get(i);
-                    dataLength = SendPacket.bytes2HexString(arrData, arrData.length).toString() == null ? 0 : arrData.length;
-                    dataPacket = new DatagramPacket(arrData, dataLength, local, PORT);
+//                    dataLength = SendPacket.bytes2HexString(arrData, arrData.length).toString() == null ? 0 : arrData.length;
+                    dataPacket = new DatagramPacket(arrData, arrData.length, local, PORT);
                     sendSocket.send(dataPacket);
                 }
-                Log.d("......", "子线程。。。。。。" + 1.5);
+                Thread.sleep(100);
                 interfaceConnect.dataSuccess("数据发送完！");
                 Log.e(TAG, "发送成功...");
             } catch (IOException e) {

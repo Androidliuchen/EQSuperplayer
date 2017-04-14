@@ -582,8 +582,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         intent.setClass(ProgramActivity.this, ImageActivity.class);
                         intent.putExtra(Constant.PROGRAM_ID, imageBean.getId());
                         startActivity(intent);
-                        overridePendingTransition(R.anim.push_left_in,
-                                R.anim.push_left_out);
                         customTypeWindow.dismiss();
                         ProgramActivity.this.finish();
                         break;
@@ -596,8 +594,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         startActivity(intent);
                         customTypeWindow.dismiss();
                         ProgramActivity.this.finish();
-                        overridePendingTransition(R.anim.push_left_in,
-                                R.anim.push_left_out);
                         break;
                     case Constant.AREA_TYPE_TIME:
                         intent = new Intent();
@@ -605,8 +601,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         intent.setClass(ProgramActivity.this, TimeActivity.class);
                         intent.putExtra(Constant.PROGRAM_ID, timeBean.getId());
                         startActivity(intent);
-                        overridePendingTransition(R.anim.push_left_in,
-                                R.anim.push_left_out);
                         customTypeWindow.dismiss();
                         ProgramActivity.this.finish();
                         break;
@@ -616,8 +610,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         intent.setClass(ProgramActivity.this, VedioActivity.class);
                         intent.putExtra(Constant.PROGRAM_ID, vedioBean.getId());
                         startActivity(intent);
-                        overridePendingTransition(R.anim.push_left_in,
-                                R.anim.push_left_out);
                         customTypeWindow.dismiss();
                         ProgramActivity.this.finish();
                         break;
