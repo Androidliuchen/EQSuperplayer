@@ -55,6 +55,9 @@ public class FindScreenThread implements Runnable {
                     System.out.println("address : +要开始接收");
                     dataSocket.setSoTimeout(3000);
                     dataSocket.receive(inPacket);
+                    InetAddress receIP = inPacket.getAddress();
+                    String receport = String.valueOf(inPacket.getPort());
+                    Log.d("S1.......", receIP + "" + receport);
                     byte[] data = inPacket.getData();
                     String s1 = SendPacket.byte2hex(data);
                     Log.d("S1.......", s1 + "");

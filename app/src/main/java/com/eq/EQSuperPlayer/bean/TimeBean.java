@@ -15,7 +15,7 @@ public class TimeBean extends TotalBean{
     @DatabaseField(columnName = "timeToBorderColor")
     public int timeToBorderColor; //边框颜色
     @DatabaseField(columnName = "timeToname")
-    private String timeToname;      // 时钟样式，一共4种
+    private String timeToname;
     @DatabaseField(canBeNull = true, foreign = true, columnName = "program_id")
     private ProgramBean programBean;
     @DatabaseField(columnName = "m_nClockType")
@@ -36,9 +36,11 @@ public class TimeBean extends TotalBean{
     @DatabaseField(columnName = " m_rgbClockTextColor")
     private int m_rgbClockTextColor; //固定文字颜色
     @DatabaseField(columnName = "m_rgbClockTextSize")
-    private int m_rgbClockTextSize = 0;  //固定文字大小 。默认第6项  12点。。
+    private int m_rgbClockTextSize = 6;  //固定文字大小
     @DatabaseField(columnName = "m_nYearType")
     private int m_nYearType;         //年格式
+    @DatabaseField(columnName = "m_nHourType")
+    private int m_nHourType;         //小时格式
     @DatabaseField(columnName = "m_nRowType")
     private int m_nRowType;         //行格式
     @DatabaseField(columnName = "m_strShowForm")
@@ -103,6 +105,10 @@ public class TimeBean extends TotalBean{
     private boolean weekshow = true;  //模拟时钟星期是否显示
     @DatabaseField(columnName = "dateshow")
     private boolean dateshow = true;  //日期是否显示
+    @DatabaseField(columnName = "m_rgbDayColor")
+    private int m_rgbDayColor;            //日期颜色
+    @DatabaseField(columnName = "m_rgbWeekColor")
+    private int m_rgbWeekColor;            //星期颜色
     @DatabaseField(columnName = "shibiaocolorposition")
     private int shibiaocolorposition; //hour时间标识颜色
 
@@ -208,6 +214,14 @@ public class TimeBean extends TotalBean{
 
     public void setM_nRowType(int m_nRowType) {
         this.m_nRowType = m_nRowType;
+    }
+
+    public int getM_nHourType() {
+        return m_nHourType;
+    }
+
+    public void setM_nHourType(int m_nHourType) {
+        this.m_nHourType = m_nHourType;
     }
 
     public String getM_strShowForm() {
@@ -515,11 +529,30 @@ public class TimeBean extends TotalBean{
     }
 
     public EQ_DateFile_Asc[] getAsc() {
+        if (asc == null) {
+            asc = new EQ_DateFile_Asc[100];
+        }
         return asc;
     }
 
     public void setAsc(EQ_DateFile_Asc[] asc) {
         this.asc = asc;
+    }
+
+    public int getM_rgbDayColor() {
+        return m_rgbDayColor;
+    }
+
+    public void setM_rgbDayColor(int m_rgbDayColor) {
+        this.m_rgbDayColor = m_rgbDayColor;
+    }
+
+    public int getM_rgbWeekColor() {
+        return m_rgbWeekColor;
+    }
+
+    public void setM_rgbWeekColor(int m_rgbWeekColor) {
+        this.m_rgbWeekColor = m_rgbWeekColor;
     }
 
     /**

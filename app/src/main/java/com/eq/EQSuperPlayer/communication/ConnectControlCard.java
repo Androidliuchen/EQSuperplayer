@@ -30,12 +30,11 @@ public class ConnectControlCard implements Runnable {
     //    public static String HOSTAddress = "192.168.2.206";    // 主机地址
     private DatagramPacket dataPacket = null;
     private DatagramSocket sendSocket = null;
-    private int dataLength = 0;    //在当前类，竟然还要传个空值过来
-    private List<byte[]> sendByte = new ArrayList<byte[]>();
+    private byte[] sendByte = null;
     private String testStr = "";
     private InterfaceConnect interfaceConnect = null;
 
-    public ConnectControlCard(Context context, List<byte[]> sendByte, InterfaceConnect interfaceConnect) {
+    public ConnectControlCard(Context context, byte[] sendByte, InterfaceConnect interfaceConnect) {
         super();
         this.sendByte = sendByte;
         this.interfaceConnect = interfaceConnect;
@@ -44,7 +43,7 @@ public class ConnectControlCard implements Runnable {
         HOSTAddress = areabean.getEquitTp();
     }
 
-    public ConnectControlCard(List<byte[]> sendByte) {
+    public ConnectControlCard(byte[] sendByte) {
 
         super();
         this.sendByte = sendByte;
@@ -69,11 +68,11 @@ public class ConnectControlCard implements Runnable {
             }
             sendSocket = new DatagramSocket();
             try {
-                for (int i = 0; i < sendByte.size(); i++) {
-                    byte[] arrData = sendByte.get(i);
-                    dataPacket = new DatagramPacket(arrData, arrData.length, local, PORT);
+//                for (int i = 0; i < sendByte.size(); i++) {
+//                    byte[] arrData = sendByte.get(i);
+                    dataPacket = new DatagramPacket(sendByte, sendByte.length, local, PORT);
                     sendSocket.send(dataPacket);
-                }
+//                }
                 interfaceConnect.dataSuccess("数据发送完！");
                 byte[] buf = new byte[50];
                 dataPacket = new DatagramPacket(buf, buf.length);
@@ -83,10 +82,7 @@ public class ConnectControlCard implements Runnable {
                     Thread.sleep(100);
                     testStr = new String(buf, "GBK").trim();
                     if (interfaceConnect != null) {
-                        String s1 = SendPacket.bytes2HexString(buf, buf.length);
                         interfaceConnect.success(buf); //传递返回值
-                        PORT = dataPacket.getPort();
-                        String A = String.valueOf(dataPacket.getAddress());
                     }
                     if (sendSocket != null) {
                         sendSocket.close();

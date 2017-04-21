@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.net.DhcpInfo;
+import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -86,7 +88,7 @@ public class Utils {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        mBitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+        mBitmap.compress(Bitmap.CompressFormat.PNG, 0, fOut);
 
         try {
             fOut.flush();
@@ -356,7 +358,23 @@ public class Utils {
         }
         return bbt;
     }
-
+    public static boolean phoneOrWifi( Context context,String str){
+        //获取WiFi信息
+        WifiManager my_wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        DhcpInfo dhcpInfo = my_wifiManager.getDhcpInfo();
+        String IP = intToIp(dhcpInfo.ipAddress);
+        String  phoneIp = IP.toString().substring(0,IP.lastIndexOf("."));
+        String  wifiIp = str.toString().substring(0,str.lastIndexOf("."));
+        if (phoneIp.equals(wifiIp)){
+            return true;
+        }
+        return false;
+    }
+    //转换成DNS格式
+    private static String intToIp(int paramInt) {
+        return (paramInt & 0xFF) + "." + (0xFF & paramInt >> 8) + "." + (0xFF & paramInt >> 16) + "."
+                + (0xFF & paramInt >> 24);
+    }
     // 工具类：在代码中使用dp的方法（因为代码中直接用数字表示的是像素）
     public static int dip2px(Context context, float dip) {
         final float scale = context.getResources().getDisplayMetrics().density;

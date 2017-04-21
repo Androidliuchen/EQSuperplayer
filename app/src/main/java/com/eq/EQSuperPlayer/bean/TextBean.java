@@ -42,7 +42,7 @@ public class TextBean extends TotalBean{
     @DatabaseField(columnName = "width")
     public int width; //长度
     @DatabaseField(columnName = "heidht")
-    public int heidht; //宽度
+    public int height; //宽度
     @DatabaseField(columnName = "stTypeFace")
     public int stTypeFace = 1 ;   //字体
     @DatabaseField(columnName = "stBold")
@@ -56,17 +56,17 @@ public class TextBean extends TotalBean{
     @DatabaseField(columnName = "stColoer")
     public int stColor;  //字体颜色
     @DatabaseField(columnName = "entertrick")
-    public int entertrick;  //进场特技
+    public int entertrick = 1;  //进场特技
     @DatabaseField(columnName = "enterspeed")
-    public int enterspeed;    //进场速度
+    public int enterspeed = 11;    //进场速度
     @DatabaseField(columnName = "STCleartrick")
-    public int cleartrick;  //清场特技
+    public int cleartrick = 2;  //清场特技
     @DatabaseField(columnName = "STClearspeed")
-    public int clearspeed;  //清场速度
+    public int clearspeed = 11;  //清场速度
     @DatabaseField(columnName = "stBackground")
     public int stBackground;  //背景色
     @DatabaseField(columnName = "standtime")
-    public int standtime;  //停留时间
+    public int standtime = 1;  //停留时间
 
     public List<String> texts = new ArrayList<String>();  //文本窗分屏，实时分屏，不存入数据库
 
@@ -153,12 +153,12 @@ public class TextBean extends TotalBean{
         this.width = width;
     }
 
-    public int getHeidht() {
-        return heidht;
+    public int getHeight() {
+        return height;
     }
 
-    public void setHeidht(int heidht) {
-        this.heidht = heidht;
+    public void setHeidht(int height) {
+        this.height = height;
     }
 
 
@@ -286,7 +286,7 @@ public class TextBean extends TotalBean{
                 ", X:" + X +
                 ", Y:" + Y +
                 ", width:" + width +
-                ", heidht:" + heidht +
+                ", heidht:" + height +
                 ", stTypeFace:" + stTypeFace +
                 ", stBold:" + stBold +
                 ", stItalic：" + stItalic +

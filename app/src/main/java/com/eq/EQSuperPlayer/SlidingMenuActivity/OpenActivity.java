@@ -47,10 +47,10 @@ public class OpenActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_open:
                 button_open.setEnabled(false);
                 button_guan.setEnabled(true);
-                List<byte[]> openPaks = new ArrayList<>();
+//                List<byte[]> openPaks = new ArrayList<>();
                 byte[] openPak = SendPacket.openScreen();
-                openPaks.add(openPak);
-                ccc = new ConnectControlCard(OpenActivity.this,openPaks, new InterfaceConnect() {
+//                openPaks.add(openPak);
+                ccc = new ConnectControlCard(OpenActivity.this,openPak, new InterfaceConnect() {
                     @Override
                     public void success(byte[] result) {
 //                        Toast.makeText(OpenActivity.this,"开启屏幕成功！",Toast.LENGTH_SHORT).show();
@@ -71,10 +71,10 @@ public class OpenActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_guan:
                 button_open.setEnabled(true);
                 button_guan.setEnabled(false);
-                List<byte[]> guanPaks = new ArrayList<>();
+//                List<byte[]> guanPaks = new ArrayList<>();
                 byte[] guanPak = SendPacket.guanScreen();
-                guanPaks.add(guanPak);
-                ccc = new ConnectControlCard(OpenActivity.this,guanPaks, new InterfaceConnect() {
+//                guanPaks.add(guanPak);
+                ccc = new ConnectControlCard(OpenActivity.this,guanPak, new InterfaceConnect() {
                     @Override
                     public void success(byte[] result) {
 //                        Toast.makeText(OpenActivity.this,"关闭屏幕成功！",Toast.LENGTH_SHORT).show();

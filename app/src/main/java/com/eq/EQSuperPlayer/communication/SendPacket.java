@@ -382,7 +382,7 @@ public class SendPacket {
      * childSize  子包的个数
      * childLength  子包的长度
      */
-    public static byte[] manyPakStart(int location, int totalSize, int childSize, int childLength) {
+    public static byte[] manyPakStart(long location, long totalSize, long childSize, long childLength) {
         byte[] b = new byte[24];
         b[0] = (byte) 0xF6;
         b[1] = (byte) 0x5A;

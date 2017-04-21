@@ -35,15 +35,15 @@ public class ImageBean extends TotalBean {
     @DatabaseField(columnName = "iamgeHeidht")
     public int iamgeHeidht; //宽度
     @DatabaseField(columnName = "iamgeEntertrick")
-    public int iamgeEntertrick;  //进场特技
+    public int iamgeEntertrick = 1;  //进场特技
     @DatabaseField(columnName = "iamgeEnterspeed")
-    public int iamgeEnterspeed;    //进场速度
+    public int iamgeEnterspeed = 11;    //进场速度
     @DatabaseField(columnName = "iamgeCleartrick")
-    public int iamgeCleartrick;  //清场特技
+    public int iamgeCleartrick = 2;  //清场特技
     @DatabaseField(columnName = "iamgeClearspeed")
-    public int iamgeClearspeed;  //清场速度
+    public int iamgeClearspeed = 11;  //清场速度
     @DatabaseField(columnName = "iamgeandtime")
-    public int iamgeandtime = 5;  //停留时间
+    public int iamgeandtime = 1;  //停留时间
     public List<String> iamgeId = new ArrayList<String>();
     @DatabaseField(columnName = "path")
     public String path; //图片路径

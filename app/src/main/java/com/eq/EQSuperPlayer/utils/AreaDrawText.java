@@ -26,8 +26,563 @@ import static java.lang.Math.cos;
  */
 public abstract class AreaDrawText extends Context {
     public static void DrawArea(Context context, Canvas canvas, TextBean textBean) {
-                drawText(context, canvas, textBean);
     }
+    public static void drawTime(Context context, Canvas canvas, TimeBean timeBean) {
+        //设置画笔属性   timeDateBean.getM_rgbClockTextSize()
+        Paint paint = Utils.getPaint(context, Utils.getPaintSize(context, Integer.parseInt(context.getResources().getStringArray(R.array.text_size)[timeBean.getM_rgbClockTextSize()])
+                + Constant.FONT_SIZE_CORRECTION));
+        Utils.setTypeface(context, paint
+                , (context.getResources().getStringArray(R.array.typeface_path))[timeBean.getNumber_typeface()]);
+        int[] number_colors = new int[]{timeBean.getM_rgbClockTextColor(), timeBean.getM_rgbDayTextColor()
+                , timeBean.getM_rgbWeekTextColor(), timeBean.getM_rgbTimeColor(),
+                timeBean.getSecondcolor(), timeBean.getMinutecolor(),
+                timeBean.getHourscolor(), timeBean.getFenbiaocolorposition(),
+                timeBean.getShibiaocolorposition()};
+        for (int i = 0; i < number_colors.length; i++) {
+            switch (number_colors[i]) {
+                case 0:
+                    number_colors[i] = Color.YELLOW;
+                    break;
+                case 1:
+                    number_colors[i] = Color.GREEN;
+                    break;
+                case 2:
+                    number_colors[i] = Color.RED;
+                    break;
+                case 3:
+                    number_colors[i] = Color.BLACK;
+                    break;
+            }
+        }
+        paint.setAntiAlias(true);
+        paint.setFakeBoldText(true);
+        paint.setColor(number_colors[0]);
+        paint.setTextSize(Utils.getPaintSize(context, timeBean.getM_rgbClockTextSize() + Constant.FONT_SIZE_CORRECTION)); // 字体大小 进度条参数
+        if (timeBean.getM_nClockType() == 3) { //模拟时钟
+            drawTimeText(context,canvas,timeBean);
+
+        } else {  //数字时钟
+            Calendar cal = Calendar.getInstance();
+            //偏移
+            int[] timelag = timeBean.splitStrTimeLag(timeBean.getM_strTimeLag());
+            if (timeBean.getM_nOffset() == 0) {   //偏移+++
+                cal.add(Calendar.DATE, timeBean.getM_nDayLag());
+                cal.add(Calendar.HOUR, timelag[0]);
+                cal.add(Calendar.MINUTE, timelag[1]);
+            } else {
+                cal.add(Calendar.DATE, -timeBean.getM_nDayLag());
+                cal.add(Calendar.HOUR, -timelag[0]);
+                cal.add(Calendar.MINUTE, -timelag[1]);
+            }
+            String year = String.valueOf(cal.get(Calendar.YEAR));//获取年份
+            if (timeBean.getM_nYearType() == 1) { //2位年，把年份截取一半
+                year = year.substring(2, 4);
+            }
+            String month = String.valueOf(cal.get(Calendar.MONTH) + 1);//获取月份
+            if (month.length() == 1) {
+                month = "0" + month;
+            }
+            String day = String.valueOf(cal.get(Calendar.DATE));//获取日
+            if (day.length() == 1) {
+                day = "0" + day;
+            }
+            String hour = String.valueOf(cal.get(Calendar.HOUR_OF_DAY));//小时
+            if (hour.length() == 1) {
+                hour = "0" + hour;
+            }
+            String minute = String.valueOf(cal.get(Calendar.MINUTE));//分
+            if (minute.length() == 1) {
+                minute = "0" + minute;
+            }
+            String second = String.valueOf(cal.get(Calendar.SECOND));//秒
+            if (second.length() == 1) {
+                second = "0" + second;
+            }
+            int WeekOfYear = cal.get(Calendar.DAY_OF_WEEK);//一周的第几天
+            boolean[] str_ints = timeBean.getStrShowFormInt(timeBean.getM_strShowForm());
+            //整合数据 ，年月日一组
+            String date = "";
+            //时钟风格  0,1,2
+            int clockStyle = timeBean.getM_nClockType();
+            if (LanguageUtil.loadData(context).equals("en") && clockStyle == 2) { //当语言环境为英语的时候，风格2 等于风格0
+                clockStyle = 0;
+            }
+            String space = "";
+            if (clockStyle == 0) {
+                space = "-";
+            }
+            if (clockStyle == 1) {
+                space = "/";
+            }
+            //组织文字
+            if (str_ints[0] == true) {
+                if (clockStyle == 2) {
+                    date += year + "年";
+                } else {
+                    date += year;
+                }
+            }
+            if (str_ints[1] == true) {
+                if (clockStyle == 2) {
+                    date += month + "月";
+                } else {
+                    if (!date.equals("")) {
+                        date += space + month;
+                    } else {
+                        date += month;
+                    }
+                }
+            }
+            if (str_ints[2] == true) {
+                if (clockStyle == 2) {
+                    date += day + "日";
+                } else {
+                    if (!date.equals("")) {
+                        date += space + day;
+                    } else {
+                        date += day;
+                    }
+                }
+            }
+            if ((str_ints[0] | str_ints[1] | str_ints[2]) & (str_ints[3] | str_ints[4]) & timeBean.getM_nRowType() == 0) {
+                date += " ";
+            }
+            String week = "";
+            if (str_ints[3] == true) {
+                if (!LanguageUtil.loadData(context).equals("en")) {
+                    String[] weekDays = {"星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"};
+                    week += weekDays[WeekOfYear - 1];
+                } else {
+                    String[] weekDays = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+                    week += weekDays[WeekOfYear - 1];
+                }
+            }
+            if (str_ints[3] == true & str_ints[4] == true & timeBean.getM_nRowType() == 0) {
+                week += " ";
+            }
+            String time = "";
+            if (str_ints[4] == true) {
+                if (clockStyle == 2) {
+                    time += hour + "时";
+                } else {
+                    time += hour;
+                }
+            }
+            if (str_ints[5] == true) {
+                if (clockStyle == 2) {
+                    time += minute + "分";
+                } else {
+                    if (!time.equals("")) {
+                        time += ":" + minute;
+                    } else {
+                        time += minute;
+                    }
+                }
+            }
+            if (str_ints[6] == true) {
+                if (clockStyle == 2) {
+                    time += second + "秒";
+                } else {
+                    if (!time.equals("")) {
+                        time += ":" + second;
+                    } else {
+                        time += second;
+                    }
+                }
+            }
+            String fixed_text = timeBean.getM_strClockText();
+            Paint.FontMetrics fm = paint.getFontMetrics();
+            int time_x = 0, time_y = 0;
+            if (timeBean.getM_nRowType() == 0) { //单行
+                String show_str = fixed_text + date + week + time;
+                time_x = (int) ((timeBean.getTimeToX()) + (timeBean.getTimeTowidth() - Utils.getTextWidth(paint, show_str)) / 2);
+                time_y = (int) ((-fm.ascent + 1) + timeBean.getTimeToY()
+                        + (timeBean.getTimeToheidht() - Utils.getFontHeight(paint)) / 2);
+
+                //绘制固定文字
+                if (!fixed_text.equals("")) {
+                    paint.setColor(number_colors[0]);
+                    canvas.drawText(fixed_text, time_x, time_y, paint);
+                    time_x += paint.measureText(fixed_text);
+                }
+                //绘日期
+                if (!date.equals("")) {
+                    paint.setColor(number_colors[1]);
+                    canvas.drawText(date, time_x, time_y, paint);
+                    time_x += paint.measureText(date);
+                }
+                //绘制星期
+                if (!week.equals("")) {
+                    paint.setColor(number_colors[2]);
+                    canvas.drawText(week, time_x, time_y, paint);
+                    time_x += paint.measureText(week);
+                }
+                //绘制时间
+                if (!time.equals("")) {
+                    paint.setColor(number_colors[3]);
+                    canvas.drawText(time, time_x, time_y, paint);
+                }
+            } else { //多行
+                time_y = (int) (-fm.ascent + 1);
+                int nRow = 0;
+                if (!fixed_text.equals("")) {
+                    nRow++;
+                }
+                if (!date.equals("")) {
+                    nRow++;
+                }
+                if (!week.equals("")) {
+                    nRow++;
+                }
+                if (!time.equals("")) {
+                    nRow++;
+                }
+
+                if (nRow > 0) {
+                    //计算每行高
+                    int nRowHeight = (timeBean.getTimeToheidht()) / (nRow);
+                    //绘固定文字
+                    if (!fixed_text.equals("")) {
+                        paint.setColor(number_colors[0]);
+                        time_x = (int) ((timeBean.getTimeToX()) + (timeBean.getTimeTowidth() - Utils.getTextWidth(paint, fixed_text)) / 2);
+                        canvas.drawText(fixed_text, time_x, time_y + (int) ((nRowHeight - Utils.getFontHeight(paint)) / 2), paint);
+                        time_y += nRowHeight;
+                    }
+                    //绘日期
+                    if (!date.equals("")) {
+                        paint.setColor(number_colors[1]);
+                        time_x = (int) ((timeBean.getTimeToX() + (timeBean.getTimeTowidth() - Utils.getTextWidth(paint, date)) / 2));
+                        canvas.drawText(date, time_x, time_y + (int) ((nRowHeight - Utils.getFontHeight(paint)) / 2), paint);
+                        time_y += nRowHeight;
+                    }
+                    //绘制星期
+                    if (!week.equals("")) {
+                        paint.setColor(number_colors[2]);
+                        time_x = (int) ((timeBean.getTimeToX()) + (timeBean.getTimeTowidth() - Utils.getTextWidth(paint, week)) / 2);
+                        canvas.drawText(week, time_x, time_y + (int) ((nRowHeight - Utils.getFontHeight(paint)) / 2), paint);
+                        time_y += nRowHeight;
+                    }
+                    //绘制时间
+                    if (!time.equals("")) {
+                        paint.setColor(number_colors[3]);
+                        time_x = (int) ((timeBean.getTimeToX()) + (timeBean.getTimeTowidth() - Utils.getTextWidth(paint, time)) / 2);
+                        canvas.drawText(time, time_x, time_y + (int) ((nRowHeight - Utils.getFontHeight(paint)) / 2), paint);
+                    }
+                }
+            }
+        }
+
+        drawLine(context, canvas, timeBean.getTimeToX(), timeBean.getTimeToY(), timeBean.getTimeTowidth(), timeBean.getTimeToheidht());
+
+    }
+    private static void drawTimeText(Context context, Canvas canvas, TimeBean timeBean){
+        Paint paint = Utils.getPaint(context, Utils.getPaintSize(context, Integer.parseInt(context.getResources().getStringArray(R.array.text_size)[timeBean.getM_rgbClockTextSize()])
+                + Constant.FONT_SIZE_CORRECTION));
+        Utils.setTypeface(context, paint
+                , (context.getResources().getStringArray(R.array.typeface_path))[timeBean.getNumber_typeface()]);
+        int[] number_colors = new int[]{timeBean.getM_rgbClockTextColor(), timeBean.getM_rgbDayTextColor()
+                , timeBean.getM_rgbWeekTextColor(), timeBean.getM_rgbTimeColor(),
+                timeBean.getSecondcolor(), timeBean.getMinutecolor(),
+                timeBean.getHourscolor(), timeBean.getFenbiaocolorposition(),
+                timeBean.getShibiaocolorposition()};
+        for (int i = 0; i < number_colors.length; i++) {
+            switch (number_colors[i]) {
+                case 0:
+                    number_colors[i] = Color.YELLOW;
+                    break;
+                case 1:
+                    number_colors[i] = Color.GREEN;
+                    break;
+                case 2:
+                    number_colors[i] = Color.RED;
+                    break;
+                case 3:
+                    number_colors[i] = Color.BLACK;
+                    break;
+            }
+        }
+        paint.setAntiAlias(true);
+        paint.setFakeBoldText(true);
+        paint.setColor(number_colors[0]);
+        paint.setTextSize(Utils.getPaintSize(context, timeBean.getM_rgbClockTextSize() + Constant.FONT_SIZE_CORRECTION)); // 字体大小 进度条参数
+        float borderWidth = timeBean.getWidth_circle();
+        //获取时间
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date(System.currentTimeMillis()));
+        timeBean.setMillSecond(calendar.get(Calendar.MILLISECOND));
+        timeBean.setSecond(calendar.get(Calendar.SECOND));
+        timeBean.setMinute(calendar.get(Calendar.MINUTE));
+        timeBean.setHour(calendar.get(Calendar.HOUR));
+
+        boolean[] str_ints = timeBean.getStrShowFormInt(timeBean.getM_strShowForm());
+        EQ_DateFile_Asc[] m_gStuAsc = timeBean.getAsc();
+        for (int i = 0; i < m_gStuAsc.length; i++) {
+            m_gStuAsc[i] = new EQ_DateFile_Asc();
+        }
+        GetDateText(calendar,timeBean,str_ints);
+        GetWeekText(calendar,timeBean,str_ints);
+        GetTimeText(calendar,timeBean,str_ints);
+        // 获取宽高参数
+        Paint.FontMetrics fm = paint.getFontMetrics();
+        if (timeBean.getTimeTowidth() <= timeBean.getTimeToheidht()) {
+            int mWidth = Math.min(timeBean.getTimeTowidth(), timeBean.getTimeToheidht());
+            int mHeight = Math.max(timeBean.getTimeTowidth(), timeBean.getTimeToheidht());
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(borderWidth);
+            //画刻度线
+            Paint paintLine = new Paint();
+            for (int i = 0; i < 60; i++) {
+                if (i % 5 == 0) {
+                    paintLine.setStrokeWidth(0);
+                    paintLine.setColor(number_colors[8]);
+                    paintLine.setStyle(Paint.Style.FILL);
+                } else {
+                    paintLine.setStrokeWidth(timeBean.getFenbiaox());
+                    paintLine.setColor(number_colors[7]);
+                    paintLine.setStyle(Paint.Style.FILL);
+                }
+                canvas.drawCircle(mWidth / 2 , mHeight / 2  - mWidth / 2  + borderWidth *2,timeBean.getRadius_center(), paintLine);
+                //canvas.drawLine(mWidth / 2 * times, mHeight / 2 * times - mWidth / 2 * times + borderWidth, mWidth / 2 * times, mHeight / 2 * times - mWidth / 2 * times + lineLength, paintLine);
+                canvas.rotate(360 / 60, mWidth / 2 , mHeight / 2 );
+            }
+
+            //刻度数字
+            String targetText[] = context.getResources().getStringArray(R.array.clock);
+
+            //绘制时间文字
+            float startX = mWidth / 2  - paint.measureText(targetText[1]) / 2;
+            float startY = mHeight / 2  - mWidth / 2 ;
+            float textR = (float) Math.sqrt(Math.pow(mWidth / 2  - startX, 2) + Math.pow(mHeight / 2  - startY, 2));
+
+            for (int i = 0; i < 12; i++) {
+                float x = (float) (startX + Math.sin(Math.PI / 6 * i) * textR);
+                float y = (float) (startY + textR - cos(Math.PI / 6 * i) * textR);
+                if (i != 11 && i != 10 && i != 0) {
+                    y = y + paint.measureText(targetText[i]) / 2;
+                } else {
+                    x = x - paint.measureText(targetText[i]) / 4;
+                    y = y + paint.measureText(targetText[i]) / 4;
+                }
+                canvas.drawText(targetText[i], x, y, paint);
+            }
+            //绘制秒针
+            paint.setColor(number_colors[4]);
+            paint.setStrokeWidth(timeBean.getWidth_second());
+            float degree = timeBean.getRefresh_time() > 1000 ? (float) (timeBean.getSecond() * 360 / 60) : (float) (timeBean.getSecond() * 360 / 60 + timeBean.getMillSecond() / 1000 * 360 / 60);
+            canvas.rotate(degree, mWidth / 2 , mHeight / 2 );
+            canvas.drawLine(mWidth / 2 , mHeight / 2 , mWidth / 2 , mHeight / 2  - (mWidth / 2  - timeBean.getWidth_circle()) * timeBean.getDensity_second(), paint);
+            canvas.rotate(-degree, mWidth / 2 , mHeight / 2 );
+
+            //绘制分针
+            paint.setColor(number_colors[5]);
+            paint.setStrokeWidth(timeBean.getWidth_minutes());
+            float degree2 = (float) (timeBean.getMinute() * 360 / 60);
+            canvas.rotate(degree2, mWidth / 2 , mHeight / 2 );
+            canvas.drawLine(mWidth / 2 , mHeight / 2 , mWidth / 2 , mHeight / 3  - (mWidth /4  - timeBean.getWidth_circle()) * timeBean.getDensity_minute(), paint);
+            canvas.rotate(-degree2, mWidth / 2 , mHeight / 2 );
+
+            //绘制时针
+            paint.setColor(number_colors[6]);
+            paint.setStrokeWidth(timeBean.getWidth_hour());
+            float degreeHour = (float) timeBean.getHour() * 360 / 12;
+            float degreeMinut = (float) timeBean.getMinute() / 60 * 360 / 12;
+            float degree3 = degreeHour + degreeMinut;
+            canvas.rotate(degree3, mWidth / 2 , mHeight / 2 );
+            canvas.drawLine(mWidth / 2 , mHeight / 2 , mWidth / 2 , mHeight / 2  + (mWidth / 2  - timeBean.getWidth_circle()) * timeBean.getDensity_hour(), paint);
+            canvas.rotate(-degree3, mWidth / 2 , mHeight / 2 );
+            // 画圆心
+            paint.setStyle(Paint.Style.FILL);
+            canvas.drawCircle(mWidth / 2 , mHeight / 2 , timeBean.getRadius_center(), paint);
+            // 绘表标题
+            if( !timeBean.getM_strClockText().isEmpty()){
+                String fixed_text = timeBean.getM_strClockText();
+                float textX = mWidth / 2  - paint.measureText(fixed_text) / 2;
+                float textY = mHeight / 2  - mWidth / 4 ;
+                paint.setColor(number_colors[4]);
+                canvas.drawText(fixed_text, textX, textY, paint);
+            }
+            //绘制日期
+            if (timeBean.isDateshow() == true){
+                long time=System.currentTimeMillis();
+                Date date=new Date(time);
+                SimpleDateFormat format=new SimpleDateFormat("MM月dd日");
+                String textDay = format.format(date);
+                float textDayX = mWidth / 2  - paint.measureText(textDay) / 2;
+                float textDayY = mHeight / 2  + mWidth / 4 ;
+                paint.setColor(number_colors[5]);
+                canvas.drawText(textDay,textDayX,textDayY,paint);
+            }
+            //绘制星期
+            if (timeBean.isWeekshow() == true){
+                int j = 0;
+                m_gStuAsc[j++].setM_byVaild(0x10);
+                m_gStuAsc[j++].setM_byVaild(0x2);
+                m_gStuAsc[j++].setM_byVaild(0x10);
+                m_gStuAsc[j++].setM_byVaild(0x2);
+                m_gStuAsc[j].setM_byAsc('W');
+                m_gStuAsc[j++].setM_byVaild(0x11);
+                m_gStuAsc[j].setM_byAsc('W');
+                m_gStuAsc[j++].setM_byVaild(0x1);
+
+                long time=System.currentTimeMillis();
+                Date date=new Date(time);
+                paint.setColor(number_colors[5]);
+                SimpleDateFormat format=new SimpleDateFormat("EEEE");
+                String weekDay = format.format(date);
+                double height = Math.ceil(fm.descent - fm.ascent);
+                float weekDayX = mWidth / 2 - paint.measureText(weekDay) / 2;
+                double weekDayY = mHeight / 2 + mWidth / 4 + height;
+                paint.setColor(number_colors[6]);
+                canvas.drawText(weekDay,weekDayX, (float) weekDayY,paint);
+            }
+        } else {
+            int mWidth = Math.max(timeBean.getTimeTowidth(), timeBean.getTimeToheidht());
+            int mHeight = Math.min(timeBean.getTimeTowidth(), timeBean.getTimeToheidht());
+            //画刻度线
+            Paint paintLine = new Paint();
+            for (int i = 0; i < 60; i++) {
+                if (i % 5 == 0) {
+                    paintLine.setStrokeWidth(timeBean.getShibiaox());
+                    paintLine.setColor(number_colors[8]);
+                    paintLine.setStyle(Paint.Style.FILL);
+                } else {
+                    paintLine.setStrokeWidth(timeBean.getFenbiaox());
+                    paintLine.setColor(number_colors[7]);
+                    paintLine.setStyle(Paint.Style.FILL);
+                }
+                canvas.drawCircle(mWidth / 2 , borderWidth,timeBean.getRadius_center(), paintLine);
+                canvas.rotate(360 / 60, mWidth / 2 , mHeight / 2);
+            }
+            //刻度数字
+            String targetText[] = context.getResources().getStringArray(R.array.clock);
+            //绘制时间文字
+            float startX = mWidth / 2  - paint.measureText(targetText[1]) / 2;
+            float startY = 0;
+            float textR = (float) Math.sqrt(Math.pow(mWidth / 2  - startX, 2) + Math.pow(mHeight / 2 - startY, 2));
+
+            for (int i = 0; i < 12; i++) {
+                float x = (float) (startX + Math.sin(Math.PI / 6 * i) * textR);
+                float y = (float) (startY + textR - cos(Math.PI / 6 * i) * textR);
+                if (i != 11 && i != 10 && i != 0) {
+                    y = y + paint.measureText(targetText[i]) / 2;
+                } else {
+                    x = x - paint.measureText(targetText[i]) / 4;
+                    y = y + paint.measureText(targetText[i]) / 4;
+                }
+                canvas.drawText(targetText[i], x, y, paint);
+            }
+            //绘制秒针
+            paint.setColor(number_colors[4]);
+            paint.setStrokeWidth(timeBean.getWidth_second());
+            float degree = timeBean.getRefresh_time() > 1000 ? (float) (timeBean.getSecond() * 360 / 60) : (float) (timeBean.getSecond() * 360 / 60 + timeBean.getMillSecond() / 1000 * 360 / 60);
+            canvas.rotate(degree, mWidth / 2 , mHeight / 2);
+            canvas.drawLine(mWidth / 2 , mHeight / 2, mWidth / 2 , mWidth / 3  - (mHeight / 3  - timeBean.getWidth_circle()) * timeBean.getDensity_second(), paint);
+            canvas.rotate(-degree, mWidth / 2 , mHeight / 2);
+
+            //绘制分针
+            paint.setColor(number_colors[5]);
+            paint.setStrokeWidth(timeBean.getWidth_minutes());
+            float degree2 = (float) (timeBean.getMinute() * 360 / 60);
+            canvas.rotate(degree2, mWidth / 2 , mHeight / 2 );
+            canvas.drawLine(mWidth / 2, mHeight / 2, mWidth / 2 , mWidth / 3  - (mHeight / 4  - timeBean.getWidth_circle()) * timeBean.getDensity_minute(), paint);
+            canvas.rotate(-degree2, mWidth / 2 , mHeight / 2 );
+
+            //绘制时针
+            paint.setColor(number_colors[6]);
+            paint.setStrokeWidth(timeBean.getWidth_hour());
+            float degreeHour = (float) timeBean.getHour() * 360 / 12;
+            float degreeMinut = (float) timeBean.getMinute() / 60 * 360 / 12;
+            float degree3 = degreeHour + degreeMinut;
+            canvas.rotate(degree3, mWidth / 2 , mHeight / 2 );
+            canvas.drawLine(mWidth / 2 , mHeight / 2 , mWidth / 2 , mWidth / 3 - (mHeight / 2  - timeBean.getWidth_circle()) * timeBean.getDensity_hour(), paint);
+            canvas.rotate(-degree3, mWidth / 2 , mHeight / 2 );
+            // 画圆心
+            paint.setStyle(Paint.Style.FILL);
+            canvas.drawCircle(mWidth / 2 , mHeight / 2 , timeBean.getRadius_center(), paint);
+
+            //绘制固定文字
+            String fixed_text = timeBean.getM_strClockText();
+            float textX = mWidth / 2 - paint.measureText(fixed_text) / 2;
+            float textY = mHeight / 4 ;
+            paint.setColor(number_colors[4]);
+            canvas.drawText(fixed_text, textX, textY, paint);
+
+            //绘制日期
+            if (timeBean.isDateshow() == true){
+                int j=0;
+                m_gStuAsc[j++].setM_byVaild(0x10);
+                m_gStuAsc[j++].setM_byVaild(0x2);
+                m_gStuAsc[j++].setM_byVaild(0x10);
+                m_gStuAsc[j++].setM_byVaild(0x2);
+                m_gStuAsc[j].setM_byAsc('W');
+                m_gStuAsc[j++].setM_byVaild(0x11);
+                m_gStuAsc[j].setM_byAsc('W');
+                m_gStuAsc[j++].setM_byVaild(0x1);
+
+                m_gStuAsc[j].setM_byAsc('D');
+                m_gStuAsc[j++].setM_byVaild(0x1);
+                m_gStuAsc[j].setM_byAsc('D');
+                m_gStuAsc[j++].setM_byVaild(0x1);
+                m_gStuAsc[j++].setM_byVaild(0x10);
+                m_gStuAsc[j++].setM_byVaild(0x2);
+                long time=System.currentTimeMillis();
+                Date date=new Date(time);
+                paint.setColor(number_colors[5]);
+                SimpleDateFormat format=new SimpleDateFormat("MM月dd日");
+                String textDay = format.format(date);
+                float textDayX = mWidth / 2  - paint.measureText(textDay) / 2;
+                float textDayY =  mHeight / 4  + mHeight / 2;
+                canvas.drawText(textDay,textDayX,textDayY,paint);
+            }
+            //绘制星期
+            if (timeBean.isWeekshow() == true){
+                int j=0;
+                m_gStuAsc[j++].setM_byVaild(0x10);
+                m_gStuAsc[j++].setM_byVaild(0x2);
+                m_gStuAsc[j++].setM_byVaild(0x10);
+                m_gStuAsc[j++].setM_byVaild(0x2);
+                m_gStuAsc[j].setM_byAsc('W');
+                m_gStuAsc[j++].setM_byVaild(0x11);
+                m_gStuAsc[j].setM_byAsc('W');
+                m_gStuAsc[j++].setM_byVaild(0x1);
+
+                long time=System.currentTimeMillis();
+                Date date=new Date(time);
+                paint.setColor(number_colors[6]);
+                SimpleDateFormat format=new SimpleDateFormat("EEEE");
+                String weekDay = format.format(date);
+                switch( Calendar.DAY_OF_WEEK)
+                {
+                    case 1:	weekDay=("星期一"); break;
+                    case 2:	weekDay=("星期二"); break;
+                    case 3:	weekDay=("星期三"); break;
+                    case 4:	weekDay=("星期四"); break;
+                    case 5:	weekDay=("星期五"); break;
+                    case 6:	weekDay=("星期六"); break;
+                    case 7:	weekDay=("星期日"); break;
+                }
+                fm = paint.getFontMetrics();
+                double height = Math.ceil(fm.descent - fm.ascent);
+                float weekDayX = mWidth / 2  - paint.measureText(weekDay) / 2;
+                double weekDayY = mHeight / 4  + mHeight / 2 + height;
+                canvas.drawText(weekDay,weekDayX, (float) weekDayY,paint);
+            }
+        }
+        int j=0;
+        for(int i=0;i<100;i++){
+            EQ_DateFile_Asc[] m_gStuAscB = timeBean.getAsc();
+            m_gStuAscB[i].setM_byVaild(0);
+            if(m_gStuAsc[i].getM_byVaild() == 0x80){
+                m_gStuAscB[j] = new EQ_DateFile_Asc();
+                m_gStuAscB[j].setM_wx(m_gStuAsc[i].getM_wx());
+                m_gStuAscB[j].setM_wy(m_gStuAsc[i].getM_wy());
+                m_gStuAscB[j].setM_byColor(m_gStuAsc[i].getM_byColor());
+                m_gStuAscB[j].setM_byAsc(m_gStuAsc[i].getM_byAsc());
+                m_gStuAscB[j++].setM_byVaild(1);
+            }
+        }
+    }
+
     private static void drawText(Context context, Canvas canvas, TextBean textBean) {
         Utils.SplitScreen(textBean.getTexts(), textBean.getSingleTextValue(), textBean.getWidth(), textBean.getPaint());
         String show_str = textBean.getSingleTextValue();
@@ -80,10 +635,10 @@ public abstract class AreaDrawText extends Context {
             //文本x坐标
 //            text_x = (textBean.getWidth() - Utils.getTextWidth(paint1, show_str)) / 2;
             //文本y坐标
-            text_y = -fm1.ascent + 1 + (textBean.getHeidht() - Utils.getFontHeight(paint1)) / 2 ;
+            text_y = -fm1.ascent + 1 + (textBean.getHeight() - Utils.getFontHeight(paint1)) / 2 ;
 
             canvas.drawText(show_str, text_x, text_y, paint1);
-            drawLine(context, canvas, areaBean.getArea_X(), areaBean.getArea_Y(), textBean.getWidth(), textBean.getHeidht());
+            drawLine(context, canvas, areaBean.getArea_X(), areaBean.getArea_Y(), textBean.getWidth(), textBean.getHeight());
         }
     }
 
@@ -146,7 +701,7 @@ public abstract class AreaDrawText extends Context {
                     paint2);
     }
     //获取模拟时钟Bitmap
-    public static Byte getTime(Context context, TimeBean timeBean) {
+    public static Bitmap getTime(Context context,Canvas canvas, TimeBean timeBean) {
 
         Paint paint = Utils.getPaint(context, Utils.getPaintSize(context, Integer.parseInt(context.getResources().getStringArray(R.array.text_size)[timeBean.getM_rgbClockTextSize()])
                 + Constant.FONT_SIZE_CORRECTION));//字体参数启动读取
@@ -176,8 +731,8 @@ public abstract class AreaDrawText extends Context {
         paint.setFakeBoldText(true);
         paint.setColor(number_colors[0]);//重置画笔颜色
         Bitmap bitmap = Bitmap.createBitmap(timeBean.getTimeTowidth(), timeBean.getTimeToheidht(), Bitmap.Config.ARGB_8888);
-        Canvas ca = new Canvas(bitmap); // 创建画布
-        ca.drawColor(Color.BLACK); // 颜色黑色
+        canvas = new Canvas(bitmap); // 创建画布
+        canvas.drawColor(Color.BLACK); // 颜色黑色
         Paint.FontMetrics fm = paint.getFontMetrics();
         //获取时间
         Calendar calendar = Calendar.getInstance();
@@ -227,9 +782,9 @@ public abstract class AreaDrawText extends Context {
                     } else {
                         paintLine.setColor(number_colors[7]);
                     }
-                    ca.drawCircle(mWidth / 2, mHeight / 2 - mWidth / 2 + borderWidth, timeBean.getRadius_center(), paintLine);
+                    canvas.drawCircle(mWidth / 2, mHeight / 2 - mWidth / 2 + borderWidth, timeBean.getRadius_center(), paintLine);
                     //ca.drawLine(mWidth / 2, mHeight / 2 - mWidth / 2 + borderWidth, mWidth / 2, mHeight / 2 - mWidth / 2 + lineLength, paintLine);
-                    ca.rotate(360 / 60, mWidth / 2, mHeight / 2);
+                    canvas.rotate(360 / 60, mWidth / 2, mHeight / 2);
                 }
                 //刻度数字
                 String targetText[] = context.getResources().getStringArray(R.array.clock);
@@ -247,24 +802,24 @@ public abstract class AreaDrawText extends Context {
                         x = x - paint.measureText(targetText[i]) / 4;
                         y = y + paint.measureText(targetText[i]) / 4;
                     }
-                    ca.drawText(targetText[i], x, y, paint);
+                    canvas.drawText(targetText[i], x, y, paint);
 
                 }
                 //绘制秒针
                 paint.setColor(number_colors[4]);
                 paint.setStrokeWidth(timeBean.getWidth_second());
                 float degree = timeBean.getRefresh_time() > 1000 ? (float) (timeBean.getSecond() * 360 / 60) : (float) (timeBean.getSecond() * 360 / 60 + timeBean.getMillSecond() / 1000 * 360 / 60);
-                ca.rotate(degree, mWidth / 2, mHeight / 2);
-                ca.drawLine(mWidth / 2, mHeight / 2, mWidth / 2, mHeight / 2 - (mWidth / 2 - timeBean.getWidth_circle()) * timeBean.getDensity_second(), paint);
-                ca.rotate(-degree, mWidth / 2, mHeight / 2);
+                canvas.rotate(degree, mWidth / 2, mHeight / 2);
+                canvas.drawLine(mWidth / 2, mHeight / 2, mWidth / 2, mHeight / 2 - (mWidth / 2 - timeBean.getWidth_circle()) * timeBean.getDensity_second(), paint);
+                canvas.rotate(-degree, mWidth / 2, mHeight / 2);
 
                 //绘制分针
                 paint.setColor(number_colors[5]);
                 paint.setStrokeWidth(timeBean.getWidth_minutes());
                 float degree2 = (float) (timeBean.getMinute() * 360 / 60);
-                ca.rotate(degree2, mWidth / 2, mHeight / 2);
-                ca.drawLine(mWidth / 2, mHeight / 2, mWidth / 2, mHeight / 2 - (mWidth / 2 - timeBean.getWidth_circle()) * timeBean.getDensity_minute(), paint);
-                ca.rotate(-degree2, mWidth / 2, mHeight / 2);
+                canvas.rotate(degree2, mWidth / 2, mHeight / 2);
+                canvas.drawLine(mWidth / 2, mHeight / 2, mWidth / 2, mHeight / 2 - (mWidth / 2 - timeBean.getWidth_circle()) * timeBean.getDensity_minute(), paint);
+                canvas.rotate(-degree2, mWidth / 2, mHeight / 2);
 
                 //绘制时针
                 paint.setColor(number_colors[6]);
@@ -272,19 +827,19 @@ public abstract class AreaDrawText extends Context {
                 float degreeHour = (float) timeBean.getHour() * 360 / 12;
                 float degreeMinut = (float) timeBean.getMinute() / 60 * 360 / 12;
                 float degree3 = degreeHour + degreeMinut;
-                ca.rotate(degree3, mWidth / 2, mHeight / 2);
-                ca.drawLine(mWidth / 2, mHeight / 2, mWidth / 2, mHeight / 2 - (mWidth / 2 - timeBean.getWidth_circle()) * timeBean.getDensity_hour(), paint);
-                ca.rotate(-degree3, mWidth / 2, mHeight / 2);
+                canvas.rotate(degree3, mWidth / 2, mHeight / 2);
+                canvas.drawLine(mWidth / 2, mHeight / 2, mWidth / 2, mHeight / 2 - (mWidth / 2 - timeBean.getWidth_circle()) * timeBean.getDensity_hour(), paint);
+                canvas.rotate(-degree3, mWidth / 2, mHeight / 2);
                 // 画圆心
                 paint.setStyle(Paint.Style.FILL);
-                ca.drawCircle(mWidth / 2, mHeight / 2, timeBean.getRadius_center(), paint);
+                canvas.drawCircle(mWidth / 2, mHeight / 2, timeBean.getRadius_center(), paint);
                 // 绘表标题
                 if (!timeBean.getM_strClockText().isEmpty()) {
                     String fixed_text = timeBean.getM_strClockText();
                     float textX = mWidth / 2 - paint.measureText(fixed_text) / 2;
                     float textY = mHeight / 2 - mWidth / 4;
                     paint.setColor(number_colors[4]);
-                    ca.drawText(fixed_text, textX, textY, paint);
+                    canvas.drawText(fixed_text, textX, textY, paint);
                 }
                 //绘制日期
                 if (timeBean.isDateshow() == true){
@@ -310,7 +865,7 @@ public abstract class AreaDrawText extends Context {
                     String textDay = format.format(date);
                     float textDayX = mWidth / 2 - paint.measureText(textDay) / 2;
                     float textDayY =  mHeight / 4 + mHeight / 2;
-                    ca.drawText(textDay,textDayX,textDayY,paint);
+                    canvas.drawText(textDay,textDayX,textDayY,paint);
                 }
                 //绘制星期
                 if (timeBean.isWeekshow() == true) {
@@ -333,7 +888,7 @@ public abstract class AreaDrawText extends Context {
 
                     float weekDayX = mWidth / 2 - paint.measureText(weekDay) / 2;
                     double weekDayY = mHeight / 4 + mHeight / 2 + height;
-                    ca.drawText(weekDay, weekDayX, (float) weekDayY, paint);
+                    canvas.drawText(weekDay, weekDayX, (float) weekDayY, paint);
                 }
             } else {
                 int mWidth = Math.max(timeBean.getTimeTowidth(), timeBean.getTimeToheidht());
@@ -346,8 +901,8 @@ public abstract class AreaDrawText extends Context {
                     } else {
                         paintLine.setColor(number_colors[7]);
                     }
-                    ca.drawCircle(mWidth / 2, borderWidth, timeBean.getRadius_center(), paintLine);
-                    ca.rotate(360 / 60, mWidth / 2, mHeight / 2);
+                    canvas.drawCircle(mWidth / 2, borderWidth, timeBean.getRadius_center(), paintLine);
+                    canvas.rotate(360 / 60, mWidth / 2, mHeight / 2);
                 }
                 //刻度数字
                 String targetText[] = context.getResources().getStringArray(R.array.clock);
@@ -365,23 +920,23 @@ public abstract class AreaDrawText extends Context {
                         x = x - paint.measureText(targetText[i]) / 4;
                         y = y + paint.measureText(targetText[i]) / 4;
                     }
-                    ca.drawText(targetText[i], x, y, paint);
+                    canvas.drawText(targetText[i], x, y, paint);
                 }
                 //绘制秒针
                 paint.setColor(number_colors[4]);
                 paint.setStrokeWidth(timeBean.getWidth_second());
                 float degree = timeBean.getRefresh_time() > 1000 ? (float) (timeBean.getSecond() * 360 / 60) : (float) (timeBean.getSecond() * 360 / 60 + timeBean.getMillSecond() / 1000 * 360 / 60);
-                ca.rotate(degree, mWidth / 2, mHeight / 2);
-                ca.drawLine(mWidth / 2, mHeight / 2, mWidth / 2, mHeight / 2 - (mWidth / 3 - timeBean.getWidth_circle()) * timeBean.getDensity_second(), paint);
-                ca.rotate(-degree, mWidth / 2, mHeight / 2);
+                canvas.rotate(degree, mWidth / 2, mHeight / 2);
+                canvas.drawLine(mWidth / 2, mHeight / 2, mWidth / 2, mHeight / 2 - (mWidth / 3 - timeBean.getWidth_circle()) * timeBean.getDensity_second(), paint);
+                canvas.rotate(-degree, mWidth / 2, mHeight / 2);
 
                 //绘制分针
                 paint.setColor(number_colors[5]);
                 paint.setStrokeWidth(timeBean.getWidth_minutes());
                 float degree2 = (float) (timeBean.getMinute() * 360 / 60);
-                ca.rotate(degree2, mWidth / 2, mHeight / 2);
-                ca.drawLine(mWidth / 2, mHeight / 2, mWidth / 2, mHeight / 2 - (mWidth / 3 - timeBean.getWidth_circle()) * timeBean.getDensity_minute(), paint);
-                ca.rotate(-degree2, mWidth / 2, mHeight / 2);
+                canvas.rotate(degree2, mWidth / 2, mHeight / 2);
+                canvas.drawLine(mWidth / 2, mHeight / 2, mWidth / 2, mHeight / 2 - (mWidth / 3 - timeBean.getWidth_circle()) * timeBean.getDensity_minute(), paint);
+                canvas.rotate(-degree2, mWidth / 2, mHeight / 2);
 
                 //绘制时针
                 paint.setColor(number_colors[6]);
@@ -389,19 +944,19 @@ public abstract class AreaDrawText extends Context {
                 float degreeHour = (float) timeBean.getHour() * 360 / 12;
                 float degreeMinut = (float) timeBean.getMinute() / 60 * 360 / 12;
                 float degree3 = degreeHour + degreeMinut;
-                ca.rotate(degree3, mWidth / 2, mHeight / 2);
-                ca.drawLine(mWidth / 2, mHeight / 2, mWidth / 2, mHeight / 2 - (mWidth / 3 - timeBean.getWidth_circle()) * timeBean.getDensity_hour(), paint);
-                ca.rotate(-degree3, mWidth / 2, mHeight / 2);
+                canvas.rotate(degree3, mWidth / 2, mHeight / 2);
+                canvas.drawLine(mWidth / 2, mHeight / 2, mWidth / 2, mHeight / 2 - (mWidth / 3 - timeBean.getWidth_circle()) * timeBean.getDensity_hour(), paint);
+                canvas.rotate(-degree3, mWidth / 2, mHeight / 2);
                 // 画圆心
                 paint.setStyle(Paint.Style.FILL);
-                ca.drawCircle(mWidth / 2, mHeight / 2, timeBean.getRadius_center(), paint);
+                canvas.drawCircle(mWidth / 2, mHeight / 2, timeBean.getRadius_center(), paint);
 
                 //绘制固定文字
                 String fixed_text = timeBean.getM_strClockText();
                 float textX = mWidth / 2 - paint.measureText(fixed_text) / 2;
                 float textY = mHeight / 4;
                 paint.setColor(number_colors[4]);
-                ca.drawText(fixed_text, textX, textY, paint);
+                canvas.drawText(fixed_text, textX, textY, paint);
 
                 //绘制日期
                 if (timeBean.isDateshow() == true){
@@ -426,7 +981,7 @@ public abstract class AreaDrawText extends Context {
                     String textDay = format.format(date);
                     float textDayX = mWidth / 2 - paint.measureText(textDay) / 2;
                     float textDayY = mHeight / 4 + mHeight / 2;
-                    ca.drawText(textDay, textDayX, textDayY, paint);
+                    canvas.drawText(textDay, textDayX, textDayY, paint);
                 }
                 //绘制星期
                 if (timeBean.isWeekshow() == true){
@@ -448,7 +1003,7 @@ public abstract class AreaDrawText extends Context {
                     double height = Math.ceil(fm.descent - fm.ascent);
                     float weekDayX = mWidth / 2 - paint.measureText(weekDay) / 2;
                     double weekDayY = mHeight / 4 + mHeight / 2 + height;
-                    ca.drawText(weekDay, weekDayX, (float) weekDayY, paint);
+                    canvas.drawText(weekDay, weekDayX, (float) weekDayY, paint);
                 }
             }
         } else {  //数字时钟
@@ -587,28 +1142,28 @@ public abstract class AreaDrawText extends Context {
                 //绘制固定文字
                 if (!fixed_text.equals("")) {
                     paint.setColor(number_colors[0]);
-                    ca.drawText(fixed_text, time_x, time_y, paint);
+                    canvas.drawText(fixed_text, time_x, time_y, paint);
                     time_x += paint.measureText(fixed_text);
                 }
                 //绘日期
                 if (!date.equals("")) {
                     ClockTextOut(time_x, time_y, date, timeBean.getM_rgbDayTextColor(), timeBean, 0);
                     paint.setColor(number_colors[1]);
-                    ca.drawText(date, time_x, time_y, paint);
+                    canvas.drawText(date, time_x, time_y, paint);
                     time_x += paint.measureText(date);
                 }
                 //绘制星期
                 if (!week.equals("")) {
                     ClockTextOut(time_x, time_y, week, timeBean.getM_rgbWeekTextColor(), timeBean, 1);
                     paint.setColor(number_colors[2]);
-                    ca.drawText(week, time_x, time_y, paint);
+                    canvas.drawText(week, time_x, time_y, paint);
                     time_x += paint.measureText(week);
                 }
                 //绘制时间
                 if (!time.equals("")) {
                     ClockTextOut(time_x, time_y, time, timeBean.getM_rgbTimeColor(), timeBean, 0);
                     paint.setColor(number_colors[3]);
-                    ca.drawText(time, time_x, time_y, paint);
+                    canvas.drawText(time, time_x, time_y, paint);
                 }
             } else { //多行
                 time_y = (int) (-fm.ascent + 1);
@@ -633,14 +1188,14 @@ public abstract class AreaDrawText extends Context {
                     if (!fixed_text.equals("")) {
                         paint.setColor(number_colors[0]);
                         time_x = (int) (timeBean.getTimeTowidth() - Utils.getTextWidth(paint, fixed_text)) / 2;
-                        ca.drawText(fixed_text, time_x, time_y + (int) ((nRowHeight - Utils.getFontHeight(paint)) / 2), paint);
+                        canvas.drawText(fixed_text, time_x, time_y + (int) ((nRowHeight - Utils.getFontHeight(paint)) / 2), paint);
                         time_y += nRowHeight;
                     }
                     //绘日期
                     if (!date.equals("")) {
                         paint.setColor(number_colors[1]);
                         time_x = (int) ((timeBean.getTimeToX()) + (timeBean.getTimeTowidth() - Utils.getTextWidth(paint, date)) / 2);
-                        ca.drawText(date, time_x, time_y + (int) ((nRowHeight - Utils.getFontHeight(paint)) / 2), paint);
+                        canvas.drawText(date, time_x, time_y + (int) ((nRowHeight - Utils.getFontHeight(paint)) / 2), paint);
                         ClockTextOut(time_x, time_y + (int) ((nRowHeight - Utils.getFontHeight(paint)) / 2), date, timeBean.getM_rgbDayTextColor(), timeBean, 0);
                         time_y += nRowHeight;
                     }
@@ -648,7 +1203,7 @@ public abstract class AreaDrawText extends Context {
                     if (!week.equals("")) {
                         paint.setColor(number_colors[2]);
                         time_x = (int) (timeBean.getTimeTowidth() - Utils.getTextWidth(paint, week)) / 2;
-                        ca.drawText(week, time_x, time_y + (int) ((nRowHeight - Utils.getFontHeight(paint)) / 2), paint);
+                        canvas.drawText(week, time_x, time_y + (int) ((nRowHeight - Utils.getFontHeight(paint)) / 2), paint);
                         ClockTextOut(time_x, time_y + (int) ((nRowHeight - Utils.getFontHeight(paint)) / 2), week, timeBean.getM_rgbWeekTextColor(), timeBean, 1);
                         time_y += nRowHeight;
                     }
@@ -656,13 +1211,13 @@ public abstract class AreaDrawText extends Context {
                     if (!time.equals("")) {
                         paint.setColor(number_colors[3]);
                         time_x = (int) ((timeBean.getTimeToX()) + (timeBean.getTimeTowidth() - Utils.getTextWidth(paint, time)) / 2);
-                        ca.drawText(time, time_x, time_y + (int) ((nRowHeight - Utils.getFontHeight(paint)) / 2), paint);
+                        canvas.drawText(time, time_x, time_y + (int) ((nRowHeight - Utils.getFontHeight(paint)) / 2), paint);
                         ClockTextOut(time_x, time_y + (int) ((nRowHeight - Utils.getFontHeight(paint)) / 2), time, timeBean.getM_rgbTimeColor(), timeBean, 0);
                     }
                 }
             }
         }
-        return null;
+        return bitmap;
     }
 
     /*

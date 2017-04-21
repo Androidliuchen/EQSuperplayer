@@ -27,7 +27,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="时间编辑"
+            android:text="@string/text_parameters_time"
             android:textColor="#fff"
             android:textSize="20sp" />
 
@@ -37,9 +37,22 @@
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:background="@drawable/button_down"
-            android:text="确定"
+            android:text="@string/submit"
             android:textColor="#fff"
             android:textSize="20sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:id="@+id/program_text_background"
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:gravity="center_vertical">
+        <ImageView
+            android:id="@+id/tiem_show"
+            android:layout_width="match_parent"
+            android:layout_height="200dp" />
     </LinearLayout>
 
     <ScrollView
@@ -52,13 +65,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="参数设置"
-                android:textSize="20sp" />
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -66,16 +72,16 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="30dp"
                 android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="名         称："
-                    android:textSize="20sp" />
+                    android:layout_weight="1"
+                    android:gravity="center|left"
+                    android:text="名称："
+                    android:textSize="15sp" />
 
                 <EditText
                     android:id="@+id/timeToname"
@@ -83,10 +89,28 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@null"
+                    android:textSize="15sp"
                     android:gravity="center"
                     android:text="时间窗" />
-            </LinearLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="固定文字："
+                    android:textSize="15sp" />
 
+                <EditText
+                    android:id="@+id/timeToarrds"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:textSize="15sp"
+                    android:gravity="center"
+                    android:text="北京" />
+
+            </LinearLayout>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -94,66 +118,31 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="30dp"
                 android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="显示风格："
-                    android:textSize="20sp" />
-
-                <Spinner
-                    android:id="@+id/timeToys"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/dimgrey" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="边         框："
-                    android:textSize="20sp" />
+                    android:layout_weight="1"
+                    android:gravity="center|left"
+                    android:text="边框："
+                    android:textSize="15sp" />
 
                 <Spinner
                     android:id="@+id/timeToborder"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:textSize="15sp"
                     android:layout_weight="1" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/dimgrey" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="2"
+                    android:layout_weight="1"
                     android:gravity="center"
                     android:text="边框颜色："
-                    android:textSize="20sp" />
+                    android:textSize="15sp" />
 
                 <Spinner
                     android:id="@+id/timeTobordercolor"
@@ -166,19 +155,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/dimgrey" />
-
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="30dp"
                 android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="坐       标x："
-                    android:textSize="20sp" />
+                    android:layout_weight="1"
+                    android:gravity="center|left"
+                    android:text="坐标x："
+                    android:textSize="15sp" />
 
                 <EditText
                     android:id="@+id/timeTox"
@@ -187,26 +175,15 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:gravity="center"
-                    android:hint="请输入坐标x" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/dimgrey" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:orientation="horizontal">
-
+                    android:textSize="15sp"
+                    android:hint="0" />
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="坐       标y："
-                    android:textSize="20sp" />
+                    android:layout_weight="1"
+                    android:gravity="center|left"
+                    android:text="坐标y："
+                    android:textSize="15sp" />
 
                 <EditText
                     android:id="@+id/timeToy"
@@ -215,9 +192,9 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:gravity="center"
-                    android:hint="请输入坐标y" />
+                    android:textSize="15sp"
+                    android:hint="0" />
             </LinearLayout>
-
 
             <View
                 android:layout_width="match_parent"
@@ -225,18 +202,19 @@
                 android:background="@color/dimgrey" />
 
 
+
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="30dp"
                 android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="宽         度："
-                    android:textSize="20sp" />
+                    android:layout_weight="1"
+                    android:gravity="center|left"
+                    android:text="宽度："
+                    android:textSize="15sp" />
 
                 <EditText
                     android:id="@+id/timeToWidth"
@@ -245,26 +223,15 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:gravity="center"
+                    android:textSize="15sp"
                     android:hint="请输入长度" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/dimgrey" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:orientation="horizontal">
-
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="高         度："
-                    android:textSize="20sp" />
+                    android:layout_weight="1"
+                    android:gravity="center|left"
+                    android:text="高度："
+                    android:textSize="15sp" />
 
                 <EditText
                     android:id="@+id/timeToHeigth"
@@ -273,6 +240,7 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:gravity="center"
+                    android:textSize="15sp"
                     android:hint="请输入宽度" />
             </LinearLayout>
             <View
@@ -282,94 +250,44 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="30dp"
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="固定文字："
-                    android:textSize="20sp" />
-
-                <EditText
-                    android:id="@+id/timeToarrds"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:background="@null"
-                    android:gravity="center"
-                    android:text="北京" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/dimgrey" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="字         体："
-                    android:textSize="20sp" />
+                    android:gravity="center|left"
+                    android:text="字体："
+                    android:textSize="15sp" />
 
                 <Spinner
                     android:id="@+id/timeToFont"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:textSize="15sp"
                     android:layout_weight="1" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/dimgrey" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:orientation="horizontal">
-
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="2"
+                    android:layout_weight="1"
                     android:gravity="center"
                     android:text="字体大小："
-                    android:textSize="20sp" />
+                    android:textSize="12sp" />
 
                 <Spinner
                     android:id="@+id/timeToSize"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:textSize="15sp"
                     android:layout_weight="1" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/dimgrey" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:orientation="horizontal">
-
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="2"
+                    android:layout_weight="1"
                     android:gravity="center"
                     android:text="字体颜色："
-                    android:textSize="20sp" />
+                    android:textSize="12sp" />
 
                 <Spinner
                     android:id="@+id/timeToColoer"
@@ -377,283 +295,432 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1" />
             </LinearLayout>
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/dimgrey" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="时钟形状："
-                    android:textSize="20sp" />
-
-                <Spinner
-                    android:id="@+id/timeToxz"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1" />
-            </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/dimgrey" />
+<LinearLayout
 
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:gravity="center|left"
+            android:text="显示风格："
+            android:textSize="15sp" />
+
+        <Spinner
+            android:id="@+id/timeToys"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/dimgrey" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:gravity="center|left"
+            android:text="时差："
+            android:textSize="15sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_weight="1">
+            <EditText
+                android:id="@+id/timeToDay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@null"
+                android:gravity="center"
+                android:textSize="15sp"
+                android:text="0" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center|left"
+                android:text="天"
+                android:textSize="15sp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:id="@+id/huorOrMinute"
+                android:textSize="14sp"
+                android:text="00:00"
+                android:textColor="@color/black"
+                android:background="@drawable/edit_shape"/>
+
+        </LinearLayout>
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/dimgrey" />
+<LinearLayout
+    android:id="@+id/window_time_analogclock"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal">
+        <CheckBox
+            android:id="@+id/timeToxq"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:hint="星期"
+            android:textSize="15sp" />
+        <Spinner
+            android:id="@+id/timeToxqColor"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+        <CheckBox
+            android:id="@+id/timeTorq"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:hint="日期"
+            android:textSize="15sp" />
+
+        <Spinner
+            android:id="@+id/timeTorqColor"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/dimgrey" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center|left"
+            android:text="时针："
+            android:textSize="15sp" />
+
+        <Spinner
+            android:id="@+id/timeTosz"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="分针："
+            android:textSize="15sp" />
+
+        <Spinner
+            android:id="@+id/timeTofz"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="秒针："
+            android:textSize="15sp" />
+
+        <Spinner
+            android:id="@+id/timeTomz"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/dimgrey" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center|left"
+            android:text="时标："
+            android:textSize="15sp" />
+
+        <Spinner
+            android:id="@+id/timeToshibiao"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center|left"
+            android:text="分标："
+            android:textSize="15sp" />
+
+        <Spinner
+            android:id="@+id/timeTofenbiao"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+</LinearLayout>
+
+<LinearLayout
+    android:id="@+id/window_time_numberclock"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:visibility="gone"
+    android:orientation="vertical">
+    <RadioGroup
+        android:id="@+id/time_yearformat"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:layout_weight="1"
+            android:text="年份风格："/>
+        <RadioButton
+            android:id="@+id/four_year"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="15dp"
+            android:text="4位年"/>
+        <RadioButton
+            android:id="@+id/two_year"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:layout_weight="1"
+            android:text="2位年"/>
+    </RadioGroup>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/dimgrey" />
+    <RadioGroup
+        android:id="@+id/hour_time_format"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:layout_weight="1"
+            android:text="小时风格："/>
+        <RadioButton
+            android:id="@+id/two_hours"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="15dp"
+            android:text="12小时制"/>
+        <RadioButton
+            android:id="@+id/four_hours"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:layout_weight="1"
+            android:text="24小时制"/>
+    </RadioGroup>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/dimgrey" />
+    <RadioGroup
+        android:id="@+id/time_lineformat"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:layout_weight="1"
+            android:text="分行："/>
+        <RadioButton
+            android:id="@+id/Single_one"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="15dp"
+            android:text="单行"/>
+        <RadioButton
+            android:id="@+id/Single_many"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:layout_weight="1"
+            android:text="多行"/>
+    </RadioGroup>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/dimgrey" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:layout_weight="1"
+            android:text="日期："/>
+        <CheckBox
+            android:id="@+id/time_year"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="15dp"
+            android:text="年"/>
+        <CheckBox
+            android:id="@+id/time_month"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:layout_weight="1"
+            android:text="月"/>
+        <CheckBox
+            android:id="@+id/time_day"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:layout_weight="1"
+            android:text="日"/>
+        <Spinner
+            android:id="@+id/time_coloer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/dimgrey" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:layout_weight="1"
+        android:text="星期："/>
+        <CheckBox
+            android:id="@+id/time_week"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:layout_weight="1"
+            android:text="星期"/>
+        <Spinner
+            android:id="@+id/week_coloer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/dimgrey" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:layout_weight="1"
+            android:text="时间："/>
+        <CheckBox
+            android:id="@+id/time_hour"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="15dp"
+            android:text="时"/>
+        <CheckBox
+            android:id="@+id/time_share"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:layout_weight="1"
+            android:text="分"/>
+        <CheckBox
+            android:id="@+id/time_second"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:layout_weight="1"
+            android:text="秒"/>
+        <Spinner
+            android:id="@+id/hour_coloer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/dimgrey" />
+</LinearLayout>
+</LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="星         期："
-                    android:textSize="20sp" />
-
-                <CheckBox
-                    android:id="@+id/timeToxq"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:hint="星期"
-                    android:textSize="15sp" />
-                <Spinner
-                    android:id="@+id/timeToxqColor"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/dimgrey" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="日         期："
-                    android:textSize="20sp" />
-
-                <CheckBox
-                    android:id="@+id/timeTorq"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:hint="日期"
-                    android:textSize="15sp" />
-
-                <Spinner
-                    android:id="@+id/timeTorqColor"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/dimgrey" />
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="时         针："
-                    android:textSize="20sp" />
-
-                <Spinner
-                    android:id="@+id/timeTosz"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/dimgrey" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="分         针："
-                    android:textSize="20sp" />
-
-                <Spinner
-                    android:id="@+id/timeTofz"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/dimgrey" />
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="秒         针："
-                    android:textSize="20sp" />
-
-                <Spinner
-                    android:id="@+id/timeTomz"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/dimgrey" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="时         标："
-                    android:textSize="20sp" />
-
-                <Spinner
-                    android:id="@+id/timeToshibiao"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/dimgrey" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="分         标："
-                    android:textSize="20sp" />
-
-                <Spinner
-                    android:id="@+id/timeTofenbiao"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/dimgrey" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:text="时           差："
-                    android:textSize="20sp" />
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:layout_weight="1">
-                    <EditText
-                        android:id="@+id/timeToDay"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@null"
-                        android:gravity="center"
-                        android:text="0" />
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="天"
-                        android:textSize="20sp"/>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:id="@+id/huorOrMinute"
-                        android:textSize="14sp"
-                        android:text="00:00"
-                        android:textColor="@color/black"
-                        android:background="@drawable/edit_shape"/>
-
-                </LinearLayout>
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/dimgrey" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:orientation="horizontal">
+                android:orientation="vertical">
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

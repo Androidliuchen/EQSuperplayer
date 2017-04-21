@@ -70,10 +70,10 @@ public class BrightnessActivity extends AppCompatActivity implements View.OnClic
                 finish();
                 break;
             case R.id.bright_setting:
-                List<byte[]> brightPaks = new ArrayList<>();
+//                List<byte[]> brightPaks = new ArrayList<>();
                 byte[] brightPak = SendPacket.brightness(brightness_int);
-                brightPaks.add(brightPak);
-                ccc = new ConnectControlCard(BrightnessActivity.this,brightPaks, new InterfaceConnect() {
+//                brightPaks.add(brightPak);
+                ccc = new ConnectControlCard(BrightnessActivity.this,brightPak, new InterfaceConnect() {
                     @Override
                     public void success(byte[] result) {
                     }

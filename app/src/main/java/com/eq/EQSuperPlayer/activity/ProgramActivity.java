@@ -2,9 +2,9 @@ package com.eq.EQSuperPlayer.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PointF;
@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.util.TypedValue;
 import android.util.Xml;
 import android.view.MotionEvent;
 import android.view.View;
@@ -41,6 +42,9 @@ import com.eq.EQSuperPlayer.bean.TextBean;
 import com.eq.EQSuperPlayer.bean.TimeBean;
 import com.eq.EQSuperPlayer.bean.TotalBean;
 import com.eq.EQSuperPlayer.bean.VedioBean;
+import com.eq.EQSuperPlayer.communication.InterfaceConnect;
+import com.eq.EQSuperPlayer.communication.SendPacket;
+import com.eq.EQSuperPlayer.communication.UDPSocketUtis;
 import com.eq.EQSuperPlayer.custom.Constant;
 import com.eq.EQSuperPlayer.custom.CustomTypeWindow;
 import com.eq.EQSuperPlayer.custom.ProgramePopWindow;
@@ -65,6 +69,7 @@ import org.xmlpull.v1.XmlSerializer;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,7 +124,16 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
     private int program_name_count;
     private int zoneIndex = 0;
     private boolean isScale=false;
-
+    private int MAXLENG = 0;//数据最大长度
+    private RandomAccessFile ism;
+    private ArrayList<String> iamgID; //存放图片名的数组
+    private List<String> filr = new ArrayList<String>();
+    private List<String> progrmae = new ArrayList<String>(); //存放图片路径的数组
+    private ProgressDialog proDialog; // 进度条
+    private String PROGRAME_ROOT = Environment
+            .getExternalStorageDirectory()
+            .getAbsolutePath() + "/EQPrograme/";
+    private int imageAllSize = 0;//取出图片的总个数
     private MyOnTouchListener listener;
 
     @Override
@@ -255,7 +269,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 String times = timeBean.getId() + ".............." + timeBean.getTimeToname();
                 Log.d("............", "times数值.........:" + times);
                 timeBean.setProgramBean(programBean);
-                timeBean.setType(Constant.AREA_TYPE_IMAGE);
+                timeBean.setType(Constant.AREA_TYPE_TIME);
                 totalBeens.add(timeBean);
             }
         }
@@ -283,32 +297,35 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
       显示文本内容
     */
     private void showText() {
-        int[] number_colors = new int[]{textBean.getBorderColor(), textBean.getStBackground(), textBean.getStColor()};
-        for (int i = 0; i < number_colors.length; i++) {
-            switch (number_colors[i]) {
+        int number_colors = textBean.getStColor();
+        for (int i = 0; i < 1; i++) {
+            switch (number_colors) {
                 case 0:
-                    number_colors[i] = Color.YELLOW;
+                    number_colors = getResources().getColor(R.color.yellow);
                     break;
                 case 1:
-                    number_colors[i] = Color.MAGENTA;
+                    number_colors = getResources().getColor(R.color.dodgerblue);
                     break;
                 case 2:
-                    number_colors[i] = Color.RED;
+                    number_colors = getResources().getColor(R.color.red);
                     break;
                 case 3:
-                    number_colors[i] = Color.GREEN;
+                    number_colors = getResources().getColor(R.color.lime);
                     break;
                 case 4:
-                    number_colors[i] = Color.WHITE;
+                    number_colors = getResources().getColor(R.color.mediumorchid);
                     break;
                 case 5:
-                    number_colors[i] = Color.BLUE;
+                    number_colors = getResources().getColor(R.color.blue);
                     break;
                 case 6:
-                    number_colors[i] = Color.BLACK;
+                    number_colors = getResources().getColor(R.color.black);
                     break;
                 case 7:
-                    number_colors[i] = Color.GRAY;
+                    number_colors = getResources().getColor(R.color.white);
+                    break;
+                case 8:
+                    number_colors = getResources().getColor(R.color.grey);
                     break;
             }
         }
@@ -317,10 +334,10 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         textview.setX(textBean.getX());
         textview.setY(textBean.getY());
         textview.setOnTouchListener(listener);
-        textview.setTextColor(number_colors[2]);
-        textview.setTextSize(textBean.getStSize());
+        textview.setTextColor(number_colors);
+        textview.setTextSize((float) (textBean.getStSize() / 1.2));
         textview.setWidth(textBean.getWidth());
-        textview.setHeight(textBean.getHeidht());
+        textview.setHeight(textBean.getHeight());
         textview.setBackgroundColor(0x0000);
         textview.setBackgroundResource(R.drawable.bodler_shape);
         text_layout.addView(textview);
@@ -441,7 +458,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 String[] arrayFruit = new String[]{getResources().getString(R.string.program_text),
                         getResources().getString(R.string.program_video),
                         getResources().getString(R.string.program_image),
-//                      getResources().getString(R.string.program_time),
+                      getResources().getString(R.string.program_time),
 
                 };
                 AlertDialog.Builder dia = new AlertDialog.Builder(ProgramActivity.this);
@@ -515,7 +532,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             }
         });
         textView.setText(getResources().getText(R.string.the_programme));
-        final ProgramBean programBean = new ProgramBeanDao(this).get(selet);
+//        final ProgramBean programBean = new ProgramBeanDao(this).get(selet);
         recyclerViewAdapter = new RecyclerViewAdapter(ProgramActivity.this, mDatas);
         recyclerViewAdapter.setmRemoveViewListener(new RecyclerViewAdapter.OnRemoveViewListener() {
             @Override
@@ -739,10 +756,102 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 }
                 break;
             case R.id.region_send:
+                Sendprogram();
                 break;
         }
     }
+    /**
+     * 节目发送指令
+     */
+    public void Sendprogram() {
+        getImageName();
+        if (progrmae.size() > 1) {
+            proDialog = new ProgressDialog(this);
+            proDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            proDialog.setCancelable(false);// 设置是否可以通过点击Back键取消
+            proDialog.setCanceledOnTouchOutside(false);// 设置在点击Dialog外是否取消Dialog进度条
+            proDialog.setTitle("节目发送中......");
+            proDialog.setMax(MAXLENG);
+            proDialog.show();
+            new Thread(new UDPSocketUtis(this, proDialog, new InterfaceConnect() {
+                @Override
+                public void success(byte[] result) {
+                    proDialog.cancel();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(ProgramActivity.this, "文件发送完成", Toast.LENGTH_SHORT).show();
 
+                        }
+                    });
+                }
+
+                @Override
+                public void failure(final int stateCode) {
+                    proDialog.cancel();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (stateCode == 0){
+                                Toast.makeText(ProgramActivity.this, "文件发送失败", Toast.LENGTH_SHORT).show();
+
+                            }else {
+                                Toast.makeText(ProgramActivity.this, "网络连接异常", Toast.LENGTH_SHORT).show();
+
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void dataSuccess(String str) {
+
+                }
+            })).start();
+        } else {
+            Toast.makeText(this, "当前节目内容为空!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    public void getImageName() {
+        MAXLENG = 0;
+        iamgID = new ArrayList<String>();
+        List<String> filePath = new ArrayList<>();
+        filePath.add(PROGRAME_ROOT);
+        String fileTextPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                + "EQText";
+        filePath.add(fileTextPath);
+
+        String fileImagePath = Environment.getExternalStorageDirectory().toString() + File.separator
+                + "EQImage";
+        filePath.add(fileImagePath);
+        String fileVedioPath = Environment.getExternalStorageDirectory().toString() + File.separator
+                + "EQVedio";
+        filePath.add(fileVedioPath);
+        for (int i = 0; i < filePath.size(); i++) {
+            File fileAll = new File(filePath.get(i));
+            if (!fileAll.exists()) {
+                fileAll.mkdir();
+            }
+            File[] files = fileAll.listFiles();
+            for (int j = 0; j < files.length; j++) {
+                File file1 = files[j];
+                MAXLENG += file1.length();
+                progrmae.add(String.valueOf(file1));
+                Log.d("...........", "progrmae........:" + progrmae.toString());
+                String imageName = file1.getPath().substring(file1.getPath().lastIndexOf("/") + 1, file1.getPath().length());
+                String DATA_TYPE = imageName.substring(imageName.indexOf(".") + 1).toString();
+                if (!DATA_TYPE.equals("xml")) {
+                    String aa = SendPacket.str2HexStr(imageName);
+                    filr.add(aa);
+                    iamgID.add(imageName);
+                    imageAllSize = iamgID.size();
+                }
+            }
+        }
+
+    }
     /*
      //显示屏启动动画
     */
@@ -935,9 +1044,49 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         serializer.text(String.valueOf(textBean.getWidth()));
                         serializer.endTag(null, "width");
 
-                        serializer.startTag(null, "heidht");
-                        serializer.text(String.valueOf(textBean.getHeidht()));
-                        serializer.endTag(null, "heidht");
+                        serializer.startTag(null, "height");
+                        serializer.text(String.valueOf(textBean.getHeight()));
+                        serializer.endTag(null, "height");
+
+                        serializer.startTag(null, "framemode");
+                        serializer.text(String.valueOf(textBean.getBorder()));
+                        serializer.endTag(null, "framemode");
+                        int number_colors =textBean.getBorderColor();
+                        long textColor = 0;
+                        for (int i = 0; i < 1; i++) {
+                            switch (number_colors) {
+                                case 0:
+                                    textColor  = 2552550;
+                                    break;
+                                case 1:
+                                    textColor  = 30144255;
+                                    break;
+                                case 2:
+                                    textColor  =25500;
+                                    break;
+                                case 3:
+                                    textColor = 02550;
+                                    break;
+                                case 4:
+                                    textColor =255192203;
+                                    break;
+                                case 5:
+                                    textColor = 00255;
+                                    break;
+                                case 6:
+                                    textColor = 000;
+                                    break;
+                                case 7:
+                                    textColor = 255255255;
+                                    break;
+                                case 8:
+                                    textColor = 192192192;
+                                    break;
+                            }
+                        }
+                        serializer.startTag(null, "framecolor");
+                        serializer.text(textColor +"");
+                        serializer.endTag(null, "framecolor");
                         serializer.endTag(null, "attribute");
                         // 图片列表
                         List<String> imagePathList = new ArrayList<String>();
@@ -960,6 +1109,9 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                                 serializer.text("bmp");
                                 serializer.endTag(null, "type");
 
+                                serializer.startTag(null, "effect");
+                                serializer.text("2");
+                                serializer.endTag(null, "effect");
                                 serializer.startTag(null, "name");
                                 serializer.text(imageName);
                                 serializer.endTag(null, "name");
@@ -1005,6 +1157,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         serializer.startTag(null, "zonetype");
                         serializer.text("file");
                         serializer.endTag(null, "zonetype");
+
                         serializer.startTag(null, "attribute");
                         serializer.startTag(null, "x");
                         serializer.text(String.valueOf(imageBean.getIamgeX()));
@@ -1018,9 +1171,50 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         serializer.text(String.valueOf(imageBean.getIamgeWidth()));
                         serializer.endTag(null, "width");
 
-                        serializer.startTag(null, "heidht");
+                        serializer.startTag(null, "height");
                         serializer.text(String.valueOf(imageBean.getIamgeHeidht()));
-                        serializer.endTag(null, "heidht");
+                        serializer.endTag(null, "height");
+
+                        serializer.startTag(null, "framemode");
+                        serializer.text(String.valueOf(imageBean.getIamgeBorder()));
+                        serializer.endTag(null, "framemode");
+
+                        int image_colors =imageBean.getIamgeBorderColor();
+                        int imageColor = 0;
+                        for (int i = 0; i < 1; i++) {
+                            switch (image_colors) {
+                                case 0:
+                                    imageColor  = 2552550;
+                                    break;
+                                case 1:
+                                    imageColor  = 30144255;
+                                    break;
+                                case 2:
+                                    imageColor  =25500;
+                                    break;
+                                case 3:
+                                    imageColor = 02550;
+                                    break;
+                                case 4:
+                                    imageColor =255192203;
+                                    break;
+                                case 5:
+                                    imageColor = 00255;
+                                    break;
+                                case 6:
+                                    imageColor = 000;
+                                    break;
+                                case 7:
+                                    imageColor = 255255255;
+                                    break;
+                                case 8:
+                                    imageColor = 192192192;
+                                    break;
+                            }
+                        }
+                        serializer.startTag(null, "framecolor");
+                        serializer.text(imageColor + "");
+                        serializer.endTag(null, "framecolor");
                         serializer.endTag(null, "attribute");
                         // 图片列表
                         List<String> imagePathList = new ArrayList<String>();
@@ -1044,6 +1238,9 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                                 serializer.startTag(null, "type");
                                 serializer.text("2");
                                 serializer.endTag(null, "type");
+                                serializer.startTag(null, "effect");
+                                serializer.text("1");
+                                serializer.endTag(null, "effect");
 
                                 serializer.startTag(null, "name");
                                 serializer.text(imageName);
@@ -1106,9 +1303,49 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         serializer.text(String.valueOf(vedioBean.getVedioWidth()));
                         serializer.endTag(null, "width");
 
-                        serializer.startTag(null, "heidht");
+                        serializer.startTag(null, "height");
                         serializer.text(String.valueOf(vedioBean.getVedioHeidht()));
-                        serializer.endTag(null, "heidht");
+                        serializer.endTag(null, "height");
+                        serializer.startTag(null, "framemode");
+                        serializer.text(String.valueOf(imageBean.getIamgeBorder()));
+                        serializer.endTag(null, "framemode");
+
+                        int vedio_colors =vedioBean.getVedioBorderColor();
+                        int vedioColor = 0;
+                        for (int i = 0; i < 1; i++) {
+                            switch (vedio_colors) {
+                                case 0:
+                                    vedioColor  = 2552550;
+                                    break;
+                                case 1:
+                                    vedioColor  = 30144255;
+                                    break;
+                                case 2:
+                                    vedioColor  =25500;
+                                    break;
+                                case 3:
+                                    vedioColor = 02550;
+                                    break;
+                                case 4:
+                                    vedioColor =255192203;
+                                    break;
+                                case 5:
+                                    vedioColor = 00255;
+                                    break;
+                                case 6:
+                                    vedioColor = 000;
+                                    break;
+                                case 7:
+                                    vedioColor = 255255255;
+                                    break;
+                                case 8:
+                                    vedioColor = 192192192;
+                                    break;
+                            }
+                        }
+                        serializer.startTag(null, "framecolor");
+                        serializer.text(vedioColor + "");
+                        serializer.endTag(null, "framecolor");
                         serializer.endTag(null, "attribute");
                         // 视频列表
                         List<String> imagePathList = new ArrayList<String>();
@@ -1177,9 +1414,9 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         serializer.text(String.valueOf(areabean.getWindowWidth()));
                         serializer.endTag(null, "width");
 
-                        serializer.startTag(null, "heidht");
+                        serializer.startTag(null, "height");
                         serializer.text(String.valueOf(areabean.getWindowHeight()));
-                        serializer.endTag(null, "heidht");
+                        serializer.endTag(null, "height");
                         serializer.endTag(null, "attribute");
                         // 图片列表
                         List<String> imagePathList = new ArrayList<String>();

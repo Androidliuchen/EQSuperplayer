@@ -1,5 +1,6 @@
 package com.eq.EQSuperPlayer.fargament;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
@@ -8,6 +9,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -203,24 +205,40 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
             public void onClickListener(int position) {
                 areabeens = new AreabeanDao(getActivity()).getListAll();
                 mAreabean = areabeens.get(0);
+                Log.d("mAreabean......", mAreabean.toString() + "");
                 updataArea = position;
                 newOrupdata = false;
-                if (addPopWindow == null) {
-                    addPopWindow = new CustomPopWindow(getActivity(), R.id.iamge);
-                    addPopWindow.setView(getPopWindowView(), 0.8f, 0.50f);
+                addPopWindow = new CustomPopWindow(getActivity(), R.id.iamge);
+                addPopWindow.setView(getPopWindowView(), 0.8f, 0.50f);
+                if (mAreabean != null) {
+                    addPopWindow.showPopupWindow(mImageView);
+                    program_name.setText(mAreabean.getName() + "");
+                    program_type.setText(mAreabean.getEquitType() + "");
+                    program_height.setText(mAreabean.getWindowHeight() + "");
+                    program_width.setText(mAreabean.getWindowWidth() + "");
+                    program_ip.setText(mAreabean.getEquitTp() + "");
                 }
-                addPopWindow.showPopupWindow(mImageView);
-                program_name.setText(mAreabean.getName() + "");
-                program_type.setText(mAreabean.getEquitType());
-                program_height.setText(mAreabean.getWindowHeight() + "");
-                program_width.setText(mAreabean.getWindowWidth() + "");
-                program_ip.setText(mAreabean.getEquitTp());
+
+
             }
         });
 
         mListView.setAdapter(mProgramAdapter);
     }
-
+public void Dialog(){
+    String[] arr = new String[]{};
+    for (int i = 0; i< areabeens.size();i++){
+        Areabean areabean = areabeens.get(i);
+        String equitl = areabean.getName();
+        arr[i] = equitl;
+    }
+    new  AlertDialog.Builder(getActivity())
+            .setTitle("多选框" )
+            .setMultiChoiceItems(arr,  null ,  null )
+            .setPositiveButton("确定" , null)
+            .setNegativeButton("取消" ,  null )
+            .show();
+}
     @Override
     public void onClick(View view) {
         mAreabean = new Areabean();
@@ -517,7 +535,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                         new AreabeanDao(getActivity()).add(mAreabean);
                         windowWidth = wdith;
                         windowHeight = height;
-                        WindowSizeManager.setSharedPreference(getActivity(), windowWidth , windowHeight);
+                        WindowSizeManager.setSharedPreference(getActivity(), windowWidth, windowHeight);
                         program_name_count++;
                         ProgramNameItemManager.setSharedPreference(getActivity(), program_name_count);
                         handler.sendEmptyMessage(0);

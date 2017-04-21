@@ -1,12 +1,9 @@
 package com.eq.EQSuperPlayer.activity;
 
 import android.app.ProgressDialog;
-import android.graphics.Bitmap;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
-import android.os.Message;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -29,28 +26,19 @@ import com.eq.EQSuperPlayer.bean.SendAdapter;
 import com.eq.EQSuperPlayer.communication.ConnectControlCard;
 import com.eq.EQSuperPlayer.communication.InterfaceConnect;
 import com.eq.EQSuperPlayer.communication.SendPacket;
+import com.eq.EQSuperPlayer.communication.UDPSocketUtis;
 import com.eq.EQSuperPlayer.custom.CustomPopWindow;
-import com.eq.EQSuperPlayer.dao.AreabeanDao;
 import com.eq.EQSuperPlayer.fargament.LeftFragment;
+import com.eq.EQSuperPlayer.fargament.ProgramFragment;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class MainActivity extends SlidingFragmentActivity implements View.OnClickListener {
     private FragmentManager mFragmentManager;
@@ -71,40 +59,14 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
     private RandomAccessFile ism;
     private ArrayList<String> iamgID; //存放图片名的数组
     private List<String> filr = new ArrayList<String>();
-    private int allFileSize = 0;
     private List<String> progrmae = new ArrayList<String>(); //存放图片路径的数组
-    private int start;//0 代表发送成功，发送文件数据，1 代表发送失败，2
     private int imageAllSize = 0;//取出图片的总个数
-    private List<byte[]> arrays = new ArrayList<byte[]>();
-    private int countAdress = 0;//当前发送的个数
-    private int manyAllConten = 0;//总包数
-    private int sendLeng = 0;
-    private int sendConten = 0;
-    private int MULTI_PACKAGE_MAX_COUNT = 50;//多包发送时最大的包个数
-    private int MULTI_PACKAGE_MIN_COUNT = 10;//多包发送时最小的包个数
-    private int DATA_MAX_SIZE = 1024;// 数据最大长度
-    private int TIMEOUT = 3;//丢包时发送次数
     private String PROGRAME_ROOT = Environment
             .getExternalStorageDirectory()
             .getAbsolutePath() + "/EQPrograme/";
-    private int alllen; //数据包总长度
-    private int countOrAdress = 0;
-    private int manyStratIndex = 0;//多包发送的起始位置
-    private int endLeng = 0;//最后一小包的长度
-    private int EORRE_COUNT = 1;//错误次数
-    private int resourcesIndex = 0;
-    private ExecutorService fixedThreadPool = Executors.newFixedThreadPool(10);
     private DhcpInfo dhcpInfo;
     public static String IP;
-    public static DatagramSocket dataSocket = null;
-    private byte[] buffer;
-    private int fileSzie = 0;
-    public static int PORT = 5050;  // 端口
-    public static String HOSTAddress = null;    // 主机地址
-    private DatagramPacket dataPacket = null;
-    private DatagramSocket sendSocket = null;
-    private int dataLength = 0;    //在当前类，竟然还要传个空值过来
-    private InetAddress local;
+    private int MAXLENG = 0;//数据最大长度
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -144,547 +106,73 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
         rb.setChecked(true);
     }
 
-    private android.os.Handler handler = new android.os.Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 0:
-                    countOrAdress = 0;
-                    manyStratIndex = 0;
-                    resourcesIndex = 0;
-                    countAdress = 0;//当前发送的长度
-                    manyAllConten = 0;//总包数
-                    sendLeng = 0;
-                    sendConten = 0;
-                    String paths = progrmae.get(resourcesIndex);
-                    File file = new File(paths);
-                    try {
-                        FileInputStream is = new FileInputStream(file);
-                        byte[] buffer = new byte[is.available()];
-//                        Log.d("...", "buffer.length....." + buffer.length);
-                        is.read(buffer);
-                        if (buffer.length < DATA_MAX_SIZE) {
 
-                        }
-                        int endXMLlen = DATA_MAX_SIZE;
-                        int xmlCount = buffer.length / DATA_MAX_SIZE;//xml数据可以分为多少个1024包
-                        if (buffer.length % DATA_MAX_SIZE > 0) {
-                            xmlCount += 1;
-                            endXMLlen = buffer.length % DATA_MAX_SIZE;
-                        }
-                        List<byte[]> cutXml = new ArrayList<byte[]>();
-                        byte[] xmlData;
-                        for (int i = 0; i < xmlCount; i++) {
-                            if (i == xmlCount - 1) {
-                                xmlData = new byte[endXMLlen];
-                                System.arraycopy(buffer, i * DATA_MAX_SIZE, xmlData, 0, endXMLlen);
-                            } else {
-                                xmlData = new byte[DATA_MAX_SIZE];
-                                System.arraycopy(buffer, i * DATA_MAX_SIZE, xmlData, 0, DATA_MAX_SIZE);
-                            }
-                            byte[] proBytes = SendPacket.prepareSendDataPkg(xmlData, 0);
-                            cutXml.add(proBytes);
-                        }
-                        ccc = new ConnectControlCard(MainActivity.this, cutXml, new InterfaceConnect() {
-                            @Override
-                            public void success(byte[] result) {
-                                start = 0;
-                                handler.sendEmptyMessage(2);
-                            }
-
-                            @Override
-                            public void failure(int stateCode) {
-                                start = 1;
-                                if (EORRE_COUNT >= 3) {
-                                    handler.sendEmptyMessage(1);
-                                    EORRE_COUNT = 1;
-                                } else {
-                                    handler.sendEmptyMessage(0);
-                                    EORRE_COUNT++;
-                                }
-
-                            }
-
-                            @Override
-                            public void dataSuccess(String str) {
-
-                            }
-                        });
-                        fixedThreadPool.execute(ccc);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case 1:
-                    Toast.makeText(MainActivity.this, getResources().getString(R.string.program_send_failure), Toast.LENGTH_SHORT).show();
-                    proDialog.cancel();
-                    break;
-                case 2://文件发送完成指令
-                    List<byte[]> sendEnd = new ArrayList<byte[]>();
-                    byte[] managerSend = SendPacket.pkgHeadend();
-                    sendEnd.add(managerSend);
-                    ccc = new ConnectControlCard(MainActivity.this, sendEnd, new InterfaceConnect() {
-                        @Override
-                        public void success(byte[] result) {
-                            if (start == 0) {
-                                handler.sendEmptyMessage(3);
-                            } else if (start == 8) {
-//                                Log.d("....", "imageAllSize88888" + imageAllSize);
-                                if (resourcesIndex < imageAllSize) {
-                                    resourcesIndex++;
-                                    countOrAdress = 0;
-                                    countAdress = 0;
-                                    handler.sendEmptyMessage(3);
-                                } else {
-                                    handler.sendEmptyMessage(4);
-                                }
-                            } else if (start == 6) {
-//                                Log.d("....", "countAdress" + countAdress);
-//                                Log.d("....", "AllSize" + AllSize);
-                                if (countAdress == AllSize) {
-                                    try {
-                                        ism.close();
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                    Log.d("....", "imageAllSize11111:" + imageAllSize);
-                                    Log.d("....", "resourcesIndex2222222:" + resourcesIndex);
-                                    if (resourcesIndex == imageAllSize - 1) {
-                                        handler.sendEmptyMessage(4);
-                                    } else {
-                                        countOrAdress = 0;
-                                        countAdress = 0;
-                                        handler.sendEmptyMessage(3);
-                                        resourcesIndex++;
-                                    }
-                                } else {
-                                    handler.sendEmptyMessage(6);
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void failure(int stateCode) {
-                            if (EORRE_COUNT >= 3) {
-                                handler.sendEmptyMessage(1);
-                                EORRE_COUNT = 1;
-                            } else {
-                                handler.sendEmptyMessage(2);
-                                EORRE_COUNT++;
-                            }
-                        }
-
-                        @Override
-                        public void dataSuccess(String str) {
-
-                        }
-                    });
-                    fixedThreadPool.execute(ccc);
-                    break;
-                case 3://发送文件名称指令
-//                    Log.d("....", "resourcesIndex33333333" + resourcesIndex);
-                    List<byte[]> controlData = new ArrayList<byte[]>();
-                    String str = iamgID.get(resourcesIndex);
-                    byte[] bytes = str.getBytes();
-                    String a1 = SendPacket.bytes2HexString(bytes, bytes.length);
-//                    Log.d(".........", "a1..............." + a1);
-//                    Log.d(".........", "bytes.length..............." + bytes.length);
-                    byte[] controlCard2 = SendPacket.fileNameData(bytes.length, bytes);
-                    String aa = SendPacket.bytes2HexString(controlCard2, controlCard2.length);
-//                    Log.d(".........", "aa..............." + aa);
-//                    Log.d(".........", "bytes.length..............." + bytes.length);
-                    controlData.add(controlCard2);
-                    ccc = new ConnectControlCard(MainActivity.this, controlData, new InterfaceConnect() {
-                        @Override
-                        public void success(byte[] result) {
-                            countOrAdress = 0;
-                            manyStratIndex = 0;
-                            countAdress = 0;//当前发送的长度
-                            manyAllConten = 0;//总包数
-                            sendLeng = 0;
-                            sendConten = 0;
-                            start = 3;
-                            handler.sendEmptyMessage(6);
-                        }
-
-                        @Override
-                        public void failure(int stateCode) {
-                            if (EORRE_COUNT >= 3) {
-                                handler.sendEmptyMessage(1);
-                                EORRE_COUNT = 1;
-                            } else {
-                                handler.sendEmptyMessage(3);
-                                EORRE_COUNT++;
-                            }
-                        }
-
-                        @Override
-                        public void dataSuccess(String str) {
-
-                        }
-                    });
-                    fixedThreadPool.execute(ccc);
-                    break;
-                case 4://节目发送完成指令
-                    List<byte[]> programeData = new ArrayList<byte[]>();
-                    byte[] endSend = SendPacket.pkgPingend();
-                    programeData.add(endSend);
-                    ccc = new ConnectControlCard(MainActivity.this, programeData, new InterfaceConnect() {
-                        @Override
-                        public void success(byte[] result) {
-                            start = 4;
-                            handler.sendEmptyMessage(9);
-                        }
-
-                        @Override
-                        public void failure(int stateCode) {
-                            if (EORRE_COUNT >= 3) {
-                                handler.sendEmptyMessage(1);
-                                EORRE_COUNT = 1;
-                            } else {
-                                handler.sendEmptyMessage(4);
-                                EORRE_COUNT++;
-                            }
-                        }
-
-                        @Override
-                        public void dataSuccess(String str) {
-
-                        }
-                    });
-                    fixedThreadPool.execute(ccc);
-                    break;
-                case 6:
-//                    Log.d("......", "countAdress2222222:" + countAdress);
-//                    Log.d("......", "resourcesIndex6666666:" + resourcesIndex);
-                    List<byte[]> manyData = new ArrayList<byte[]>();
-                    String pathData = progrmae.get(resourcesIndex + 1);
-                    File files = new File(pathData);
-                    try {
-                        if (ism != null) {
-                            ism.close();
-                        }
-                        ism = new RandomAccessFile(files, "r");
-                        allFileSize = (int) ism.length();
-                        alllen = allFileSize;//总长度
-                        count = alllen / DATA_MAX_SIZE;//总包以50包为单位可以分多少个
-//                        Log.d("...", "alllen...." + alllen);
-                        if (alllen % DATA_MAX_SIZE > 0) {
-                            count += 1;
-                            endLeng = alllen % DATA_MAX_SIZE;
-                        }
-                        AllSize = count;//总包数
-                        if ((AllSize - 1) % MULTI_PACKAGE_MAX_COUNT > 0) {
-                            sendLeng = (AllSize - 1) % MULTI_PACKAGE_MAX_COUNT;//最后一包个数
-                            manyAllConten = (AllSize - 1) / MULTI_PACKAGE_MAX_COUNT + 2;//数据总长度可以分为多少个50包
-                        } else if ((AllSize - 1) % MULTI_PACKAGE_MAX_COUNT == 0) {
-                            sendLeng = MULTI_PACKAGE_MAX_COUNT;
-                            manyAllConten = (AllSize - 1) / MULTI_PACKAGE_MAX_COUNT + 1;
-                        }
-//                        Log.d(".....", "manyAllConten返回的数据。。。：" + manyAllConten);
-                        sendConten = sendLeng;//最后一组数据包的个数
-                        if (countOrAdress < manyAllConten - 2) {
-                            byte[] manySendStart = SendPacket.manyPakStart(manyStratIndex, MULTI_PACKAGE_MAX_COUNT * DATA_MAX_SIZE, MULTI_PACKAGE_MAX_COUNT, DATA_MAX_SIZE);
-                            countAdress = (countOrAdress + 1) * MULTI_PACKAGE_MAX_COUNT;
-                            manyStratIndex = countAdress * DATA_MAX_SIZE;//每包起始位置长度
-                            manyData.add(manySendStart);
-                            ccc = new ConnectControlCard(MainActivity.this, manyData, new InterfaceConnect() {
-                                @Override
-                                public void success(byte[] result) {
-                                    String results = SendPacket.byte2hex(result);
-//                                    Log.d(".....", "results返回的数据。。。：" + results);
-                                    start = 6;
-                                    handler.sendEmptyMessage(7);
-                                }
-
-                                @Override
-                                public void failure(int stateCode) {
-                                    start = 6;
-                                    handler.sendEmptyMessage(1);
-                                }
-
-                                @Override
-                                public void dataSuccess(String str) {
-
-                                }
-                            });
-                            fixedThreadPool.execute(ccc);
-                        } else if (countOrAdress == manyAllConten - 2) {
-                            if (1 <= sendConten) {
-//                                Log.d("最后一包当前位置", "manyStratIndex....." + manyStratIndex);
-//                                Log.d("最后一包当前位置", "sendConten....." + sendConten);
-                                byte[] manySendStart = SendPacket.manyPakStart(manyStratIndex, sendConten * DATA_MAX_SIZE, sendConten, DATA_MAX_SIZE);
-                                String many = SendPacket.byte2hex(manySendStart);
-//                                Log.d("最后一包当前位置", "many....." + many);
-                                manyData.add(manySendStart);
-                                ccc = new ConnectControlCard(MainActivity.this, manyData, new InterfaceConnect() {
-                                    @Override
-                                    public void success(byte[] result) {
-                                        start = 6;
-                                        handler.sendEmptyMessage(7);
-                                    }
-
-                                    @Override
-                                    public void failure(int stateCode) {
-                                        handler.sendEmptyMessage(1);
-                                    }
-
-                                    @Override
-                                    public void dataSuccess(String str) {
-
-                                    }
-                                });
-                                fixedThreadPool.execute(ccc);
-                            }
-                        } else {
-                            byte[] list = new byte[DATA_MAX_SIZE];
-                            try {
-                                ism.seek(alllen - endLeng);
-                                ism.read(list, 0, endLeng);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-//                            Log.d("......", "countAdress1111111111:" + countAdress);
-                            arrays = new ArrayList<byte[]>();
-                            arrays.add(list);
-                            List<byte[]> simallData = new ArrayList<byte[]>();
-                            for (int i = 0; i < arrays.size(); i++) {
-                                byte[] arrData = arrays.get(i);
-                                byte[] iangeData = SendPacket.prepareSendDataPkg(arrData, i);
-                                simallData.add(iangeData);
-                            }
-                            ccc = new ConnectControlCard(MainActivity.this, simallData, new InterfaceConnect() {
-                                @Override
-                                public void success(byte[] result) {
-                                    String results = SendPacket.byte2hex(result);
-//                                    Log.d(".........", "results..........:" + results);
-                                    start = 6;
-                                    handler.sendEmptyMessage(2);
-                                }
-
-                                @Override
-                                public void failure(int stateCode) {
-                                    handler.sendEmptyMessage(1);
-                                }
-
-                                @Override
-                                public void dataSuccess(String str) {
-
-                                }
-                            });
-                            fixedThreadPool.execute(ccc);
-                            countAdress++;
-                        }
-
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    break;
-
-                case 7:
-
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            long time = SystemClock.currentThreadTimeMillis();
-                            System.out.print("开始时间"+time);
-//                            Log.d("...", "countOrAdress.jjjj.." + countOrAdress);
-                            if (countOrAdress < manyAllConten - 2) {
-                                byte[] list = new byte[DATA_MAX_SIZE * MULTI_PACKAGE_MAX_COUNT];
-                                byte[] manyIangeData = new byte[DATA_MAX_SIZE + 14];
-                                manyIangeData[0] = (byte) 0xF6;
-                                manyIangeData[1] = (byte) 0x5A;
-                                manyIangeData[2] = (byte) ((1038 >> 0) & 0xFF);
-                                manyIangeData[3] = (byte) ((1038 >> 8) & 0xFF);
-                                manyIangeData[4] = (byte) 0xA5;
-                                manyIangeData[5] = (byte) 0xF0;
-                                manyIangeData[6] = (byte) 0x07;
-                                manyIangeData[7] = (byte) 0x02;
-                                manyIangeData[1024 + 10] = (byte) 0x00;
-                                manyIangeData[1024 + 11] = (byte) 0x00;
-                                manyIangeData[1024 + 12] = (byte) 0x5A;
-                                manyIangeData[1024 + 13] = (byte) 0xF6;
-                                try {
-                                    ism.seek((countOrAdress * MULTI_PACKAGE_MAX_COUNT) * DATA_MAX_SIZE);
-                                    ism.read(list, 0, DATA_MAX_SIZE * MULTI_PACKAGE_MAX_COUNT);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                for (int i = 0; i < MULTI_PACKAGE_MAX_COUNT; i++) {
-                                    System.arraycopy(list, i * DATA_MAX_SIZE, manyIangeData, 8, DATA_MAX_SIZE);
-                                    manyIangeData[1024 + 8] = (byte) ((i >> 0) & 0xFF);
-                                    manyIangeData[1024 + 9] = (byte) ((i >> 8) & 0xFF);
-                                    dataPacket = new DatagramPacket(manyIangeData, manyIangeData.length, local, PORT);
-                                    try {
-                                        sendSocket.send(dataPacket);
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                handler.sendEmptyMessage(8);
-                            } else {
-                                if (1 <= sendConten) {
-                                    byte[] list = new byte[DATA_MAX_SIZE * MULTI_PACKAGE_MAX_COUNT];
-                                    byte[] manyIangeData = new byte[DATA_MAX_SIZE + 14];
-                                    manyIangeData[0] = (byte) 0xF6;
-                                    manyIangeData[1] = (byte) 0x5A;
-                                    manyIangeData[2] = (byte) ((1038 >> 0) & 0xFF);
-                                    manyIangeData[3] = (byte) ((1038 >> 8) & 0xFF);
-                                    manyIangeData[4] = (byte) 0xA5;
-                                    manyIangeData[5] = (byte) 0xF0;
-                                    manyIangeData[6] = (byte) 0x07;
-                                    manyIangeData[7] = (byte) 0x02;
-                                    manyIangeData[1024 + 10] = (byte) 0x00;
-                                    manyIangeData[1024 + 11] = (byte) 0x00;
-                                    manyIangeData[1024 + 12] = (byte) 0x5A;
-                                    manyIangeData[1024 + 13] = (byte) 0xF6;
-                                    try {
-                                        ism.seek((countOrAdress * MULTI_PACKAGE_MAX_COUNT) * DATA_MAX_SIZE);
-                                        ism.read(list, 0, DATA_MAX_SIZE * sendConten);
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                    countAdress = countAdress + sendConten;
-                                    for (int i = 0; i < sendConten; i++) {
-                                        System.arraycopy(list, i * DATA_MAX_SIZE, manyIangeData, 8, DATA_MAX_SIZE);
-                                        manyIangeData[1024 + 8] = (byte) ((i >> 0) & 0xFF);
-                                        manyIangeData[1024 + 9] = (byte) ((i >> 8) & 0xFF);
-                                        dataPacket = new DatagramPacket(manyIangeData, manyIangeData.length, local, PORT);
-                                        try {
-                                            sendSocket.send(dataPacket);
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-
-                                    handler.sendEmptyMessage(8);
-                                }
-                            }
-                            countOrAdress++;
-                            long time2 = SystemClock.currentThreadTimeMillis();
-                            System.out.print("开始时间2"+time2);
-                        }
-                    }).start();
-
-                    break;
-                case 8:
-                    List<byte[]> manySnedEnd = new ArrayList<byte[]>();
-                    byte[] manySend = SendPacket.manySendComplete();
-                    String SEND = SendPacket.byte2hex(manySend);
-//                    Log.d("......", "SEND返回的数据是。。。。。。。：" + SEND);
-                    manySnedEnd.add(manySend);
-                    erro(manySnedEnd, EORRE_COUNT);
-                    EORRE_COUNT++;
-                    break;
-                case 9:
-                    Toast.makeText(MainActivity.this, getResources().getString(R.string.program_send_success), Toast.LENGTH_SHORT).show();
-                    proDialog.cancel();
-                    break;
-
-            }
-            super.handleMessage(msg);
-        }
-    };
-
-    //接受错误回报
-    public void erro(List<byte[]> bytes, final int erroData) {
-        ccc = new ConnectControlCard(MainActivity.this, bytes, new InterfaceConnect() {
-            @Override
-            public void success(byte[] result) {
-                String come = SendPacket.byte2hex(result);
-                String aa = SendPacket.toD(come, come.length());
-                if (countAdress == AllSize + 1) {
-                    handler.sendEmptyMessage(2);
-                } else {
-                    handler.sendEmptyMessage(6);
-                }
-                start = 8;
-            }
-
-            @Override
-            public void failure(int stateCode) {
-                int eorreindex = erroData;
-                if (eorreindex == 3) {
-                    start = 1;
-                    handler.sendEmptyMessage(1);
-                    EORRE_COUNT = 1;
-                } else {
-                    handler.sendEmptyMessage(8);
-                }
-
-            }
-
-            @Override
-            public void dataSuccess(String str) {
-
-            }
-        });
-        fixedThreadPool.execute(ccc);
-    }
-
+//    builder = new AlertDialog.Builder(MainActivity.this);
+//            LayoutInflater factory = LayoutInflater.from(this);
+//            final View textEntryView = factory.inflate(R.layout.layou_loading, null);
+//            builder.setView(textEntryView);
+//            LoadingView loadingView = new LoadingView(MainActivity.this);
+//            loadingView.startAnimation(0,100,5000);
+//            loadingView.setMax(MAXLENG);
+//            builder.setCancelable(false);
+//            builder.create().show();
 
     /**
      * 节目发送指令
      */
     public void Sendprogram() {
         getImageName();
-        if (sendSocket != null){
-            sendSocket.close();
-        }
-        List<Areabean> areabeans = new AreabeanDao(this).getListAll();
-        Areabean areabean = areabeans.get(0);
-        HOSTAddress = areabean.getEquitTp();
-        try {
-            local = InetAddress.getByName(HOSTAddress);
-            try {
-                sendSocket = new DatagramSocket();
-            } catch (SocketException e) {
-                e.printStackTrace();
-            }
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        if (progrmae.size() > 0) {
-            List<byte[]> manySnedStart = new ArrayList<byte[]>();
-            proDialog = android.app.ProgressDialog.show(this, null,
-                    getResources().getString(R.string.program_sending));
-            byte[] controlCard = SendPacket.pkgHeadInterface();
-            manySnedStart.add(controlCard);
-            ccc = new ConnectControlCard(MainActivity.this, manySnedStart, new InterfaceConnect() {
+        if (progrmae.size() > 1) {
+            proDialog = new ProgressDialog(this);
+            proDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            proDialog.setCancelable(false);// 设置是否可以通过点击Back键取消
+            proDialog.setCanceledOnTouchOutside(false);// 设置在点击Dialog外是否取消Dialog进度条
+            proDialog.setTitle("节目发送中......");
+            proDialog.setMax(MAXLENG);
+            proDialog.show();
+            new Thread(new UDPSocketUtis(this, proDialog, new InterfaceConnect() {
                 @Override
                 public void success(byte[] result) {
-                    try {
-                        Thread.sleep(1000);
-                        handler.sendEmptyMessage(0);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    proDialog.cancel();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this, "文件发送完成", Toast.LENGTH_SHORT).show();
 
+                        }
+                    });
                 }
 
                 @Override
-                public void failure(int stateCode) {
-                    start = 1;
-                    handler.sendEmptyMessage(1);
+                public void failure(final int stateCode) {
+                    proDialog.cancel();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (stateCode == 0){
+                                Toast.makeText(MainActivity.this, "文件发送失败", Toast.LENGTH_SHORT).show();
+
+                            }else {
+                                Toast.makeText(MainActivity.this, "网络连接异常", Toast.LENGTH_SHORT).show();
+
+                            }
+                        }
+                    });
                 }
 
                 @Override
                 public void dataSuccess(String str) {
 
                 }
-            });
-            fixedThreadPool.execute(ccc);
+            })).start();
         } else {
             Toast.makeText(this, "当前节目内容为空!", Toast.LENGTH_SHORT).show();
         }
     }
 
+
     public void getImageName() {
+        MAXLENG = 0;
         iamgID = new ArrayList<String>();
         List<String> filePath = new ArrayList<>();
         filePath.add(PROGRAME_ROOT);
@@ -706,6 +194,7 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
             File[] files = fileAll.listFiles();
             for (int j = 0; j < files.length; j++) {
                 File file1 = files[j];
+                MAXLENG += file1.length();
                 progrmae.add(String.valueOf(file1));
                 Log.d("...........", "progrmae........:" + progrmae.toString());
                 String imageName = file1.getPath().substring(file1.getPath().lastIndexOf("/") + 1, file1.getPath().length());
@@ -717,30 +206,10 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     imageAllSize = iamgID.size();
                 }
             }
-//            Log.d(".......", "图片总个数。。。。:" + iamgID);
         }
 
     }
 
-    /**
-     * 获取指定文件大小
-     *
-     * @param
-     * @return
-     * @throws Exception
-     */
-    private static long getFileSize(File file) throws Exception {
-        long size = 0;
-        if (file.exists()) {
-            FileInputStream fis = null;
-            fis = new FileInputStream(file);
-            size = fis.available();
-        } else {
-            file.createNewFile();
-//            Log.e("获取文件大小", "文件不存在!");
-        }
-        return size;
-    }
 
     public View getPopWindowListView() {
         List<Areabean> areabeens = new ArrayList<Areabean>();
@@ -752,14 +221,13 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
 
         return null;
     }
-
     /**
      * 初始化侧边栏
      */
     private void initSlidingMenu(Bundle savedInstanceState) {
         // 设置侧面隐藏的布局
         setBehindContentView(R.layout.menu_frame_left);
-        // 增加碎片
+// 增加碎片
         final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         LeftFragment leftFragment = new LeftFragment();
         ft.replace(R.id.menu_frame, leftFragment);
@@ -833,7 +301,6 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
                     customPopWindow.backgroundAlpha(1f);
                 }
                 customPopWindow.showPopupWindow(mSend);
-
                 break;
         }
     }

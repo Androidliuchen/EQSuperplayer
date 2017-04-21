@@ -107,6 +107,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
     private int textHeights;//文本框输入屏幕的高度
     private int bitmapWidth;//生成图片的实际宽度
     private int text_id;
+    private Paint paint;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,7 +130,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
         // 文本窗宽高
         if (textBean.getWidth() != 0) {
             STWidth.setText(textBean.getWidth() + "");
-            STHeigth.setText(textBean.getHeidht() + "");
+            STHeigth.setText(textBean.getHeight() + "");
         } else {
             STWidth.setText(areabean.getWindowWidth() + "");
             STHeigth.setText(areabean.getWindowHeight() + "");
@@ -255,8 +256,8 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public Bitmap drawBitmap() {
-        Paint paint = new Paint();
-        int size = Integer.parseInt(this.getResources().getStringArray(R.array.text_size)[STSize.getSelectedItemPosition()]) + 3;
+        paint = new Paint();
+        int size = Integer.parseInt(this.getResources().getStringArray(R.array.text_size)[STSize.getSelectedItemPosition()]) + 4;
         paint.setTextSize(size);
         String text = editText.getText().toString();
         textWidth = paint.measureText(text);
@@ -269,39 +270,48 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
         Log.d(".......", "textHeight........." + textHeight);
         Log.d(".......", "textWidth........." + textWidth);
         Bitmap bitmap = Bitmap.createBitmap((int) textWidth, textHeight, Bitmap.Config.ARGB_8888);
-        int[] number_colors = new int[]{textBean.getBorderColor(), textBean.getStBackground(), textBean.getStColor()};
-        for (int i = 0; i < number_colors.length; i++) {
-            switch (number_colors[i]) {
+        int number_colors =textBean.getStColor();
+        for (int i = 0; i < 1; i++) {
+            switch (number_colors) {
                 case 0:
-                    number_colors[i] = R.color.yellow;
+                    number_colors = getResources().getColor(R.color.yellow);
+                    textBean.setBorderColor(2552550);
                     break;
                 case 1:
-                    number_colors[i] = R.color.dodgerblue;
+                    number_colors = getResources().getColor(R.color.dodgerblue);
+                    textBean.setBorderColor(30144255);
                     break;
                 case 2:
-                    number_colors[i] = R.color.red;
+                    number_colors = getResources().getColor(R.color.red);
+                    textBean.setBorderColor(25500);
                     break;
                 case 3:
-                    number_colors[i] =R.color.lime;
+                    number_colors = getResources().getColor(R.color.lime);
+                    textBean.setBorderColor(02550);
                     break;
                 case 4:
-                    number_colors[i] = R.color.mediumorchid;
+                    number_colors = getResources().getColor(R.color.mediumorchid);
+                    textBean.setBorderColor(255192203);
                     break;
                 case 5:
-                    number_colors[i] = R.color.blue;
+                    number_colors = getResources().getColor(R.color.blue);
+                    textBean.setBorderColor(00255);
                     break;
                 case 6:
-                    number_colors[i] =R.color.black;
+                    number_colors = getResources().getColor(R.color.black);
+                    textBean.setBorderColor(000);
                     break;
                 case 7:
-                    number_colors[i] = R.color.white;
+                    number_colors = getResources().getColor(R.color.white);
+                    textBean.setBorderColor(255255255);
                     break;
                 case 8:
-                    number_colors[i] = R.color.grey;
+                    number_colors = getResources().getColor(R.color.grey);
+                    textBean.setBorderColor(192192192);
                     break;
             }
         }
-        paint.setColor(number_colors[2]); // 字体颜色 选择的 button **
+        paint.setColor(number_colors); // 字体颜色 选择的 button **
         if (textBean.getStTypeFace() == 1 && textBean.isStBold() == true) {
             paint.setTypeface(Typeface.DEFAULT_BOLD);
         }
@@ -311,9 +321,11 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
         if (textBean.isStItalic() == true && textBean.isStBold()) {
             paint.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
         }
+        Paint.FontMetrics fm1 = paint.getFontMetrics();
+        float y = ((-fm1.ascent + 1) + (textBean.getHeight() - Utils.getFontHeight(paint)) / 2);
         Canvas canvas = new Canvas(bitmap); // 创建画布
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-        canvas.drawText(text, 0, textBean.getHeidht() / 2, paint);
+        canvas.drawText(text, 0, y, paint);
 //        Paint paint1 = new Paint();
 //        //给边框设置颜色
 //        paint1.setColor(number_colors[0]);
@@ -351,7 +363,11 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
                 Bitmap bmp;
                 if (i == bitmapCount - 1) {
                     bmp = Bitmap.createBitmap(drawBitmap(), x, 0, endBitmapWidth, y, null, true);
-                    Utils.saveMyBitmap(bmp, "text" + i);
+                    Bitmap bitmap = Bitmap.createBitmap(textWidths, textHeights, Bitmap.Config.ARGB_8888);
+                    Canvas canvas = new Canvas(bitmap); // 创建画布
+                    canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                    canvas.drawBitmap(bmp,0,0,paint);
+                    Utils.saveMyBitmap(bitmap, "text" + i);
                     textWidths += textWidths;
                 } else {
                     bmp = Bitmap.createBitmap(drawBitmap(), x, 0, textWidths, y, null, true);

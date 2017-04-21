@@ -2,15 +2,25 @@ package com.eq.EQSuperPlayer.activity;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -23,12 +33,15 @@ import com.eq.EQSuperPlayer.bean.Areabean;
 import com.eq.EQSuperPlayer.bean.ProgramBean;
 import com.eq.EQSuperPlayer.bean.TimeBean;
 import com.eq.EQSuperPlayer.custom.Constant;
+import com.eq.EQSuperPlayer.dao.AreabeanDao;
 import com.eq.EQSuperPlayer.dao.ProgramBeanDao;
 import com.eq.EQSuperPlayer.dao.TimeDao;
-import com.eq.EQSuperPlayer.dao.VedioDao;
+import com.eq.EQSuperPlayer.utils.AreaDrawText;
 import com.eq.EQSuperPlayer.utils.Utils;
 import com.eq.EQSuperPlayer.utils.WindowSizeManager;
+
 import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -65,8 +78,6 @@ public class TimeActivity extends AppCompatActivity {
     Spinner timeToSize;
     @BindView(R.id.timeToColoer)
     Spinner timeToColoer;
-    @BindView(R.id.timeToxz)
-    Spinner timeToxz;
     @BindView(R.id.timeToxq)
     CheckBox timeToxq;
     @BindView(R.id.timeTorq)
@@ -89,13 +100,60 @@ public class TimeActivity extends AppCompatActivity {
     Spinner timeToxqColor;
     @BindView(R.id.timeTorqColor)
     Spinner timeTorqColor;
+    @BindView(R.id.window_time_analogclock)
+    LinearLayout windowTimeAnalogclock;
+    @BindView(R.id.four_year)
+    RadioButton fourYear;
+    @BindView(R.id.two_year)
+    RadioButton twoYear;
+    @BindView(R.id.two_hours)
+    RadioButton twoHours;
+    @BindView(R.id.four_hours)
+    RadioButton fourHours;
+    @BindView(R.id.Single_one)
+    RadioButton SingleOne;
+    @BindView(R.id.Single_many)
+    RadioButton SingleMany;
+    @BindView(R.id.time_year)
+    CheckBox timeYear;
+    @BindView(R.id.time_month)
+    CheckBox timeMonth;
+    @BindView(R.id.time_day)
+    CheckBox timeDay;
+    @BindView(R.id.time_coloer)
+    Spinner timeColoer;
+    @BindView(R.id.time_week)
+    CheckBox timeWeek;
+    @BindView(R.id.week_coloer)
+    Spinner weekColoer;
+    @BindView(R.id.time_hour)
+    CheckBox timeHour;
+    @BindView(R.id.time_share)
+    CheckBox timeShare;
+    @BindView(R.id.time_second)
+    CheckBox timeSecond;
+    @BindView(R.id.hour_coloer)
+    Spinner hourColoer;
+    @BindView(R.id.window_time_numberclock)
+    LinearLayout windowTimeNumberclock;
+    @BindView(R.id.time_yearformat)
+    RadioGroup timeYearformat;
+    @BindView(R.id.hour_time_format)
+    RadioGroup hourTimeFormat;
+    @BindView(R.id.time_lineformat)
+    RadioGroup timeLineformat;
+    @BindView(R.id.tiem_show)
+    ImageView tiemShow;
+    @BindView(R.id.program_text_background)
+    LinearLayout programTextBackground;
     private TimeBean timeBean;
     private ProgramBean programBean;
     private List<ProgramBean> programBeans;
-    private Areabean areabean = new Areabean();
+    private Areabean areabean;
     private int windowWidth;//窗口宽度
     private int windowHeight; //窗口高度
     private WindowSizeManager windowSizeManager;
+    private CheckBox[] checkBoxes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +164,7 @@ public class TimeActivity extends AppCompatActivity {
     }
 
     private void initView() {
+        areabean = new AreabeanDao(this).get(ProgramActivity.program_id);
         int time_id = getIntent().getIntExtra(Constant.PROGRAM_ID, -1);
         timeBean = new TimeDao(this).get(time_id);
         programBean = new ProgramBeanDao(this).get(ProgramActivity.selet);
@@ -117,19 +176,42 @@ public class TimeActivity extends AppCompatActivity {
         windowWidth = windowSizeManager.getWindowWidth();
         windowHeight = windowSizeManager.getWindowHeight();
         //区域宽高 ，坐标
-        if (areabean.getWindowWidth() != 0) {
+        if (timeBean.getTimeTowidth() != 0) {
+            timeToWidth.setText(timeBean.getTimeTowidth() + "");
+            timeToHeigth.setText(timeBean.getTimeToheidht() + "");
+
+        } else {
             timeToWidth.setText(areabean.getWindowWidth() + "");
             timeToHeigth.setText(areabean.getWindowHeight() + "");
-        } else {
-            timeToWidth.setText(windowWidth + "");
-            timeToHeigth.setText(windowHeight + "");
         }
-        timeTox.setText(0 + "");
-        timeToy.setText(0 + "");
-
+        if (timeBean.getTimeToX() == 0 || timeBean.getTimeToY() == 0) {
+            timeTox.setText(0 + "");
+            timeToy.setText(0 + "");
+        } else {
+            timeTox.setText(timeBean.getTimeToX() + "");
+            timeToy.setText(timeBean.getTimeToY() + "");
+        }
         //时钟样式
         timeToys.setAdapter(new SpinnerAdapter(this, this.getResources().getStringArray(R.array.colck_style)));
         timeToys.setSelection(timeBean.getM_nClockType());
+        timeToys.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 3) {
+                    windowTimeAnalogclock.setVisibility(View.VISIBLE);
+                    windowTimeNumberclock.setVisibility(View.GONE);
+                } else {
+                    windowTimeNumberclock.setVisibility(View.VISIBLE);
+                    windowTimeAnalogclock.setVisibility(View.GONE);
+                }
+                new TimeThread().start(); //启动新的线程
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         //固定文字  固定文字字体，颜色，大小
         timeToarrds.setText(timeBean.getM_strClockText());
         timeToFont.setAdapter(new SpinnerAdapter(this, this.getResources().getStringArray(R.array.text_font)));
@@ -152,16 +234,42 @@ public class TimeActivity extends AppCompatActivity {
         timeToSize.setAdapter(new SpinnerAdapter(this, this.getResources().getStringArray(R.array.text_size)));
         timeToSize.setSelection(timeBean.getM_rgbClockTextSize());
         //年月日，是否显示，颜色读取
-        final CheckBox[] checkBoxes = {timeTorq, timeToxq};
+        checkBoxes = new CheckBox[]{timeYear, timeMonth, timeDay, timeWeek, timeHour, timeShare, timeSecond};
         final String m_strShowForm = timeBean.getM_strShowForm();
         boolean[] str_ints = timeBean.getStrShowFormInt(m_strShowForm);
         for (int i = 0; i < m_strShowForm.length(); i++) {
-//            checkBoxes[i].setChecked(str_ints[i]);
+            checkBoxes[i].setChecked(str_ints[i]);
         }
+        //模拟时钟
         timeTorqColor.setAdapter(new SpinnerImageAdapter(this, color_id));
         timeTorqColor.setSelection(timeBean.getM_rgbDayTextColor());
         timeToxqColor.setAdapter(new SpinnerImageAdapter(this, color_id));
         timeToxqColor.setSelection(timeBean.getM_rgbWeekTextColor());
+        //数字时钟属性
+        timeColoer.setAdapter(new SpinnerImageAdapter(this, color_id));
+        timeColoer.setSelection(timeBean.getM_rgbDayTextColor());
+        weekColoer.setAdapter(new SpinnerImageAdapter(this, color_id));
+        weekColoer.setSelection(timeBean.getM_rgbWeekTextColor());
+        hourColoer.setAdapter(new SpinnerImageAdapter(this, color_id));
+        hourColoer.setSelection(timeBean.getM_rgbWeekTextColor());
+
+        //年格式，行格式  0 代表4位，单行  1代表2位
+        if (timeBean.getM_nYearType() == 0) {
+            fourYear.setChecked(true);
+        } else {
+            twoYear.setChecked(true);
+        }
+        if (timeBean.getM_nHourType() == 0) {
+            timeHour.setChecked(true);
+        } else {
+            fourYear.setChecked(true);
+        }
+        if (timeBean.getM_nRowType() == 0) {
+            SingleOne.setChecked(true);
+        } else {
+            SingleMany.setChecked(true);
+        }
+
         //时差   日期  ，  天数  ， 时间
         timeToDay.setText(timeBean.getM_nDayLag() + "");
         huorOrMinute.setText("" + timeBean.getM_strTimeLag());
@@ -199,8 +307,8 @@ public class TimeActivity extends AppCompatActivity {
         });
         //模拟时钟参数填写
         //时钟形状，是否显示星期，日期等文字
-        timeToxz.setAdapter(new SpinnerAdapter(this, this.getResources().getStringArray(R.array.colck_shape)));
-        timeToxz.setSelection(timeBean.getColckShape());
+//        timeToxz.setAdapter(new SpinnerAdapter(this, this.getResources().getStringArray(R.array.colck_shape)));
+//        timeToxz.setSelection(timeBean.getColckShape());
         timeToxq.setChecked(timeBean.isWeekshow());
         timeTorq.setChecked(timeBean.isDateshow());
         //时标，颜色，宽高，形状
@@ -226,14 +334,13 @@ public class TimeActivity extends AppCompatActivity {
                 timeBean.setTimeToX(Integer.parseInt(timeTox.getText().toString()));
                 timeBean.setTimeToY(Integer.parseInt(timeToy.getText().toString()));
             } else {
-                Toast.makeText(TimeActivity.this, "参数超出边界，请重新设置",Toast.LENGTH_SHORT).show();
+                Toast.makeText(TimeActivity.this, "参数超出边界，请重新设置", Toast.LENGTH_SHORT).show();
             }
 
         } catch (NumberFormatException exception) {
 
         }
         //模拟时钟参数存储
-        timeBean.setColckShape(timeToxz.getSelectedItemPosition());
         timeBean.setWeekshow(timeToxq.isChecked());
         timeBean.setDateshow(timeTorq.isChecked());
         timeBean.setShibiaocolorposition(timeToshibiao.getSelectedItemPosition());
@@ -250,7 +357,7 @@ public class TimeActivity extends AppCompatActivity {
         timeBean.setNumber_typeface(timeToFont.getSelectedItemPosition());
         timeBean.setM_rgbClockTextColor(timeToColoer.getSelectedItemPosition());
         timeBean.setM_rgbClockTextSize(timeToSize.getSelectedItemPosition());
-        //
+
         StringBuffer strShowForm = new StringBuffer();
         for (CheckBox cb : checkBoxes
                 ) {
@@ -274,11 +381,28 @@ public class TimeActivity extends AppCompatActivity {
         }
 
         timeBean.setM_strShowForm(strShowForm.toString());
-        timeBean.setM_rgbDayTextColor(timeTorqColor.getSelectedItemPosition());
-        timeBean.setM_rgbWeekTextColor(timeToxqColor.getSelectedItemPosition());
-//        timeBean.setM_rgbTimeColor(wt_timecolor.getSelectedItemPosition());
-//        timeBean.setM_nDayLag(Integer.parseInt(timeToDay.getText().toString()));
-//        timeBean.setM_strTimeLag(huorOrMinute.getText().toString());
+        timeBean.setM_rgbDayColor(timeTorqColor.getSelectedItemPosition());
+        timeBean.setM_rgbWeekColor(timeToxqColor.getSelectedItemPosition());
+        timeBean.setM_rgbDayTextColor(timeColoer.getSelectedItemPosition());
+        timeBean.setM_rgbWeekTextColor(weekColoer.getSelectedItemPosition());
+        timeBean.setM_rgbTimeColor(hourColoer.getSelectedItemPosition());
+        if (timeYearformat.getCheckedRadioButtonId() == R.id.four_year) {
+            timeBean.setM_nYearType(0);
+        } else {
+            timeBean.setM_nYearType(1);
+        }
+        if (hourTimeFormat.getCheckedRadioButtonId() == R.id.two_hours) {
+            timeBean.setM_nHourType(0);
+        } else {
+            timeBean.setM_nHourType(1);
+        }
+        if (timeLineformat.getCheckedRadioButtonId() == R.id.Single_one) {
+            timeBean.setM_nRowType(0);
+        } else {
+            timeBean.setM_nRowType(1);
+        }
+        timeBean.setM_nDayLag(Integer.parseInt(timeToDay.getText().toString()));
+        timeBean.setM_strTimeLag(huorOrMinute.getText().toString());
         new TimeDao(TimeActivity.this).update(timeBean);
         //获取画笔属性
         Paint paint = Utils.getPaint(TimeActivity.this, Utils.getPaintSize(TimeActivity.this, Integer.parseInt(TimeActivity.this.getResources().getStringArray(R.array.text_size)[timeBean.getM_rgbClockTextSize()])
@@ -286,19 +410,62 @@ public class TimeActivity extends AppCompatActivity {
         Utils.setTypeface(TimeActivity.this, paint
                 , (TimeActivity.this.getResources().getStringArray(R.array.typeface_path))[timeBean.getNumber_typeface()]);
         paint.setTextSize(Utils.getPaintSize(TimeActivity.this, timeBean.getM_rgbClockTextSize() + Constant.FONT_SIZE_CORRECTION)); // 字体大小 进度条参数
-
     }
+
 
     @OnClick({R.id.timeTofinsh, R.id.time_btn})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.timeTofinsh:
+                Intent intent1 = new Intent(this, ProgramActivity.class);
+                startActivity(intent1);
                 TimeActivity.this.finish();
                 break;
             case R.id.time_btn:
+                Intent intent2 = new Intent(this, ProgramActivity.class);
+                startActivity(intent2);
                 TimeActivity.this.finish();
-
                 break;
         }
     }
+
+    private void showText() {
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) programTextBackground.getLayoutParams();
+        layoutParams.weight = windowWidth / 2;
+        layoutParams.height = windowHeight / 2;
+        programTextBackground.setLayoutParams(layoutParams);
+        final Bitmap bt = Bitmap.createBitmap(windowWidth , windowHeight, Bitmap.Config.ARGB_8888);
+        Canvas canvas1 = new Canvas(bt); // 创建画布
+        canvas1.drawColor(Color.BLACK); // 颜色黑色
+        AreaDrawText.drawTime(TimeActivity.this,canvas1, timeBean);
+        tiemShow.setImageBitmap(bt);
+    }
+
+    class TimeThread extends Thread {
+        @Override
+        public void run() {
+            do {
+                try {
+                    Thread.sleep(1000);
+                    Message msg = new Message();
+                    msg.what = 1;  //消息(一个整型值)
+                    mHandler.sendMessage(msg);// 每隔1秒发送一个msg给mHandler
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } while (true);
+        }
+    }
+
+    //在主线程里面处理消息并更新UI界面
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case 1:
+                    showText();
+            }
+        }
+    };
 }
