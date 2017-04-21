@@ -204,7 +204,6 @@ public class TimeActivity extends AppCompatActivity {
                     windowTimeNumberclock.setVisibility(View.VISIBLE);
                     windowTimeAnalogclock.setVisibility(View.GONE);
                 }
-                new TimeThread().start(); //启动新的线程
             }
 
             @Override
