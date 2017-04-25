@@ -303,6 +303,9 @@ public class UDPSocketUtis implements Runnable {
         String fileVedioPath = Environment.getExternalStorageDirectory().toString() + File.separator
                 + "EQVedio";
         filePath.add(fileVedioPath);
+        String fileTimePath = Environment.getExternalStorageDirectory().toString() + File.separator
+                + "EQTime";
+        filePath.add(fileTimePath);
         for (int i = 0; i < filePath.size(); i++) {
             File fileAll = new File(filePath.get(i));
             if (!fileAll.exists()) {

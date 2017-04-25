@@ -21,6 +21,11 @@
         <item>双线</item>
         <item>三线</item>
     </string-array>
+    <!--  边框 !-->
+    <string-array name="textType">
+        <item>单行文本</item>
+        <item>多行文本</item>
+    </string-array>
 
     <!--  时钟样式 !-->
     <string-array name="colck_style">

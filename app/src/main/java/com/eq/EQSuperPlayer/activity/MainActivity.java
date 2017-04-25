@@ -106,17 +106,6 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
         rb.setChecked(true);
     }
 
-
-//    builder = new AlertDialog.Builder(MainActivity.this);
-//            LayoutInflater factory = LayoutInflater.from(this);
-//            final View textEntryView = factory.inflate(R.layout.layou_loading, null);
-//            builder.setView(textEntryView);
-//            LoadingView loadingView = new LoadingView(MainActivity.this);
-//            loadingView.startAnimation(0,100,5000);
-//            loadingView.setMax(MAXLENG);
-//            builder.setCancelable(false);
-//            builder.create().show();
-
     /**
      * 节目发送指令
      */
@@ -186,6 +175,9 @@ public class MainActivity extends SlidingFragmentActivity implements View.OnClic
         String fileVedioPath = Environment.getExternalStorageDirectory().toString() + File.separator
                 + "EQVedio";
         filePath.add(fileVedioPath);
+        String fileTimePath = Environment.getExternalStorageDirectory().toString() + File.separator
+                + "EQTime";
+        filePath.add(fileTimePath);
         for (int i = 0; i < filePath.size(); i++) {
             File fileAll = new File(filePath.get(i));
             if (!fileAll.exists()) {

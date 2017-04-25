@@ -55,6 +55,7 @@ import com.eq.EQSuperPlayer.dao.TextBeanDao;
 import com.eq.EQSuperPlayer.dao.TimeDao;
 import com.eq.EQSuperPlayer.dao.VedioDao;
 import com.eq.EQSuperPlayer.utils.AnimatorUtils;
+import com.eq.EQSuperPlayer.utils.AreaDrawText;
 import com.eq.EQSuperPlayer.utils.FileUtils;
 import com.eq.EQSuperPlayer.utils.ProgramNameItemManager;
 import com.eq.EQSuperPlayer.utils.Utils;
@@ -333,6 +334,9 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         textview.setText(textBean.getSingleTextValue());
         textview.setX(textBean.getX());
         textview.setY(textBean.getY());
+        if (textBean.getTextType() == 1){
+            textview.setSingleLine(false);
+        }
         textview.setOnTouchListener(listener);
         textview.setTextColor(number_colors);
         textview.setTextSize((float) (textBean.getStSize() / 1.2));
@@ -368,6 +372,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         flipler.setOnTouchListener(listener);
         int hour = imageBean.getIamgeandtime();
         flipler.setFlipInterval(hour * 1000);//设置自动播放的时间间隔为3S
+//        flipler.setInAnimation();
         flipler.setAutoStart(true);
         flipler.setX(imageBean.getIamgeX());
         flipler.setY(imageBean.getIamgeY());
@@ -386,6 +391,22 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         }
         text_layout.addView(view);
     }
+//    private void showTime() {
+//        View imageviews = View.inflate(this, R.layout.time_showitme, null);
+//        ImageView imageView = (ImageView) imageviews.findViewById(R.id.tiem_show);
+//        ViewGroup.LayoutParams il = imageView.getLayoutParams();
+//        il.width = timeBean.getTimeTowidth();
+//        il.height = timeBean.getTimeToheidht();
+//        imageView.setLayoutParams(il);
+//        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+//        imageView.setBackgroundResource(R.drawable.bodler_shape);
+//        if (timeBean.getM_nClockType() == 3){
+//            imageView.setImageBitmap( AreaDrawText.analogColck(ProgramActivity.this,timeBean));
+//        }else {
+//            imageView.setImageBitmap( AreaDrawText.getTime(ProgramActivity.this,timeBean));
+//        }
+//        text_layout.addView(imageviews);
+//    }
 
     /*
    添加视频显示
@@ -554,6 +575,9 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                     totalBeens.remove(position);
                     new TimeDao(ProgramActivity.this).delete(timeBean);
                     programListView.slideBack();
+                    String fileTimePath = Environment.getExternalStorageDirectory().toString() + File.separator
+                            + "EQTime";
+                    FileUtils.deleteDir(fileTimePath);
                     recyclerViewAdapter.notifyDataSetChanged();
                     recyclerViewAdapter.notifyDataSetInvalidated();
                 } else if (imageBean == totalBeens.get(position)) {
@@ -671,6 +695,9 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 String fileVedioPath = Environment.getExternalStorageDirectory().toString() + File.separator
                         + "EQVedio";
                 filePath.add(fileVedioPath);
+                String fileTimePath = Environment.getExternalStorageDirectory().toString() + File.separator
+                        + "EQTime";
+                filePath.add(fileTimePath);
                 String PROGRAME_ROOT = Environment
                         .getExternalStorageDirectory()
                         .getAbsolutePath() + "/EQPrograme/";
@@ -829,6 +856,9 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         String fileVedioPath = Environment.getExternalStorageDirectory().toString() + File.separator
                 + "EQVedio";
         filePath.add(fileVedioPath);
+        String fileTimePath = Environment.getExternalStorageDirectory().toString() + File.separator
+                + "EQTime";
+        filePath.add(fileTimePath);
         for (int i = 0; i < filePath.size(); i++) {
             File fileAll = new File(filePath.get(i));
             if (!fileAll.exists()) {
@@ -1394,13 +1424,49 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 if (iteratorTime != null) {
                     while (iteratorTime.hasNext()) {
                         timeBean = iteratorTime.next();
+                        int[] number_colors = new int[]{timeBean.getTimeToBorderColor(),timeBean.getM_rgbClockTextColor(), timeBean.getM_rgbDayTextColor()
+                                , timeBean.getM_rgbWeekTextColor(), timeBean.getM_rgbTimeColor(),
+                                timeBean.getSecondcolor(), timeBean.getMinutecolor(),
+                                timeBean.getHourscolor(), timeBean.getFenbiaocolorposition(),
+                                timeBean.getShibiaocolorposition()};
+                        for (int i = 0; i < number_colors.length; i++) {
+                            switch (number_colors[i]) {
+                                case 0:
+                                    number_colors[i] =  2552550;
+                                    break;
+                                case 1:
+                                    number_colors[i] = 30144255;
+                                    break;
+                                case 2:
+                                    number_colors[i] = 25500;
+                                    break;
+                                case 3:
+                                    number_colors[i] = 02550;
+                                    break;
+                                case 4:
+                                    number_colors[i] = 255192203;
+                                    break;
+                                case 5:
+                                    number_colors[i] = 00255;
+                                    break;
+                                case 6:
+                                    number_colors[i] = 000;
+                                    break;
+                                case 7:
+                                    number_colors[i] = 255255255;
+                                    break;
+                                case 8:
+                                    number_colors[i] = 192192192;
+                                    break;
+                            }
+                        }
                         serializer.startTag(null, "zone");
                         serializer.attribute(null, "index", zoneIndex + "");
                         zoneIndex++;
                         serializer.startTag(null, "zonetype");
-
                         serializer.text("clock");
                         serializer.endTag(null, "zonetype");
+
                         serializer.startTag(null, "attribute");
                         serializer.startTag(null, "x");
                         serializer.text(String.valueOf(areabean.getArea_X()));
@@ -1417,61 +1483,160 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         serializer.startTag(null, "height");
                         serializer.text(String.valueOf(areabean.getWindowHeight()));
                         serializer.endTag(null, "height");
+
+                        serializer.startTag(null, "framemode");
+                        serializer.text(String.valueOf(timeBean.getTimeToBorder()));
+                        serializer.endTag(null, "framemode");
+
+                        serializer.startTag(null, "framecolor");
+                        serializer.text(number_colors[0] + "");
+                        serializer.endTag(null, "framecolor");
+
                         serializer.endTag(null, "attribute");
-                        // 图片列表
-                        List<String> imagePathList = new ArrayList<String>();
-                        // 得到sd卡内image文件夹的路径   File.separator(/)
-                        String filePath = Environment.getExternalStorageDirectory().toString() + File.separator
-                                + "timeImage";
-                        // 得到该路径文件夹下所有的文件
-                        File fileAll = new File(filePath);
-                        File[] files = fileAll.listFiles();
-                        // 将所有的文件存入ArrayList中,并过滤所有图片格式的文件
-                        for (int i = 0; i < files.length; i++) {
-                            File file2 = files[i];
-                            if (checkIsImageFile(file2.getPath())) {
-                                imagePathList.add(file2.getPath());
-                                String imageName = file2.getPath().substring(file2.getPath().lastIndexOf("/") + 1, file2.getPath().length());
-                                Log.d("............", "imageName............" + imageName);
-                                Log.d("............", "imagePathList...................:" + imagePathList);
-                                serializer.startTag(null, "file");
-                                serializer.attribute(null, "index", "0");
+                        if (timeBean.getM_nClockType() == 3){
+                            // 图片列表
+                            List<String> imagePathList = new ArrayList<String>();
+                            // 得到sd卡内image文件夹的路径   File.separator(/)
+                            String filePath = Environment.getExternalStorageDirectory().toString() + File.separator
+                                    + "EQTime";
+                            // 得到该路径文件夹下所有的文件
+                            File fileAll = new File(filePath);
+                            File[] files = fileAll.listFiles();
+                            // 将所有的文件存入ArrayList中,并过滤所有图片格式的文件
+                            for (int i = 0; i < files.length; i++) {
+                                File file2 = files[i];
+                                if (checkIsImageFile(file2.getPath())) {
+                                    imagePathList.add(file2.getPath());
+                                    String timeName = file2.getPath().substring(file2.getPath().lastIndexOf("/") + 1, file2.getPath().length());
+                                    Log.d("............", "imageName............" + timeName);
+                                    Log.d("............", "imagePathList...................:" + imagePathList);
+                                    serializer.startTag(null, "file");
+                                    serializer.attribute(null, "index", "0");
 
-                                serializer.startTag(null, "style");
-                                serializer.text("1");
-                                serializer.endTag(null, "style");
+                                    serializer.startTag(null, "style");
+                                    serializer.text("0");
+                                    serializer.endTag(null, "style");
 
-                                serializer.startTag(null, "font");
+                                    serializer.startTag(null, "font");
+                                    if (timeBean.getNumber_typeface() == 0){
+                                        serializer.startTag(null, "name");
+                                        serializer.text("宋体");
+                                        serializer.endTag(null, "name");
+                                    }else {
+                                        serializer.startTag(null, "name");
+                                        serializer.text("Arial");
+                                        serializer.endTag(null, "name");
+                                    }
+                                    serializer.startTag(null, "size");
+                                    serializer.text(Utils.getPaintSize(this, timeBean.getM_rgbClockTextSize() + Constant.FONT_SIZE_CORRECTION) + "");
+                                    serializer.endTag(null, "size");
 
+                                    serializer.startTag(null, "bold");
+                                    serializer.text("0");
+                                    serializer.endTag(null, "bold");
+
+                                    serializer.startTag(null, "underline");
+                                    serializer.text("0");
+                                    serializer.endTag(null, "underline");
+
+                                    serializer.startTag(null, "italic");
+                                    serializer.text("0");
+                                    serializer.endTag(null, "italic");
+
+                                    serializer.startTag(null, "color");
+                                    serializer.text(number_colors[1] + "");
+                                    serializer.endTag(null, "color");
+
+                                    serializer.endTag(null, "font");
+
+                                    serializer.startTag(null, "dateformat");
+                                    serializer.text("yyyy-MM-dd");
+                                    serializer.endTag(null, "dateformat");
+
+                                    serializer.startTag(null, "text");
+                                    serializer.text(timeBean.getM_strClockText());
+                                    serializer.endTag(null, "text");
+
+                                    if (timeBean.isDateshow() == true){
+                                        serializer.startTag(null, "showdate");
+                                        serializer.text(1+"");
+                                        serializer.endTag(null, "showdate");
+                                    }else {
+                                        serializer.startTag(null, "showdate");
+                                        serializer.text(0 + "");
+                                        serializer.endTag(null, "showdate");
+                                    }
+
+                                    if (timeBean.isWeekshow() == true){
+                                        serializer.startTag(null, "showweek");
+                                        serializer.text(1+"");
+                                        serializer.endTag(null, "showweek");
+                                    }else {
+                                        serializer.startTag(null, "showweek");
+                                        serializer.text(0 + "");
+                                        serializer.endTag(null, "showweek");
+                                    }
+                                    serializer.startTag(null, "clockimage");
+                                    serializer.text(timeName);
+                                    serializer.endTag(null, "clockimage");
+
+                                    serializer.startTag(null, "hourcolor");
+                                    serializer.text(number_colors[7] + "");
+                                    serializer.endTag(null, "hourcolor");
+
+                                    serializer.startTag(null, "minutecolor");
+                                    serializer.text(number_colors[6] + "");
+                                    serializer.endTag(null, "minutecolor");
+
+                                    serializer.startTag(null, "secondcolor");
+                                    serializer.text(number_colors[5] + "");
+                                    serializer.endTag(null, "secondcolor");
+
+                                    serializer.endTag(null, "file");
+                                }
+                            }
+
+                        }else {
+                            //数字时钟xml
+                            serializer.startTag(null, "file");
+                            serializer.attribute(null, "index", "0");
+
+                            serializer.startTag(null, "style");
+                            serializer.text(1+"");
+                            serializer.endTag(null, "style");
+
+                            serializer.startTag(null, "font");
+                            if (timeBean.getNumber_typeface() == 0){
                                 serializer.startTag(null, "name");
                                 serializer.text("宋体");
                                 serializer.endTag(null, "name");
-
+                            }else {
                                 serializer.startTag(null, "name");
-                                serializer.text(imageName);
+                                serializer.text("Arial");
                                 serializer.endTag(null, "name");
+                            }
+                            serializer.startTag(null, "size");
+                            serializer.text(Utils.getPaintSize(this, timeBean.getM_rgbClockTextSize() + Constant.FONT_SIZE_CORRECTION) + "");
+                            serializer.endTag(null, "size");
 
-                                serializer.startTag(null, "size");
-                                serializer.text("16");
-                                serializer.endTag(null, "size");
+                            serializer.startTag(null, "bold");
+                            serializer.text("0");
+                            serializer.endTag(null, "bold");
 
-                                serializer.startTag(null, "bold");
-                                serializer.text(imageName);
-                                serializer.endTag(null, "bold");
+                            serializer.startTag(null, "underline");
+                            serializer.text("0");
+                            serializer.endTag(null, "underline");
 
-                                serializer.startTag(null, "underline");
-                                serializer.text(imageName);
-                                serializer.endTag(null, "underline");
+                            serializer.startTag(null, "italic");
+                            serializer.text("0");
+                            serializer.endTag(null, "italic");
 
-                                serializer.startTag(null, "italic");
-                                serializer.text(imageName);
-                                serializer.endTag(null, "italic");
+                            serializer.startTag(null, "color");
+                            serializer.text(number_colors[1] + "");
+                            serializer.endTag(null, "color");
 
-                                serializer.startTag(null, "color");
-                                serializer.text(imageName);
-                                serializer.endTag(null, "color");
-
-                                serializer.endTag(null, "font");
+                            serializer.endTag(null, "font");
+                            if (timeBean.getM_nClockType() == 0){
                                 serializer.startTag(null, "dateformat");
                                 serializer.text("yyyy-MM-dd");
                                 serializer.endTag(null, "dateformat");
@@ -1479,33 +1644,50 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                                 serializer.startTag(null, "timeformat");
                                 serializer.text("HH:mm:ss");
                                 serializer.endTag(null, "timeformat");
+                            }else if (timeBean.getM_nClockType() == 1){
+                                serializer.startTag(null, "dateformat");
+                                serializer.text("yyyy/MM/dd");
+                                serializer.endTag(null, "dateformat");
 
-                                serializer.startTag(null, "text");
-                                serializer.text("北京时间");
-                                serializer.endTag(null, "text");
+                                serializer.startTag(null, "timeformat");
+                                serializer.text("HH:mm:ss");
+                                serializer.endTag(null, "timeformat");
+                            }else {
+                                serializer.startTag(null, "dateformat");
+                                serializer.text("yyyy年MM月dd日");
+                                serializer.endTag(null, "dateformat");
+
+                                serializer.startTag(null, "timeformat");
+                                serializer.text("HH时mm分ss秒");
+                                serializer.endTag(null, "timeformat");
+                            }
+
+
+                            serializer.startTag(null, "text");
+                            serializer.text(timeBean.getM_strClockText());
+                            serializer.endTag(null, "text");
 
                                 serializer.startTag(null, "showdate");
-                                serializer.text("1");
+                                serializer.text(1+"");
                                 serializer.endTag(null, "showdate");
 
                                 serializer.startTag(null, "showweek");
-                                serializer.text("1");
+                                serializer.text(1+"");
                                 serializer.endTag(null, "showweek");
 
                                 serializer.startTag(null, "showtime");
-                                serializer.text("1");
+                                serializer.text(1+"");
                                 serializer.endTag(null, "showtime");
 
                                 serializer.startTag(null, "multline");
-                                serializer.text("1");
+                                serializer.text(timeBean.getM_nRowType() +"");
                                 serializer.endTag(null, "multline");
 
-                                serializer.endTag(null, "file");
-                            }
+                            serializer.endTag(null, "file");
                         }
                         serializer.endTag(null, "zone");
-                        Log.d("...............", "全部数据................:" + imageBean.toString());
                     }
+
                 }
 
                 serializer.endTag(null, "programe");

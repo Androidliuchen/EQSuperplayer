@@ -30,13 +30,13 @@ public class TimeBean extends TotalBean{
     public int timeToheidht; //宽度
     //数字时钟的参数
     @DatabaseField(columnName = "number_typeface")
-    private int number_typeface = 1;  //数字时钟字体
+    private int number_typeface = 0;  //数字时钟字体
     @DatabaseField(columnName = "m_strClockText")
     private String m_strClockText = "";  //固定文字
     @DatabaseField(columnName = " m_rgbClockTextColor")
     private int m_rgbClockTextColor; //固定文字颜色
     @DatabaseField(columnName = "m_rgbClockTextSize")
-    private int m_rgbClockTextSize = 6;  //固定文字大小
+    private int m_rgbClockTextSize = 4;  //固定文字大小
     @DatabaseField(columnName = "m_nYearType")
     private int m_nYearType;         //年格式
     @DatabaseField(columnName = "m_nHourType")
@@ -76,7 +76,7 @@ public class TimeBean extends TotalBean{
     @DatabaseField(columnName = "density_hour")
     private float density_hour = 0.45f;//时针长度比例
     @DatabaseField(columnName = "width_circle")
-    private float width_circle = 5;//表盘最外圆圈的宽度
+    private float width_circle = 1;//表盘最外圆圈的宽度
     @DatabaseField(columnName = "width_hour")
     private float width_hour = 10;//时针宽度
     @DatabaseField(columnName = "width_minutes")

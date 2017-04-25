@@ -146,6 +146,10 @@ public class TimeActivity extends AppCompatActivity {
     ImageView tiemShow;
     @BindView(R.id.program_text_background)
     LinearLayout programTextBackground;
+    @BindView(R.id.analog_clock)
+    Button analogClock;
+    @BindView(R.id.number_clock)
+    Button numberClock;
     private TimeBean timeBean;
     private ProgramBean programBean;
     private List<ProgramBean> programBeans;
@@ -154,6 +158,8 @@ public class TimeActivity extends AppCompatActivity {
     private int windowHeight; //窗口高度
     private WindowSizeManager windowSizeManager;
     private CheckBox[] checkBoxes;
+    private int time_id;
+    private boolean isTimeGo = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,7 +171,7 @@ public class TimeActivity extends AppCompatActivity {
 
     private void initView() {
         areabean = new AreabeanDao(this).get(ProgramActivity.program_id);
-        int time_id = getIntent().getIntExtra(Constant.PROGRAM_ID, -1);
+        time_id = getIntent().getIntExtra(Constant.PROGRAM_ID, -1);
         timeBean = new TimeDao(this).get(time_id);
         programBean = new ProgramBeanDao(this).get(ProgramActivity.selet);
         timeBean.setProgramBean(programBean);
@@ -200,6 +206,7 @@ public class TimeActivity extends AppCompatActivity {
                 if (position == 3) {
                     windowTimeAnalogclock.setVisibility(View.VISIBLE);
                     windowTimeNumberclock.setVisibility(View.GONE);
+
                 } else {
                     windowTimeNumberclock.setVisibility(View.VISIBLE);
                     windowTimeAnalogclock.setVisibility(View.GONE);
@@ -323,8 +330,17 @@ public class TimeActivity extends AppCompatActivity {
         timeTofz.setSelection(timeBean.getMinutecolor());
         timeTomz.setAdapter(new SpinnerImageAdapter(this, color_id));
         timeTomz.setSelection(timeBean.getSecondcolor());
+        timeDataSave();
+    }
 
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        isTimeGo = false;
+    }
+
+    private void timeDataSave() {
         try {
             if (Integer.parseInt(timeToWidth.getText().toString()) + Integer.parseInt(timeTox.getText().toString()) <= windowWidth
                     && Integer.parseInt(timeToHeigth.getText().toString()) + Integer.parseInt(timeToy.getText().toString()) <= windowHeight) {
@@ -404,15 +420,28 @@ public class TimeActivity extends AppCompatActivity {
         timeBean.setM_strTimeLag(huorOrMinute.getText().toString());
         new TimeDao(TimeActivity.this).update(timeBean);
         //获取画笔属性
-        Paint paint = Utils.getPaint(TimeActivity.this, Utils.getPaintSize(TimeActivity.this, Integer.parseInt(TimeActivity.this.getResources().getStringArray(R.array.text_size)[timeBean.getM_rgbClockTextSize()])
-                + Constant.FONT_SIZE_CORRECTION));
+        Paint paint = Utils.getPaint(TimeActivity.this, Utils.getPaintSize(TimeActivity.this, Integer.parseInt(TimeActivity.this.getResources().getStringArray(R.array.text_size)[timeBean.getM_rgbClockTextSize()])));
         Utils.setTypeface(TimeActivity.this, paint
                 , (TimeActivity.this.getResources().getStringArray(R.array.typeface_path))[timeBean.getNumber_typeface()]);
-        paint.setTextSize(Utils.getPaintSize(TimeActivity.this, timeBean.getM_rgbClockTextSize() + Constant.FONT_SIZE_CORRECTION)); // 字体大小 进度条参数
+        paint.setTextSize(Utils.getPaintSize(TimeActivity.this, timeBean.getM_rgbClockTextSize())); // 字体大小 进度条参数
     }
 
 
-    @OnClick({R.id.timeTofinsh, R.id.time_btn})
+    private void showText() {
+        timeBean = new TimeDao(this).get(time_id);
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) programTextBackground.getLayoutParams();
+        layoutParams.weight = windowWidth;
+        layoutParams.height = windowHeight;
+        programTextBackground.setLayoutParams(layoutParams);
+        if (timeBean.getM_nClockType() == 3) {
+            tiemShow.setImageBitmap(AreaDrawText.analogColck(TimeActivity.this, timeBean));
+        } else {
+            tiemShow.setImageBitmap(AreaDrawText.getTime(TimeActivity.this, timeBean));
+
+        }
+    }
+
+    @OnClick({R.id.timeTofinsh, R.id.time_btn, R.id.analog_clock, R.id.number_clock})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.timeTofinsh:
@@ -421,23 +450,20 @@ public class TimeActivity extends AppCompatActivity {
                 TimeActivity.this.finish();
                 break;
             case R.id.time_btn:
+                timeDataSave();
                 Intent intent2 = new Intent(this, ProgramActivity.class);
                 startActivity(intent2);
                 TimeActivity.this.finish();
                 break;
+            case R.id.analog_clock:
+                timeDataSave();
+                new TimeThread().start();
+                break;
+            case R.id.number_clock:
+                timeDataSave();
+                new TimeThread().start();
+                break;
         }
-    }
-
-    private void showText() {
-        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) programTextBackground.getLayoutParams();
-        layoutParams.weight = windowWidth / 2;
-        layoutParams.height = windowHeight / 2;
-        programTextBackground.setLayoutParams(layoutParams);
-        final Bitmap bt = Bitmap.createBitmap(windowWidth , windowHeight, Bitmap.Config.ARGB_8888);
-        Canvas canvas1 = new Canvas(bt); // 创建画布
-        canvas1.drawColor(Color.BLACK); // 颜色黑色
-        AreaDrawText.drawTime(TimeActivity.this,canvas1, timeBean);
-        tiemShow.setImageBitmap(bt);
     }
 
     class TimeThread extends Thread {
@@ -452,7 +478,7 @@ public class TimeActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            } while (true);
+            } while (isTimeGo);
         }
     }
 
@@ -461,10 +487,8 @@ public class TimeActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch (msg.what) {
-                case 1:
-                    showText();
-            }
+            showText();
         }
     };
+
 }

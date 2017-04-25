@@ -95,6 +95,9 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
             String fileVedioPath = Environment.getExternalStorageDirectory().toString() + File.separator
                     + "EQVedio";
             filePath.add(fileVedioPath);
+            String fileTimePath = Environment.getExternalStorageDirectory().toString() + File.separator
+                    + "EQTime";
+            filePath.add(fileTimePath);
             String PROGRAME_ROOT = Environment
                     .getExternalStorageDirectory()
                     .getAbsolutePath() + "/EQPrograme/";
@@ -186,6 +189,9 @@ public class ProgramFragment extends Fragment implements View.OnClickListener, V
                 String fileVedioPath = Environment.getExternalStorageDirectory().toString() + File.separator
                         + "EQVedio";
                 filePath.add(fileVedioPath);
+                String fileTimePath = Environment.getExternalStorageDirectory().toString() + File.separator
+                        + "EQTime";
+                filePath.add(fileTimePath);
                 String PROGRAME_ROOT = Environment
                         .getExternalStorageDirectory()
                         .getAbsolutePath() + "/EQPrograme/";

@@ -101,7 +101,39 @@ public class Utils {
             e.printStackTrace();
         }
     }
+    /*
+     * bitmap 转存 图片到本地
+     */
+    public static void saveTimeBitmap(Bitmap mBitmap) {
+        File appDir = new File(Environment.getExternalStorageDirectory(), "EQTime");
+        Log.d(".........","Environment.getExternalStorageDirectory()........" + Environment.getExternalStorageDirectory());
+        FileUtils.deleteDir(appDir.getPath());
+        if (!appDir.exists()) {
+            appDir.mkdir();
+        }
+        String bitName = String.valueOf(System.currentTimeMillis());
+        String fileName = bitName + ".png";
+        File file = new File(appDir, fileName);
+        Log.d("存储路径", file.toString());
+        FileOutputStream fOut = null;
+        try {
+            fOut = new FileOutputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        mBitmap.compress(Bitmap.CompressFormat.PNG, 0, fOut);
 
+        try {
+            fOut.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            fOut.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     /*
     通过指针提取图片数据
    */

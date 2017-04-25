@@ -29,6 +29,8 @@ public class TextBean extends TotalBean{
     public Paint paint;
     @DatabaseField(columnName = "singleTextValue")
     public String singleTextValue = " "; //文本内容
+    @DatabaseField(columnName = "textType")
+    public int textType = 0; //文本类型
     @DatabaseField(columnName = "name")
     public String name; //节目名字
     @DatabaseField(columnName = "border")
@@ -99,6 +101,18 @@ public class TextBean extends TotalBean{
 
     public Paint getPaint() {
         return paint;
+    }
+
+    public int getTextType() {
+        return textType;
+    }
+
+    public void setTextType(int textType) {
+        this.textType = textType;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     public void setPaint(Paint paint) {

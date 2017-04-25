@@ -13,6 +13,9 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -55,7 +58,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
     @BindView(R.id.edit_text)
     EditText editText;
     @BindView(R.id.ST)
-    EditText ST;
+    Spinner ST;
     @BindView(R.id.STborder)
     Spinner STborder;
     @BindView(R.id.STbordercolor)
@@ -123,7 +126,6 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
         programBean = new ProgramBeanDao(this).get(ProgramActivity.selet);
         textBean.setProgramBean(programBean);
         //节目名称
-        ST.setText(textBean.getName());
         windowSizeManager = WindowSizeManager.getSahrePreference(this);
         windowWidth = windowSizeManager.getWindowWidth();
         windowHeight = windowSizeManager.getWindowHeight();
@@ -142,7 +144,9 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
             STx.setText(areabean.getArea_X() + "");
             STy.setText(areabean.getArea_Y() + "");
         }
-
+        //文本类型
+        ST.setAdapter(new SpinnerAdapter(this, this.getResources().getStringArray(R.array.textType)));
+        ST.setSelection(textBean.getTextType());
         //字体是否加粗
         STBold.setChecked(textBean.isStBold());
         //文字是否设置斜体
@@ -218,6 +222,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
         textBean.setEnterspeed(STSpeed.getSelectedItemPosition());
         textBean.setEntertrick(STTick.getSelectedItemPosition());
         textBean.setStandtime(Integer.parseInt(STStandtime.getText().toString()));
+        textBean.setTextType(ST.getSelectedItemPosition());
         //创建时画笔赋值
         Paint paint = Utils.getPaint(TextActivity.this, Utils.getPaintSize(TextActivity.this, 15));
         paint.setFakeBoldText(textBean.isStBold());
@@ -247,12 +252,102 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
                     FileUtils.deleteDir(fileTextPath);
                 }
                 save();
-                copyBitmap();
+                if (textBean.getTextType() == 0) {
+                    copyBitmap();
+                }else {
+                    copyManyBitmap(getNewBitMap());
+                }
                 Intent intent2 = new Intent(this, ProgramActivity.class);
                 startActivity(intent2);
                 TextActivity.this.finish();
                 break;
         }
+    }
+    //绘制多行文本
+    public Bitmap getNewBitMap() {
+        textWidths = Integer.parseInt(STWidth.getText().toString());//文本框输入的长度
+        textHeights = Integer.parseInt(STHeigth.getText().toString());//文本框输入的长度
+        //文字
+        String text = editText.getText().toString();
+        //文字大小
+        int size = Integer.parseInt(this.getResources().getStringArray(R.array.text_size)[STSize.getSelectedItemPosition()]) + 3;
+        //文字颜色
+        int[] number_colors = new int[]{textBean.getBorderColor(), textBean.getStBackground(), textBean.getStColor()};
+        for (int i = 0; i < number_colors.length; i++) {
+            switch (number_colors[i]) {
+                case 0:
+                    number_colors[i] =getResources().getColor(R.color.yellow) ;
+                    break;
+                case 1:
+                    number_colors[i] =getResources().getColor(R.color.dodgerblue) ;
+                    break;
+                case 2:
+                    number_colors[i] =getResources().getColor(R.color.red) ;
+                    break;
+                case 3:
+                    number_colors[i] =getResources().getColor(R.color.lime) ;
+                    break;
+                case 4:
+                    number_colors[i] =getResources().getColor(R.color.mediumorchid) ;
+                    break;
+                case 5:
+                    number_colors[i] =getResources().getColor(R.color.blue) ;
+                    break;
+                case 6:
+                    number_colors[i] =getResources().getColor(R.color.black) ;
+                    break;
+                case 7:
+                    number_colors[i] =getResources().getColor(R.color.white) ;
+                    break;
+                case 8:
+                    number_colors[i] =getResources().getColor(R.color.grey) ;
+                    break;
+            }
+        }
+
+        TextPaint textPaint = new TextPaint();
+        textPaint.setAntiAlias(true);
+        textPaint.setTextSize(size);  //字体大小
+        textPaint.setColor(number_colors[2]);  //字体颜色
+        if (textBean.getStTypeFace() == 1 && textBean.isStBold() == true) {
+            textPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        }
+        if (textBean.isStUnderLine() == true) {
+            textPaint.setUnderlineText(true);
+        }
+        if (textBean.isStItalic() == true && textBean.isStBold()) {
+            textPaint.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
+        }
+
+        Paint.FontMetrics fontMetrics = textPaint.getFontMetrics();
+        float top = fontMetrics.ascent;
+        float bottom = fontMetrics.bottom;
+        float strhei = (bottom-top); //每行的高度
+        //判断总共绘制多少行文字
+        int length = text.length();
+        int hang = 0;
+        int num = 1;
+        for (int i = 0; i <length ; i++) {
+            float strwid = textPaint.measureText(text.substring(i, i + 1));
+            if ((hang +strwid)>=textWidths){
+                hang = 0;
+                num+=1;
+            }
+            hang = (int) (hang +strwid);
+        }
+        Log.d("---","uuu"+num);
+        int height = (int)strhei*(num);
+        if (height> textHeights){
+            height = (int)strhei*(num);
+        }else {
+            height  = textHeights;
+        }
+        Bitmap newBitmap = Bitmap.createBitmap(textWidths,height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(newBitmap);
+        //开始多行绘制
+        StaticLayout sl = new StaticLayout(text, textPaint, newBitmap.getWidth(), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+        sl.draw(canvas);
+        return newBitmap;
     }
 
     public Bitmap drawBitmap() {
@@ -270,7 +365,7 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
         Log.d(".......", "textHeight........." + textHeight);
         Log.d(".......", "textWidth........." + textWidth);
         Bitmap bitmap = Bitmap.createBitmap((int) textWidth, textHeight, Bitmap.Config.ARGB_8888);
-        int number_colors =textBean.getStColor();
+        int number_colors = textBean.getStColor();
         for (int i = 0; i < 1; i++) {
             switch (number_colors) {
                 case 0:
@@ -342,7 +437,41 @@ public class TextActivity extends AppCompatActivity implements View.OnClickListe
 
         return bitmap;
     }
+    //多行文本的截取
+    public void copyManyBitmap(Bitmap bitmaps) {
+        Paint paint = new Paint();
 
+        int endBitmapWidth;
+        if (bitmaps.getHeight() <= textHeights) {
+            Utils.saveMyBitmap(bitmaps, "text");
+        } else {
+            int bitmapsheight = bitmaps.getHeight();
+            int bitmapCount = bitmapsheight / textHeights;//按屏幕可截取多少张图片
+            if (bitmapsheight % textHeights > 0) {
+                bitmapCount += 1;
+                endBitmapWidth = bitmapsheight % textHeights;//最后一张图片截取的宽度
+            } else {
+                endBitmapWidth = textHeights;
+            }
+            Log.d(".......", "bitmapCount生成的图片可以截取几张图片。。。：" + bitmapCount);
+            for (int i = 0; i < bitmapCount; i++) {
+                int x = i * textHeights;
+                Bitmap bmp;
+                if (i == bitmapCount - 1) {
+                    bmp = Bitmap.createBitmap(bitmaps, 0, x, textWidths, endBitmapWidth, null, true);
+                    Bitmap bitmap = Bitmap.createBitmap(textWidths, textHeights, Bitmap.Config.ARGB_8888);
+                    Canvas canvas = new Canvas(bitmap); // 创建画布
+                    canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                    canvas.drawBitmap(bmp,0,0,paint);
+                    Utils.saveMyBitmap(bitmap, "text" + i);
+                } else {
+                    bmp = Bitmap.createBitmap(bitmaps, 0, x, textWidths, textHeights, null, true);
+                    Utils.saveMyBitmap(bmp, "text" + i);
+                }
+
+            }
+        }
+    }
     public void copyBitmap() {
         int y = Integer.parseInt(STHeigth.getText().toString());
         int endBitmapWidth;
