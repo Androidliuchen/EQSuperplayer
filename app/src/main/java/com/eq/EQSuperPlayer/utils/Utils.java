@@ -111,7 +111,7 @@ public class Utils {
         if (!appDir.exists()) {
             appDir.mkdir();
         }
-        String bitName = String.valueOf(System.currentTimeMillis());
+        String bitName = "timeImage";
         String fileName = bitName + ".png";
         File file = new File(appDir, fileName);
         Log.d("存储路径", file.toString());
@@ -324,7 +324,7 @@ public class Utils {
       获取用户选择的画笔大小
      */
     public static int getPaintSize(Context context, int text_size_position) {
-        return Integer.parseInt(context.getResources().getStringArray(R.array.text_size)[text_size_position]) + 30;
+        return Integer.parseInt(context.getResources().getStringArray(R.array.text_size)[text_size_position] +3);
     }
 
 

@@ -54,7 +54,7 @@ public class TextBean extends TotalBean{
     @DatabaseField(columnName = "stUnderLine")
     public boolean stUnderLine = false;  //下划线 默认不加下划线
     @DatabaseField(columnName = "stSize")
-    public int stSize = 7;      //字体大小
+    public int stSize = 14;      //字体大小
     @DatabaseField(columnName = "stColoer")
     public int stColor;  //字体颜色
     @DatabaseField(columnName = "entertrick")

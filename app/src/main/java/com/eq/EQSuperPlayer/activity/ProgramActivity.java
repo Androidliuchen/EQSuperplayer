@@ -11,7 +11,9 @@ import android.graphics.PointF;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.util.Xml;
@@ -19,6 +21,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -124,7 +127,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
     int mode = NONE;
     private int program_name_count;
     private int zoneIndex = 0;
-    private boolean isScale=false;
+    private boolean isScale = false;
     private int MAXLENG = 0;//数据最大长度
     private RandomAccessFile ism;
     private ArrayList<String> iamgID; //存放图片名的数组
@@ -160,10 +163,17 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         text_layout = (RelativeLayout) findViewById(R.id.program_text_background);
         relt = (RelativeLayout) findViewById(R.id.relt);
         listener = new MyOnTouchListener();
+
         //读取宽高设置
         WindowSizeManager windowSizeManager = WindowSizeManager.getSahrePreference(this);
         windowHeight = windowSizeManager.getWindowHeight();
         windowWidth = windowSizeManager.getWindowWidth();
+        WindowManager manager = this.getWindowManager();
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        manager.getDefaultDisplay().getMetrics(outMetrics);
+        int width = outMetrics.widthPixels;
+        float widscale = width / (float) windowWidth;
+        AnimatorUtils.scale(text_layout, 1, widscale, 1, widscale);
         //显示区域宽高设置
         text_layout.getLayoutParams().width = windowWidth;
         text_layout.getLayoutParams().height = windowHeight;
@@ -200,7 +210,28 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             Log.d("........", "tableBeens.............:" + tableBeens.toString());
             System.out.println("查询设备所有节目个数:" + programBean.toString());
         }
-
+        if (tableBeens.size() <= 0) {
+            programBean = new ProgramBean();
+            areabean = new AreabeanDao(ProgramActivity.this).get(program_id);
+            programBean.setAreabean(areabean);
+            program_name_count = ProgramNameItemManager.getSahrePreference(ProgramActivity.this);
+            programBean.setName(getResources().getText(R.string.main_program) + "" + program_name_count);
+            new ProgramBeanDao(ProgramActivity.this).add(programBean);
+            tableBeens.add(programBean);
+            Log.d("..............", "areabean...........:" + areabean.toString());
+//            region_text.setText(getResources().getText(R.string.main_program) + "" + program_name_count);
+            ProgramBean programBean = (ProgramBean) tableBeens.get(0);
+            initDatas(programBean);
+            region_text.setText(programBean.getName());
+            selet = programBean.getId();
+            program_name_count++;
+            ProgramNameItemManager.setSharedPreference(ProgramActivity.this, program_name_count);
+        }else {
+            ProgramBean programBean = (ProgramBean) tableBeens.get(0);
+            initDatas(programBean);
+            region_text.setText(programBean.getName());
+            selet = programBean.getId();
+        }
     }
 
     /*
@@ -272,6 +303,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 timeBean.setProgramBean(programBean);
                 timeBean.setType(Constant.AREA_TYPE_TIME);
                 totalBeens.add(timeBean);
+                showTime();
             }
         }
 
@@ -334,12 +366,12 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         textview.setText(textBean.getSingleTextValue());
         textview.setX(textBean.getX());
         textview.setY(textBean.getY());
-        if (textBean.getTextType() == 1){
+        if (textBean.getTextType() == 1) {
             textview.setSingleLine(false);
         }
         textview.setOnTouchListener(listener);
         textview.setTextColor(number_colors);
-        textview.setTextSize((float) (textBean.getStSize() / 1.2));
+        textview.setTextSize((float) (textBean.getStSize() / 2));
         textview.setWidth(textBean.getWidth());
         textview.setHeight(textBean.getHeight());
         textview.setBackgroundColor(0x0000);
@@ -391,22 +423,19 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         }
         text_layout.addView(view);
     }
-//    private void showTime() {
-//        View imageviews = View.inflate(this, R.layout.time_showitme, null);
-//        ImageView imageView = (ImageView) imageviews.findViewById(R.id.tiem_show);
-//        ViewGroup.LayoutParams il = imageView.getLayoutParams();
-//        il.width = timeBean.getTimeTowidth();
-//        il.height = timeBean.getTimeToheidht();
-//        imageView.setLayoutParams(il);
-//        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-//        imageView.setBackgroundResource(R.drawable.bodler_shape);
-//        if (timeBean.getM_nClockType() == 3){
-//            imageView.setImageBitmap( AreaDrawText.analogColck(ProgramActivity.this,timeBean));
-//        }else {
-//            imageView.setImageBitmap( AreaDrawText.getTime(ProgramActivity.this,timeBean));
-//        }
-//        text_layout.addView(imageviews);
-//    }
+    private void showTime() {
+//        View imageviews = View.inflate(this, R.layout.time_showitme, null);nul
+        ImageView imageView = new ImageView(this);
+        imageView.setLayoutParams(new ViewGroup.LayoutParams(timeBean.getTimeTowidth(),timeBean.getTimeToheidht()));
+        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+        imageView.setBackgroundResource(R.drawable.bodler_shape);
+        if (timeBean.getM_nClockType() == 3){
+            imageView.setImageBitmap( AreaDrawText.analogColck(ProgramActivity.this,timeBean));
+        }else {
+            imageView.setImageBitmap( AreaDrawText.getTime(ProgramActivity.this,timeBean));
+        }
+        text_layout.addView(imageView);
+    }
 
     /*
    添加视频显示
@@ -464,7 +493,6 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
     }
 
 
-
     private View getTypeWindowListView() {
         View view = this.getLayoutInflater().inflate(R.layout.recry_itme, null);
         programListView = (ProgramListView) view.findViewById(R.id.program_listview);
@@ -479,7 +507,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 String[] arrayFruit = new String[]{getResources().getString(R.string.program_text),
                         getResources().getString(R.string.program_video),
                         getResources().getString(R.string.program_image),
-                      getResources().getString(R.string.program_time),
+                        getResources().getString(R.string.program_time),
 
                 };
                 AlertDialog.Builder dia = new AlertDialog.Builder(ProgramActivity.this);
@@ -754,14 +782,14 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.out_iamge:
-                Intent intent = new Intent(ProgramActivity.this,MainActivity.class);
+                Intent intent = new Intent(ProgramActivity.this, MainActivity.class);
                 startActivity(intent);
                 this.finish();
                 break;
             case R.id.region_program:
                 if (programePopWindow == null) {
                     programePopWindow = new ProgramePopWindow(this, R.id.region_program);
-                    programePopWindow.setView(getPopWindowListView(),1.0f, 0.57f);
+                    programePopWindow.setView(getPopWindowListView(), 1.0f, 0.57f);
                     programePopWindow.backgroundAlpha(1f);
                 }
                 programePopWindow.showPopupWindow(prog_btn);
@@ -787,6 +815,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 break;
         }
     }
+
     /**
      * 节目发送指令
      */
@@ -819,10 +848,10 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (stateCode == 0){
+                            if (stateCode == 0) {
                                 Toast.makeText(ProgramActivity.this, "文件发送失败", Toast.LENGTH_SHORT).show();
 
-                            }else {
+                            } else {
                                 Toast.makeText(ProgramActivity.this, "网络连接异常", Toast.LENGTH_SHORT).show();
 
                             }
@@ -882,6 +911,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
         }
 
     }
+
     /*
      //显示屏启动动画
     */
@@ -894,6 +924,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             containerHeight = relt.getWidth();
         }
     }
+
     class MyOnTouchListener implements View.OnTouchListener {
 
         @Override
@@ -901,7 +932,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             switch (event.getAction() & MotionEvent.ACTION_MASK) {
                 //进入拖拽模式
                 case MotionEvent.ACTION_DOWN:
-                    System.out.println("uuuu"+v.getMeasuredWidth());
+                    System.out.println("uuuu" + v.getMeasuredWidth());
                     mode = DRAG;
                     lastX_drag = event.getRawX();
                     lastY_drag = event.getRawY();
@@ -918,13 +949,13 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         Log.e("触摸_间距", currentDistance + "  " + lastDistance + " ");
                         if (currentDistance > lastRotation) {
                             Log.e("屏幕_缩放", "放大");
-                            scale = (float) (lastScale + (float)(currentDistance-lastRotation)/lastRotation);
+                            scale = (float) (lastScale + (float) (currentDistance - lastRotation) / lastRotation);
                             AnimatorUtils.scale(v, lastScale, scale, lastScale, scale);
                             lastScale = scale;
                         }
                         if (currentDistance < lastRotation) {
                             Log.e("屏幕_缩放", "缩小");
-                            scale = (float) (lastScale -(float)(lastRotation-currentDistance)/lastRotation);
+                            scale = (float) (lastScale - (float) (lastRotation - currentDistance) / lastRotation);
                             AnimatorUtils.scale(v, lastScale, scale, lastScale, scale);
                             lastScale = scale;
                         }
@@ -971,7 +1002,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 nextY = windowHeight - v.getHeight();
             }
             AnimatorUtils.translate(v, v.getX(), v.getY(), nextX, nextY);
-            v.setX(v.getX()+nextX);
+            v.setX(v.getX() + nextX);
             lastX_drag = event.getRawX();
             lastY_drag = event.getRawY();
         }
@@ -989,6 +1020,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
             return point;
         }
     }
+
     /**
      * 检查扩展名，得到图片格式的文件
      *
@@ -1081,24 +1113,24 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         serializer.startTag(null, "framemode");
                         serializer.text(String.valueOf(textBean.getBorder()));
                         serializer.endTag(null, "framemode");
-                        int number_colors =textBean.getBorderColor();
+                        int number_colors = textBean.getBorderColor();
                         long textColor = 0;
                         for (int i = 0; i < 1; i++) {
                             switch (number_colors) {
                                 case 0:
-                                    textColor  = 2552550;
+                                    textColor = 2552550;
                                     break;
                                 case 1:
-                                    textColor  = 30144255;
+                                    textColor = 30144255;
                                     break;
                                 case 2:
-                                    textColor  =25500;
+                                    textColor = 25500;
                                     break;
                                 case 3:
                                     textColor = 02550;
                                     break;
                                 case 4:
-                                    textColor =255192203;
+                                    textColor = 255192203;
                                     break;
                                 case 5:
                                     textColor = 00255;
@@ -1115,7 +1147,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                             }
                         }
                         serializer.startTag(null, "framecolor");
-                        serializer.text(textColor +"");
+                        serializer.text(textColor + "");
                         serializer.endTag(null, "framecolor");
                         serializer.endTag(null, "attribute");
                         // 图片列表
@@ -1209,24 +1241,24 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         serializer.text(String.valueOf(imageBean.getIamgeBorder()));
                         serializer.endTag(null, "framemode");
 
-                        int image_colors =imageBean.getIamgeBorderColor();
+                        int image_colors = imageBean.getIamgeBorderColor();
                         int imageColor = 0;
                         for (int i = 0; i < 1; i++) {
                             switch (image_colors) {
                                 case 0:
-                                    imageColor  = 2552550;
+                                    imageColor = 2552550;
                                     break;
                                 case 1:
-                                    imageColor  = 30144255;
+                                    imageColor = 30144255;
                                     break;
                                 case 2:
-                                    imageColor  =25500;
+                                    imageColor = 25500;
                                     break;
                                 case 3:
                                     imageColor = 02550;
                                     break;
                                 case 4:
-                                    imageColor =255192203;
+                                    imageColor = 255192203;
                                     break;
                                 case 5:
                                     imageColor = 00255;
@@ -1336,46 +1368,46 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         serializer.startTag(null, "height");
                         serializer.text(String.valueOf(vedioBean.getVedioHeidht()));
                         serializer.endTag(null, "height");
-                        serializer.startTag(null, "framemode");
-                        serializer.text(String.valueOf(imageBean.getIamgeBorder()));
-                        serializer.endTag(null, "framemode");
-
-                        int vedio_colors =vedioBean.getVedioBorderColor();
-                        int vedioColor = 0;
-                        for (int i = 0; i < 1; i++) {
-                            switch (vedio_colors) {
-                                case 0:
-                                    vedioColor  = 2552550;
-                                    break;
-                                case 1:
-                                    vedioColor  = 30144255;
-                                    break;
-                                case 2:
-                                    vedioColor  =25500;
-                                    break;
-                                case 3:
-                                    vedioColor = 02550;
-                                    break;
-                                case 4:
-                                    vedioColor =255192203;
-                                    break;
-                                case 5:
-                                    vedioColor = 00255;
-                                    break;
-                                case 6:
-                                    vedioColor = 000;
-                                    break;
-                                case 7:
-                                    vedioColor = 255255255;
-                                    break;
-                                case 8:
-                                    vedioColor = 192192192;
-                                    break;
-                            }
-                        }
-                        serializer.startTag(null, "framecolor");
-                        serializer.text(vedioColor + "");
-                        serializer.endTag(null, "framecolor");
+//                        serializer.startTag(null, "framemode");
+//                        serializer.text(String.valueOf(imageBean.getIamgeBorder()));
+//                        serializer.endTag(null, "framemode");
+//
+//                        int vedio_colors =vedioBean.getVedioBorderColor();
+//                        int vedioColor = 0;
+//                        for (int i = 0; i < 1; i++) {
+//                            switch (vedio_colors) {
+//                                case 0:
+//                                    vedioColor  = 2552550;
+//                                    break;
+//                                case 1:
+//                                    vedioColor  = 30144255;
+//                                    break;
+//                                case 2:
+//                                    vedioColor  =25500;
+//                                    break;
+//                                case 3:
+//                                    vedioColor = 02550;
+//                                    break;
+//                                case 4:
+//                                    vedioColor =255192203;
+//                                    break;
+//                                case 5:
+//                                    vedioColor = 00255;
+//                                    break;
+//                                case 6:
+//                                    vedioColor = 000;
+//                                    break;
+//                                case 7:
+//                                    vedioColor = 255255255;
+//                                    break;
+//                                case 8:
+//                                    vedioColor = 192192192;
+//                                    break;
+//                            }
+//                        }
+//                        serializer.startTag(null, "framecolor");
+//                        serializer.text(vedioColor + "");
+//                        serializer.endTag(null, "framecolor");
                         serializer.endTag(null, "attribute");
                         // 视频列表
                         List<String> imagePathList = new ArrayList<String>();
@@ -1424,7 +1456,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                 if (iteratorTime != null) {
                     while (iteratorTime.hasNext()) {
                         timeBean = iteratorTime.next();
-                        int[] number_colors = new int[]{timeBean.getTimeToBorderColor(),timeBean.getM_rgbClockTextColor(), timeBean.getM_rgbDayTextColor()
+                        int[] number_colors = new int[]{timeBean.getTimeToBorderColor(), timeBean.getM_rgbClockTextColor(), timeBean.getM_rgbDayTextColor()
                                 , timeBean.getM_rgbWeekTextColor(), timeBean.getM_rgbTimeColor(),
                                 timeBean.getSecondcolor(), timeBean.getMinutecolor(),
                                 timeBean.getHourscolor(), timeBean.getFenbiaocolorposition(),
@@ -1432,7 +1464,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         for (int i = 0; i < number_colors.length; i++) {
                             switch (number_colors[i]) {
                                 case 0:
-                                    number_colors[i] =  2552550;
+                                    number_colors[i] = 2552550;
                                     break;
                                 case 1:
                                     number_colors[i] = 30144255;
@@ -1469,19 +1501,19 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
 
                         serializer.startTag(null, "attribute");
                         serializer.startTag(null, "x");
-                        serializer.text(String.valueOf(areabean.getArea_X()));
+                        serializer.text(String.valueOf(timeBean.getTimeToX()));
                         serializer.endTag(null, "x");
 
                         serializer.startTag(null, "y");
-                        serializer.text(String.valueOf(areabean.getArea_Y()));
+                        serializer.text(String.valueOf(timeBean.getTimeToY()));
                         serializer.endTag(null, "y");
 
                         serializer.startTag(null, "width");
-                        serializer.text(String.valueOf(areabean.getWindowWidth()));
+                        serializer.text(String.valueOf(timeBean.getTimeTowidth()));
                         serializer.endTag(null, "width");
 
                         serializer.startTag(null, "height");
-                        serializer.text(String.valueOf(areabean.getWindowHeight()));
+                        serializer.text(String.valueOf(timeBean.getTimeToheidht()));
                         serializer.endTag(null, "height");
 
                         serializer.startTag(null, "framemode");
@@ -1493,7 +1525,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                         serializer.endTag(null, "framecolor");
 
                         serializer.endTag(null, "attribute");
-                        if (timeBean.getM_nClockType() == 3){
+                        if (timeBean.getM_nClockType() == 3) {
                             // 图片列表
                             List<String> imagePathList = new ArrayList<String>();
                             // 得到sd卡内image文件夹的路径   File.separator(/)
@@ -1517,18 +1549,22 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                                     serializer.text("0");
                                     serializer.endTag(null, "style");
 
+                                    serializer.startTag(null, "effect");
+                                    serializer.text("1");
+                                    serializer.endTag(null, "effect");
+
                                     serializer.startTag(null, "font");
-                                    if (timeBean.getNumber_typeface() == 0){
+                                    if (timeBean.getNumber_typeface() == 0) {
                                         serializer.startTag(null, "name");
                                         serializer.text("宋体");
                                         serializer.endTag(null, "name");
-                                    }else {
+                                    } else {
                                         serializer.startTag(null, "name");
                                         serializer.text("Arial");
                                         serializer.endTag(null, "name");
                                     }
                                     serializer.startTag(null, "size");
-                                    serializer.text(Utils.getPaintSize(this, timeBean.getM_rgbClockTextSize() + Constant.FONT_SIZE_CORRECTION) + "");
+                                    serializer.text(getResources().getStringArray(R.array.text_size)[timeBean.getM_rgbClockTextSize()] + "");
                                     serializer.endTag(null, "size");
 
                                     serializer.startTag(null, "bold");
@@ -1557,21 +1593,21 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                                     serializer.text(timeBean.getM_strClockText());
                                     serializer.endTag(null, "text");
 
-                                    if (timeBean.isDateshow() == true){
+                                    if (timeBean.isDateshow() == true) {
                                         serializer.startTag(null, "showdate");
-                                        serializer.text(1+"");
+                                        serializer.text(1 + "");
                                         serializer.endTag(null, "showdate");
-                                    }else {
+                                    } else {
                                         serializer.startTag(null, "showdate");
                                         serializer.text(0 + "");
                                         serializer.endTag(null, "showdate");
                                     }
 
-                                    if (timeBean.isWeekshow() == true){
+                                    if (timeBean.isWeekshow() == true) {
                                         serializer.startTag(null, "showweek");
-                                        serializer.text(1+"");
+                                        serializer.text(1 + "");
                                         serializer.endTag(null, "showweek");
-                                    }else {
+                                    } else {
                                         serializer.startTag(null, "showweek");
                                         serializer.text(0 + "");
                                         serializer.endTag(null, "showweek");
@@ -1596,27 +1632,27 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                                 }
                             }
 
-                        }else {
+                        } else {
                             //数字时钟xml
                             serializer.startTag(null, "file");
                             serializer.attribute(null, "index", "0");
 
                             serializer.startTag(null, "style");
-                            serializer.text(1+"");
+                            serializer.text(1 + "");
                             serializer.endTag(null, "style");
 
                             serializer.startTag(null, "font");
-                            if (timeBean.getNumber_typeface() == 0){
+                            if (timeBean.getNumber_typeface() == 0) {
                                 serializer.startTag(null, "name");
                                 serializer.text("宋体");
                                 serializer.endTag(null, "name");
-                            }else {
+                            } else {
                                 serializer.startTag(null, "name");
                                 serializer.text("Arial");
                                 serializer.endTag(null, "name");
                             }
                             serializer.startTag(null, "size");
-                            serializer.text(Utils.getPaintSize(this, timeBean.getM_rgbClockTextSize() + Constant.FONT_SIZE_CORRECTION) + "");
+                            serializer.text(getResources().getStringArray(R.array.text_size)[timeBean.getM_rgbClockTextSize()] + "");
                             serializer.endTag(null, "size");
 
                             serializer.startTag(null, "bold");
@@ -1636,7 +1672,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                             serializer.endTag(null, "color");
 
                             serializer.endTag(null, "font");
-                            if (timeBean.getM_nClockType() == 0){
+                            if (timeBean.getM_nClockType() == 0) {
                                 serializer.startTag(null, "dateformat");
                                 serializer.text("yyyy-MM-dd");
                                 serializer.endTag(null, "dateformat");
@@ -1644,7 +1680,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                                 serializer.startTag(null, "timeformat");
                                 serializer.text("HH:mm:ss");
                                 serializer.endTag(null, "timeformat");
-                            }else if (timeBean.getM_nClockType() == 1){
+                            } else if (timeBean.getM_nClockType() == 1) {
                                 serializer.startTag(null, "dateformat");
                                 serializer.text("yyyy/MM/dd");
                                 serializer.endTag(null, "dateformat");
@@ -1652,7 +1688,7 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                                 serializer.startTag(null, "timeformat");
                                 serializer.text("HH:mm:ss");
                                 serializer.endTag(null, "timeformat");
-                            }else {
+                            } else {
                                 serializer.startTag(null, "dateformat");
                                 serializer.text("yyyy年MM月dd日");
                                 serializer.endTag(null, "dateformat");
@@ -1667,21 +1703,21 @@ public class ProgramActivity extends Activity implements View.OnClickListener, V
                             serializer.text(timeBean.getM_strClockText());
                             serializer.endTag(null, "text");
 
-                                serializer.startTag(null, "showdate");
-                                serializer.text(1+"");
-                                serializer.endTag(null, "showdate");
+                            serializer.startTag(null, "showdate");
+                            serializer.text(1 + "");
+                            serializer.endTag(null, "showdate");
 
-                                serializer.startTag(null, "showweek");
-                                serializer.text(1+"");
-                                serializer.endTag(null, "showweek");
+                            serializer.startTag(null, "showweek");
+                            serializer.text(1 + "");
+                            serializer.endTag(null, "showweek");
 
-                                serializer.startTag(null, "showtime");
-                                serializer.text(1+"");
-                                serializer.endTag(null, "showtime");
+                            serializer.startTag(null, "showtime");
+                            serializer.text(1 + "");
+                            serializer.endTag(null, "showtime");
 
-                                serializer.startTag(null, "multline");
-                                serializer.text(timeBean.getM_nRowType() +"");
-                                serializer.endTag(null, "multline");
+                            serializer.startTag(null, "multline");
+                            serializer.text(timeBean.getM_nRowType() + "");
+                            serializer.endTag(null, "multline");
 
                             serializer.endTag(null, "file");
                         }

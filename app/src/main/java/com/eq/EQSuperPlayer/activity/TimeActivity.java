@@ -4,13 +4,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -54,6 +48,8 @@ public class TimeActivity extends AppCompatActivity {
     TextView timeTitle;
     @BindView(R.id.time_btn)
     Button timeBtn;
+    @BindView(R.id.btn_ab)
+    Button btnAb;
     @BindView(R.id.timeToname)
     EditText timeToname;
     @BindView(R.id.timeToys)
@@ -146,10 +142,10 @@ public class TimeActivity extends AppCompatActivity {
     ImageView tiemShow;
     @BindView(R.id.program_text_background)
     LinearLayout programTextBackground;
-    @BindView(R.id.analog_clock)
-    Button analogClock;
-    @BindView(R.id.number_clock)
-    Button numberClock;
+//    @BindView(R.id.analog_clock)
+//    Button analogClock;
+//    @BindView(R.id.number_clock)
+//    Button numberClock;
     private TimeBean timeBean;
     private ProgramBean programBean;
     private List<ProgramBean> programBeans;
@@ -206,11 +202,12 @@ public class TimeActivity extends AppCompatActivity {
                 if (position == 3) {
                     windowTimeAnalogclock.setVisibility(View.VISIBLE);
                     windowTimeNumberclock.setVisibility(View.GONE);
-
                 } else {
                     windowTimeNumberclock.setVisibility(View.VISIBLE);
                     windowTimeAnalogclock.setVisibility(View.GONE);
                 }
+                timeDataSave();
+                showText();
             }
 
             @Override
@@ -330,7 +327,6 @@ public class TimeActivity extends AppCompatActivity {
         timeTofz.setSelection(timeBean.getMinutecolor());
         timeTomz.setAdapter(new SpinnerImageAdapter(this, color_id));
         timeTomz.setSelection(timeBean.getSecondcolor());
-        timeDataSave();
     }
 
 
@@ -419,11 +415,12 @@ public class TimeActivity extends AppCompatActivity {
         timeBean.setM_nDayLag(Integer.parseInt(timeToDay.getText().toString()));
         timeBean.setM_strTimeLag(huorOrMinute.getText().toString());
         new TimeDao(TimeActivity.this).update(timeBean);
-        //获取画笔属性
-        Paint paint = Utils.getPaint(TimeActivity.this, Utils.getPaintSize(TimeActivity.this, Integer.parseInt(TimeActivity.this.getResources().getStringArray(R.array.text_size)[timeBean.getM_rgbClockTextSize()])));
-        Utils.setTypeface(TimeActivity.this, paint
-                , (TimeActivity.this.getResources().getStringArray(R.array.typeface_path))[timeBean.getNumber_typeface()]);
-        paint.setTextSize(Utils.getPaintSize(TimeActivity.this, timeBean.getM_rgbClockTextSize())); // 字体大小 进度条参数
+//        //获取画笔属性
+//        Paint paint = Utils.getPaint(TimeActivity.this, Utils.getPaintSize(TimeActivity.this, Integer.parseInt(TimeActivity.this.getResources().getStringArray(R.array.text_size)[timeBean.getM_rgbClockTextSize()])));
+//        Utils.setTypeface(TimeActivity.this, paint
+//                , (TimeActivity.this.getResources().getStringArray(R.array.typeface_path))[timeBean.getNumber_typeface()]);
+//        paint.setTextSize(Utils.getPaintSize(TimeActivity.this, timeBean.getM_rgbClockTextSize())); // 字体大小 进度条参数
+
     }
 
 
@@ -441,7 +438,7 @@ public class TimeActivity extends AppCompatActivity {
         }
     }
 
-    @OnClick({R.id.timeTofinsh, R.id.time_btn, R.id.analog_clock, R.id.number_clock})
+    @OnClick({R.id.timeTofinsh, R.id.time_btn,R.id.btn_ab})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.timeTofinsh:
@@ -455,40 +452,14 @@ public class TimeActivity extends AppCompatActivity {
                 startActivity(intent2);
                 TimeActivity.this.finish();
                 break;
-            case R.id.analog_clock:
+            case R.id.btn_ab:
                 timeDataSave();
-                new TimeThread().start();
-                break;
-            case R.id.number_clock:
-                timeDataSave();
-                new TimeThread().start();
+                showText();
                 break;
         }
     }
 
-    class TimeThread extends Thread {
-        @Override
-        public void run() {
-            do {
-                try {
-                    Thread.sleep(1000);
-                    Message msg = new Message();
-                    msg.what = 1;  //消息(一个整型值)
-                    mHandler.sendMessage(msg);// 每隔1秒发送一个msg给mHandler
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } while (isTimeGo);
-        }
-    }
 
-    //在主线程里面处理消息并更新UI界面
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            showText();
-        }
-    };
+
 
 }

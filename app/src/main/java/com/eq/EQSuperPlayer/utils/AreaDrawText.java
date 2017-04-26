@@ -88,9 +88,10 @@ public abstract class AreaDrawText extends Context {
                 paint2);
     }
 
-    //获取模拟时钟Bitmap
+    //获取数字时钟Bitmap
     public static Bitmap getTime(Context context, TimeBean timeBean) {
-        Paint paint = Utils.getPaint(context, Utils.getPaintSize(context, Integer.parseInt(context.getResources().getStringArray(R.array.text_size)[timeBean.getM_rgbClockTextSize()])));//字体参数启动读取
+        Paint paint = new Paint();//字体参数启动读取
+        paint.setTextSize(Float.parseFloat(context.getResources().getStringArray(R.array.text_size)[timeBean.getM_rgbClockTextSize()]));
         Utils.setTypeface(context, paint, (context.getResources().getStringArray(R.array.typeface_path))[timeBean.getNumber_typeface()]);
         int[] number_colors = new int[]{timeBean.getM_rgbClockTextColor(), timeBean.getM_rgbDayTextColor()
                 , timeBean.getM_rgbWeekTextColor(), timeBean.getM_rgbTimeColor(),
@@ -376,9 +377,10 @@ public abstract class AreaDrawText extends Context {
         }
         return bitmap;
     }
-
+//获取模拟时钟
     public static Bitmap analogColck(Context context, TimeBean timeBean) {
-        Paint paint = Utils.getPaint(context, Utils.getPaintSize(context, Integer.parseInt(context.getResources().getStringArray(R.array.text_size)[timeBean.getM_rgbClockTextSize()])));//字体参数启动读取
+        Paint paint = new Paint();///字体参数启动读取
+        paint.setTextSize(Float.parseFloat(context.getResources().getStringArray(R.array.text_size)[timeBean.getM_rgbClockTextSize()]));
         Utils.setTypeface(context, paint, (context.getResources().getStringArray(R.array.typeface_path))[timeBean.getNumber_typeface()]);
         int[] number_colors = new int[]{timeBean.getM_rgbClockTextColor(), timeBean.getM_rgbDayTextColor()
                 , timeBean.getM_rgbWeekTextColor(), timeBean.getM_rgbTimeColor(),
@@ -475,12 +477,12 @@ public abstract class AreaDrawText extends Context {
                 textpaint.setColor(number_colors[8]);
                 canvas.rotate(360 / 60 * i, mWidth / 2, mHeight / 2);
                 textpaint.setTextSize(timeR / 10);
-                canvas.rotate(-360 / 60 * i, mWidth / 2, mHeight / 2 - timeR + 5);
+                canvas.rotate(-360 / 60 * i, mWidth / 2, mHeight / 2 - timeR);
                 canvas.drawText("" + i / 5, mWidth / 2, mHeight / 2 - timeR + timeR / 20, textpaint);
             } else {
                 paintLine.setColor(number_colors[7]);
                 canvas.rotate(360 / 60 * i, mWidth / 2, mHeight / 2);
-                canvas.drawCircle(mWidth / 2, mHeight / 2 - timeR, 2, paintLine);
+                canvas.drawCircle(mWidth / 2, mHeight / 2 - timeR, 1, paintLine);
             }
             canvas.restore();//
         }

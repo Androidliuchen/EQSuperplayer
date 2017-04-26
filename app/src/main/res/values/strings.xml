@@ -119,7 +119,7 @@
     <string name="text_parameters_image">图片编辑</string>
     <string name="text_parameters_vedio">视频编辑</string>
     <string name="text_parameters_time">时间编辑</string>
-    <string name="submit">提交</string>
+    <string name="submit">确定</string>
     <string name="file_size">文件大小</string>
     <string name="video_format">视频格式</string>
     <string name="vedio_len">视频长度</string>
